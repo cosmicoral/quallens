@@ -4,6 +4,7 @@ import type {
   FinalReviewSourceAgent,
   SectionReview,
 } from "@/lib/types";
+import { AgentMascot } from "./AgentMascot";
 
 const RECOMMENDATION_LABELS: Record<FinalReview["recommendation"], string> = {
   minor_revision: "Minor revision",
@@ -182,13 +183,20 @@ export function FinalReviewDetails({ review }: { review: FinalReview }) {
               {RECOMMENDATION_LABELS[review.recommendation]}
             </span>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-              Review confidence
-            </p>
-            <p className="mt-1 text-sm font-semibold capitalize text-white">
-              {review.confidence}
-            </p>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="text-right">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                Review confidence
+              </p>
+              <p className="mt-1 text-sm font-semibold capitalize text-white">
+                {review.confidence}
+              </p>
+            </div>
+            <AgentMascot
+              agentId="final-reviewer"
+              className="size-20 rounded-xl border border-white/15 bg-white sm:size-24"
+              sizes="96px"
+            />
           </div>
         </div>
         <p className="max-w-4xl text-base leading-7 text-slate-100 sm:text-lg sm:leading-8">

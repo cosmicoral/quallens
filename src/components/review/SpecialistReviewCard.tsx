@@ -1,5 +1,5 @@
-import { ResearchIcon } from "@/components/ResearchIcon";
 import type { AgentReview, ReviewFinding, Severity } from "@/lib/types";
+import { AgentMascot } from "./AgentMascot";
 import { EvidenceAuditDetails } from "./EvidenceAuditDetails";
 import { OverclaimAuditDetails } from "./OverclaimAuditDetails";
 import { ResearchDesignAuditDetails } from "./ResearchDesignAuditDetails";
@@ -50,12 +50,6 @@ function FindingList({ findings }: { findings: ReviewFinding[] }) {
 }
 
 export function SpecialistReviewCard({ review }: { review: AgentReview }) {
-  const isActive =
-    review.agentId === "manuscript-reader" ||
-    review.agentId === "evidence-auditor" ||
-    review.agentId === "research-design-reviewer" ||
-    review.agentId === "theory-auditor" ||
-    review.agentId === "overclaim-auditor";
   const itemCount = review.evidenceAudit
     ? `${review.evidenceAudit.claims.length} claim${review.evidenceAudit.claims.length === 1 ? "" : "s"}`
     : review.researchDesignAudit
@@ -73,20 +67,18 @@ export function SpecialistReviewCard({ review }: { review: AgentReview }) {
     >
       <summary className="flex list-none items-center justify-between gap-4 p-4 marker:hidden sm:p-5 [&::-webkit-details-marker]:hidden">
         <span className="flex min-w-0 items-center gap-3.5">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--paper-blue)] text-[var(--blue)]">
-            <ResearchIcon name={review.agentId} className="size-5" />
-          </span>
+          <AgentMascot
+            agentId={review.agentId}
+            className="size-12 shrink-0 rounded-xl border border-[var(--line)] bg-white"
+            sizes="48px"
+          />
           <span className="min-w-0">
             <span className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-[var(--ink)]">{review.agentName}</span>
               <span
-                className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                  isActive
-                    ? "bg-[var(--paper-blue)] text-[var(--blue)]"
-                    : "bg-slate-100 text-slate-500"
-                }`}
+                className="rounded-full bg-[var(--paper-blue)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--blue)]"
               >
-                {isActive ? "Live analysis" : "MVP output"}
+                Live analysis
               </span>
             </span>
             <span className="mt-1 block text-xs text-[var(--muted)]">{itemCount}</span>

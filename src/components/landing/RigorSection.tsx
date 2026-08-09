@@ -22,7 +22,7 @@ export function RigorSection() {
               Built for Social Science Rigor
             </h2>
             <p className="mt-5 max-w-md text-base leading-7 text-slate-300">
-              QualLens is designed around the distinctions qualitative
+              Qualisapio is designed around the distinctions qualitative
               researchers actually make—not generic writing-quality signals.
             </p>
             <div className="mt-10 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-slate-300">

@@ -1,5 +1,6 @@
 import { ScoreBadge } from "@/components/review/ScoreBadge";
 import { FinalReviewDetails } from "@/components/review/FinalReviewDetails";
+import { AgentMascot } from "@/components/review/AgentMascot";
 import { SpecialistReviewCard } from "@/components/review/SpecialistReviewCard";
 import type { ReviewResult, Verdict } from "@/lib/types";
 
@@ -52,7 +53,14 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
                 {VERDICT_LABELS[final.verdict]}
               </span>
             </div>
-            <ScoreBadge score={final.overallScore} large />
+            <div className="flex items-center gap-3">
+              <AgentMascot
+                agentId="final-reviewer"
+                className="size-20 rounded-xl border border-white/15 bg-white"
+                sizes="80px"
+              />
+              <ScoreBadge score={final.overallScore} large />
+            </div>
           </div>
           <p className="max-w-2xl text-base leading-7 text-slate-200">{final.summary}</p>
           <div className="mt-8 border-t border-white/10 pt-5 text-xs text-slate-400">

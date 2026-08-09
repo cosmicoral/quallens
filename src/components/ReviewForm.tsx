@@ -20,9 +20,10 @@ const inputClasses =
 interface ReviewFormProps {
   onSubmit: (manuscript: ManuscriptInput) => void;
   submitting: boolean;
+  disabled?: boolean;
 }
 
-export function ReviewForm({ onSubmit, submitting }: ReviewFormProps) {
+export function ReviewForm({ onSubmit, submitting, disabled = false }: ReviewFormProps) {
   const [title, setTitle] = useState("");
   const [abstract, setAbstract] = useState("");
   const [body, setBody] = useState("");
@@ -173,12 +174,12 @@ export function ReviewForm({ onSubmit, submitting }: ReviewFormProps) {
 
       <div className="flex flex-col gap-4 border-t border-[var(--line)] bg-[var(--paper)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
         <p className="max-w-md text-xs leading-5 text-[var(--muted)]">
-          QualLens records missing information as missing—it does not fill gaps
+          Qualisapio records missing information as missing—it does not fill gaps
           with invented evidence.
         </p>
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || disabled}
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--blue)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--blue-deep)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? (
@@ -189,6 +190,8 @@ export function ReviewForm({ onSubmit, submitting }: ReviewFormProps) {
               />
               Reviewing manuscript
             </>
+          ) : disabled ? (
+            "Review allowance unavailable"
           ) : (
             <>
               Run structured review <span aria-hidden="true">→</span>

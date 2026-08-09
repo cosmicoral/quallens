@@ -1,21 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewResults } from "@/components/ReviewResults";
 import { ResearchIcon } from "@/components/ResearchIcon";
 import { SiteHeader } from "@/components/SiteHeader";
-import { QualLensAgentMascot } from "@/components/review/QualLensAgentMascot";
+import { QualisapioAgentMascot } from "@/components/review/QualisapioAgentMascot";
 import type { ManuscriptInput, ReviewResponse, ReviewResult } from "@/lib/types";
+import type { UsageView } from "@/lib/billing/entitlement";
+
+async function loadUsage(): Promise<UsageView | null> {
+  const response = await fetch("/api/billing/usage", { cache: "no-store" });
+  const data = await response.json() as { ok?: boolean; usage?: UsageView };
+  return response.ok && data.usage ? data.usage : null;
+}
 
 export default function ReviewPage() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [usage, setUsage] = useState<UsageView | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    loadUsage()
+      .then((value) => { if (active && value) setUsage(value); })
+      .catch(() => { /* The server still enforces usage if this indicator is unavailable. */ });
+    return () => { active = false; };
+  }, []);
 
   async function handleSubmit(manuscript: ManuscriptInput) {
     setSubmitting(true);
     setError(null);
+    setErrorCode(null);
     setResult(null);
     try {
       const res = await fetch("/api/review", {
@@ -26,6 +45,7 @@ export default function ReviewPage() {
       const data: ReviewResponse = await res.json();
       if (!data.ok || !data.result) {
         setError(data.error ?? "The review failed. Please try again.");
+        setErrorCode(data.errorCode ?? null);
       } else {
         setResult(data.result);
       }
@@ -33,6 +53,7 @@ export default function ReviewPage() {
       setError("Could not reach the review service. Please try again.");
     } finally {
       setSubmitting(false);
+      void loadUsage().then((value) => { if (value) setUsage(value); }).catch(() => {});
     }
   }
 
@@ -47,7 +68,7 @@ export default function ReviewPage() {
             Submit a manuscript for a structured scholarly review.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--slate)] sm:text-lg">
-            QualLens reads the manuscript in full, maps its reported research
+            Qualisapio reads the manuscript in full, maps its reported research
             design, and audits major claims against the evidence presented.
           </p>
         </header>
@@ -158,10 +179,23 @@ export default function ReviewPage() {
           </aside>
 
           <div className="min-w-0">
-            <ReviewForm onSubmit={handleSubmit} submitting={submitting} />
+            {usage && (
+              <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-[var(--line)] bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--ink)]">{usage.planName} review allowance</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">
+                    {usage.remaining} remaining · {usage.used} of {usage.limit} successful reviews used
+                    {usage.reserved > 0 ? " · one review in progress" : ""}
+                  </p>
+                </div>
+                <Link href="/pricing" className="text-sm font-semibold text-[var(--blue-deep)] hover:underline">View plans</Link>
+              </div>
+            )}
+
+            <ReviewForm onSubmit={handleSubmit} submitting={submitting} disabled={usage ? !usage.canReview : false} />
 
             {submitting && (
-              <QualLensAgentMascot illustrativeSequence className="mt-5" />
+              <QualisapioAgentMascot illustrativeSequence className="mt-5" />
             )}
 
             {error && (
@@ -171,6 +205,9 @@ export default function ReviewPage() {
               >
                 <p className="font-semibold">The review could not be completed.</p>
                 <p className="mt-1 text-amber-900">{error}</p>
+                {["quota_exhausted", "free_trial_used", "former_paid_user"].includes(errorCode ?? "") && (
+                  <Link href="/pricing" className="mt-3 inline-flex font-semibold text-[var(--blue-deep)] underline">Compare Qualisapio plans</Link>
+                )}
               </div>
             )}
           </div>

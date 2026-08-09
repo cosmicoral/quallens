@@ -1,5 +1,6 @@
 import type { AgentId } from "@/lib/types";
 import { ResearchIcon } from "@/components/ResearchIcon";
+import { AgentMascot } from "@/components/review/AgentMascot";
 
 const reviewers: Array<{
   id: AgentId;
@@ -62,37 +63,54 @@ export function ReviewerPanel() {
         {reviewers.map((reviewer, index) => (
           <li
             key={reviewer.id}
-            className="group rounded-2xl border border-[var(--line)] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition duration-300 hover:-translate-y-1 hover:border-[var(--line-strong)] hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
+            className="group overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition duration-300 hover:-translate-y-1 hover:border-[var(--line-strong)] hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
           >
-            <div className="mb-8 flex items-start justify-between gap-4">
-              <span className="grid size-11 place-items-center rounded-xl bg-[var(--paper-blue)] text-[var(--blue)] transition group-hover:bg-[var(--ink)] group-hover:text-white">
-                <ResearchIcon name={reviewer.id} className="size-6" />
-              </span>
+            <div className="relative h-36 overflow-hidden border-b border-[var(--line)] bg-[linear-gradient(145deg,var(--paper-blue),white_72%)] sm:h-40">
+              <div className="absolute inset-2 transition duration-500 group-hover:scale-[1.025]">
+                <AgentMascot
+                  agentId={reviewer.id}
+                  className="size-full"
+                  sizes="(max-width: 767px) 90vw, (max-width: 1023px) 44vw, 27vw"
+                />
+              </div>
               <span
-                className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${
+                className={`absolute top-3 right-3 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] shadow-sm backdrop-blur-sm ${
                   reviewer.status === "Active"
-                    ? "border-[var(--blue-soft)] bg-[var(--paper-blue)] text-[var(--blue)]"
+                    ? "border-[var(--blue-soft)] bg-white/90 text-[var(--blue)]"
                     : "border-[var(--line)] bg-[var(--paper)] text-[var(--muted)]"
                 }`}
               >
                 {reviewer.status}
               </span>
             </div>
-            <p className="mb-2 font-mono text-xs text-[var(--muted)]">
-              0{index + 1}
-            </p>
-            <h3 className="mb-2 text-lg font-semibold tracking-[-0.02em] text-[var(--ink)]">
-              {reviewer.name}
-            </h3>
-            <p className="text-sm leading-6 text-[var(--slate)]">{reviewer.description}</p>
+            <div className="p-5 sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <p className="font-mono text-xs text-[var(--muted)]">0{index + 1}</p>
+                <span className="grid size-8 place-items-center rounded-lg bg-[var(--paper-blue)] text-[var(--blue)] transition group-hover:bg-[var(--ink)] group-hover:text-white">
+                  <ResearchIcon name={reviewer.id} className="size-4" />
+                </span>
+              </div>
+              <h3 className="mb-2 text-lg font-semibold tracking-[-0.02em] text-[var(--ink)]">
+                {reviewer.name}
+              </h3>
+              <p className="text-sm leading-6 text-[var(--slate)]">
+                {reviewer.description}
+              </p>
+            </div>
           </li>
         ))}
       </ul>
 
-      <p className="mt-6 text-xs leading-5 text-[var(--muted)]">
-        All six reviewers are live and produce schema-validated,
-        manuscript-specific analysis.
-      </p>
+      <div className="mt-6 rounded-2xl border border-[var(--blue-soft)] bg-[var(--paper-blue)] px-5 py-4 text-xs leading-5 text-[var(--slate)] sm:flex sm:items-center sm:justify-between sm:gap-6">
+        <p>
+          <span className="font-semibold text-[var(--ink)]">How the panel works: </span>
+          Reader establishes context; Evidence, Research Design, and Theory run as
+          parallel specialist lenses; Overclaim checks scope; Final synthesizes.
+        </p>
+        <p className="mt-2 shrink-0 font-semibold text-[var(--blue)] sm:mt-0">
+          All six reviewers active
+        </p>
+      </div>
     </section>
   );
 }
