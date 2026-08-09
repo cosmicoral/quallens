@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   ResearchIcon,
   type ResearchIconName,
 } from "@/components/ResearchIcon";
-import styles from "./QualLensAgentMascot.module.css";
+import styles from "./QualisapioAgentMascot.module.css";
+import { AgentMascot } from "./AgentMascot";
+import type { AgentId } from "@/lib/types";
 
-export type QualLensMascotStage =
+export type QualisapioMascotStage =
   | "reading"
   | "evidence"
   | "research-design"
@@ -22,54 +23,62 @@ interface StagePresentation {
   description: string;
   badge: string;
   icon: ResearchIconName;
+  agentId: AgentId;
 }
 
-const STAGES: Record<QualLensMascotStage, StagePresentation> = {
+const STAGES: Record<QualisapioMascotStage, StagePresentation> = {
   reading: {
     label: "Reading the manuscript",
     description: "Building a faithful map of the study before specialist review.",
     badge: "Reader lens",
     icon: "manuscript-reader",
+    agentId: "manuscript-reader",
   },
   evidence: {
     label: "Auditing empirical evidence",
     description: "Examining how the manuscript's material supports its claims.",
     badge: "Evidence lens",
     icon: "evidence-auditor",
+    agentId: "evidence-auditor",
   },
   "research-design": {
     label: "Reviewing research design",
     description: "Considering design fit, transparency, and internal coherence.",
     badge: "Design lens",
     icon: "research-design-reviewer",
+    agentId: "research-design-reviewer",
   },
   theory: {
     label: "Checking theoretical integration",
     description: "Tracing whether concepts genuinely shape the interpretation.",
     badge: "Theory lens",
     icon: "theory-auditor",
+    agentId: "theory-auditor",
   },
   overclaim: {
     label: "Checking claim proportionality",
     description: "Comparing conclusion scope with the evidence and study design.",
     badge: "Claims lens",
     icon: "overclaim-auditor",
+    agentId: "overclaim-auditor",
   },
   synthesis: {
     label: "Synthesizing the final review",
     description: "Bringing the specialist perspectives into one review workspace.",
     badge: "Synthesis",
-    icon: "synthesize",
+    icon: "final-reviewer",
+    agentId: "final-reviewer",
   },
   complete: {
     label: "Review complete",
     description: "The manuscript-specific review is ready to inspect.",
     badge: "Ready",
     icon: "final-reviewer",
+    agentId: "final-reviewer",
   },
 };
 
-const ILLUSTRATIVE_SEQUENCE: QualLensMascotStage[] = [
+const ILLUSTRATIVE_SEQUENCE: QualisapioMascotStage[] = [
   "reading",
   "evidence",
   "research-design",
@@ -78,12 +87,25 @@ const ILLUSTRATIVE_SEQUENCE: QualLensMascotStage[] = [
   "synthesis",
 ];
 
-export function QualLensAgentMascot({
+const WORKFLOW_GROUPS: Array<{
+  label: string;
+  stages: QualisapioMascotStage[];
+}> = [
+  { label: "Reader", stages: ["reading"] },
+  {
+    label: "Parallel specialists",
+    stages: ["evidence", "research-design", "theory"],
+  },
+  { label: "Claim scope", stages: ["overclaim"] },
+  { label: "Synthesis", stages: ["synthesis", "complete"] },
+];
+
+export function QualisapioAgentMascot({
   stage = "reading",
   illustrativeSequence = false,
   className = "",
 }: {
-  stage?: QualLensMascotStage;
+  stage?: QualisapioMascotStage;
   /** Cycles workflow examples; it is not backend stage telemetry. */
   illustrativeSequence?: boolean;
   className?: string;
@@ -109,24 +131,28 @@ export function QualLensAgentMascot({
 
   return (
     <section
-      aria-label="QualLens review progress"
+      aria-label="Qualisapio review progress"
       className={`overflow-hidden rounded-2xl border border-[var(--blue-soft)] bg-[var(--paper-blue)] shadow-[0_18px_45px_rgba(15,23,42,0.08)] ${className}`}
     >
       <div className="grid sm:grid-cols-[minmax(13rem,0.82fr)_minmax(0,1.18fr)]">
-        <div className="relative order-2 min-h-36 overflow-hidden border-t border-[var(--blue-soft)] sm:order-1 sm:min-h-64 sm:border-t-0 sm:border-r">
+        <div className="relative order-2 min-h-48 overflow-hidden border-t border-[var(--blue-soft)] sm:order-1 sm:min-h-64 sm:border-t-0 sm:border-r">
           <span
             aria-hidden="true"
             className={`${styles.ambientGlow} absolute top-8 left-1/2 z-10 size-36 -translate-x-1/2 rounded-full bg-[var(--blue-light)]/25 blur-3xl`}
           />
-          <div className={`${styles.imageFloat} absolute inset-0`}>
-            <Image
-              src="/mascot/quallens-hero.png"
-              alt="QualLens's spotted white kitten reviewer, wearing round black glasses and a navy academic cardigan, working with a manuscript"
-              fill
-              priority
-              sizes="(max-width: 639px) 100vw, 34vw"
-              className="object-cover object-[62%_47%]"
-            />
+          <div
+            className={`${styles.imageFloat} absolute inset-x-0 top-0 bottom-12 sm:inset-0`}
+          >
+            <div
+              key={`mascot-${activeStage}`}
+              className={`${styles.stageContent} absolute inset-3 sm:inset-5`}
+            >
+              <AgentMascot
+                agentId={presentation.agentId}
+                className="size-full"
+                sizes="(max-width: 639px) 88vw, 30vw"
+              />
+            </div>
           </div>
           <div
             aria-hidden="true"
@@ -174,12 +200,12 @@ export function QualLensAgentMascot({
           </div>
 
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--blue)]">
-            QualLens agent workspace
+            Qualisapio agent workspace
           </p>
           <h3 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--ink)] sm:text-2xl">
             {isComplete
-              ? "Your QualLens review is ready."
-              : "QualLens is reviewing your manuscript."}
+              ? "Your Qualisapio review is ready."
+              : "Qualisapio is reviewing your manuscript."}
           </h3>
 
           <div
@@ -203,22 +229,27 @@ export function QualLensAgentMascot({
 
           {illustrativeSequence && (
             <p className="mt-5 max-w-xl text-xs leading-5 text-[var(--muted)]">
-              This sequence illustrates the review workflow; it is not live agent
-              telemetry. Completion is shown only after the server returns the
-              finished review.
+              This rotation illustrates reviewer roles, not live agent telemetry or
+              execution order. Evidence, Research Design, and Theory may run in
+              parallel. Completion appears only after the server returns the review.
             </p>
           )}
 
-          <div aria-hidden="true" className="mt-5 flex items-center gap-1.5">
-            {ILLUSTRATIVE_SEQUENCE.map((sequenceStage) => (
+          <div
+            aria-label="Review workflow groups"
+            className="mt-5 grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap"
+          >
+            {WORKFLOW_GROUPS.map((group) => (
               <span
-                key={sequenceStage}
-                className={`h-1.5 rounded-full transition-[width,background-color] duration-500 motion-reduce:transition-none ${
-                  isComplete || sequenceStage === activeStage
-                    ? "w-6 bg-[var(--blue)]"
-                    : "w-1.5 bg-[var(--line-strong)]"
+                key={group.label}
+                className={`rounded-full border px-2.5 py-1 text-center text-[9px] font-semibold uppercase tracking-[0.08em] transition-colors duration-500 motion-reduce:transition-none ${
+                  group.stages.includes(activeStage)
+                    ? "border-[var(--blue-soft)] bg-white text-[var(--blue)]"
+                    : "border-transparent bg-white/45 text-[var(--muted)]"
                 }`}
-              />
+              >
+                {group.label}
+              </span>
             ))}
           </div>
         </div>

@@ -58,8 +58,8 @@ export default function Home() {
           <figure className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-[var(--paper-warm)] shadow-[0_32px_80px_rgba(15,23,42,0.16)]">
             <div className="relative aspect-[4/3] min-h-[360px] sm:min-h-[500px] lg:min-h-[610px]">
               <Image
-                src="/mascot/quallens-hero.png"
-                alt="The QualLens spotted white kitten reviewing an annotated manuscript in a scholarly office"
+                src="/mascot/qualisapio-hero.png"
+                alt="The Qualisapio spotted white kitten reviewing an annotated manuscript in a scholarly office"
                 fill
                 sizes="(max-width: 1024px) 100vw, 56vw"
                 className="object-cover object-center"

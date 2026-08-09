@@ -20,7 +20,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
       <span
         className={`${compact ? "text-xl" : "text-2xl"} font-semibold tracking-[-0.04em]`}
       >
-        QualLens
+        Qualisapio
       </span>
     </span>
   );

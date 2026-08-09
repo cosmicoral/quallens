@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "QualLens — AI-Powered Review for Qualitative Social Science",
+  title: "Qualisapio — AI-Powered Review for Qualitative Social Science",
   description:
     "Rigorous, evidence-aware manuscript feedback built around how qualitative researchers actually reason.",
 };
@@ -22,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
