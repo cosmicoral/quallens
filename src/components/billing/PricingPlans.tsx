@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { BillingInterval, PaidPlan } from "@/lib/billing/config";
 
@@ -33,7 +32,6 @@ const plans = [
 ];
 
 export function PricingPlans() {
-  const router = useRouter();
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [loading, setLoading] = useState<PaidPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +47,8 @@ export function PricingPlans() {
       });
       const data = await response.json().catch(() => ({})) as { url?: string; error?: string; errorCode?: string };
       if (response.status === 401) {
-        router.push(`/auth/login?callbackURL=${encodeURIComponent("/pricing")}`);
+        setError("Your session expired. Refresh the page or sign in again from Settings.");
+        setLoading(null);
         return;
       }
       if (!response.ok || !data.url) throw new Error(data.error ?? "Checkout is unavailable.");

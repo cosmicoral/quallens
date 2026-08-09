@@ -32,7 +32,10 @@ export const CONSULTATION_COPY = {
     "Gender",
     "Ethnicity",
     "Digital Society",
-    "Everyday Social Practices",
+    "Technology and Society",
+    "Everyday Life",
+    "Social Practices",
+    "Material Culture",
   ],
   support:
     "Discuss qualitative research design, analytical framing, theory–evidence alignment, findings and discussion development, reviewer feedback, or revision strategy.",
