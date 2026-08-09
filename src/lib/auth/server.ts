@@ -14,7 +14,11 @@ function createAuth() {
       maxPasswordLength: 128,
     },
     account: {
-      accountLinking: { enabled: false },
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "orcid"],
+        allowDifferentEmails: true,
+      },
     },
     socialProviders: {
       google: {

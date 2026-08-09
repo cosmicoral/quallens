@@ -147,8 +147,8 @@ export function AuthPanel({
         </h1>
         <p className="mt-2 font-serif text-base text-[#52657b] sm:text-lg">
           {signup
-            ? "Create your Qualisapio account to get started."
-            : "Sign in to continue your research review."}
+            ? "Create your account for author revision or reviewer-assist peer review."
+            : "Sign in to continue your peer-review workspace."}
         </p>
       </div>
 

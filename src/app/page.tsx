@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
+import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigger";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ReviewerPanel } from "@/components/landing/ReviewerPanel";
 import { RigorSection } from "@/components/landing/RigorSection";
@@ -16,17 +17,17 @@ export default function Home() {
           <div className="max-w-xl">
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] shadow-sm">
               <span className="size-1.5 rounded-full bg-[var(--blue)]" />
-              Purpose-built for qualitative social science
+              Peer-review for authors and reviewers
             </div>
 
-            <p className="eyebrow">AI-Powered Review for</p>
+            <p className="eyebrow">AI peer review for</p>
             <h1 className="text-[clamp(2.8rem,6vw,5.5rem)] leading-[0.95] font-semibold tracking-[-0.065em] text-[var(--ink)]">
               Qualitative
               <span className="block text-[var(--blue)]">Social Science</span>
             </h1>
             <p className="mt-7 max-w-lg text-lg leading-8 text-[var(--slate)] sm:text-xl">
-              Rigorous, evidence-aware feedback built around how qualitative
-              researchers actually reason.
+              Journal-style peer review for qualitative manuscripts—for authors
+              preparing a submission and reviewers structuring constructive feedback.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -67,10 +68,10 @@ export default function Home() {
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(15,23,42,0.9)] via-[rgba(15,23,42,0.35)] to-transparent px-5 pt-20 pb-5 sm:px-7 sm:pb-7">
                 <p className="text-lg font-semibold tracking-[-0.02em] text-white">
-                  Rigorous. Fair. Constructive.
+                  Constructive peer review—for authors and reviewers.
                 </p>
                 <p className="mt-1 text-sm text-slate-200">
-                  See the study. Strengthen the science.
+                  Strengthen a submission or organize a reviewer assessment.
                 </p>
               </div>
             </div>
@@ -84,13 +85,14 @@ export default function Home() {
         <section className="section-shell pb-24 sm:pb-28">
           <div className="grid gap-8 rounded-[2rem] border border-[var(--line)] bg-[var(--paper-warm)] px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[1fr_auto] lg:items-center lg:px-14">
             <div>
-              <p className="eyebrow">A more disciplined first review</p>
+              <p className="eyebrow">Authors and peer reviewers</p>
               <h2 className="max-w-2xl text-3xl font-semibold tracking-[-0.04em] text-[var(--ink)] sm:text-4xl">
-                Bring your manuscript. Keep your uncertainty.
+                One manuscript. Two ways to use peer review.
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--slate)]">
-                Get structured feedback that respects qualitative evidence,
-                methodological context, and the limits of what a study can claim.
+                Authors get disciplined feedback before submission. Reviewers get
+                structured support to examine evidence, design, theory, and claims—without
+                rewriting the manuscript.
               </p>
             </div>
             <Link
@@ -106,9 +108,12 @@ export default function Home() {
       <footer className="border-t border-[var(--line)] bg-white">
         <div className="section-shell flex flex-col gap-5 py-8 sm:flex-row sm:items-center sm:justify-between">
           <BrandMark compact />
-          <p className="text-xs text-[var(--muted)]">
-            AI-powered review for qualitative social science.
-          </p>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <p className="text-xs text-[var(--muted)]">
+              Peer review for authors and reviewers in qualitative social science. Not a substitute for journal peer review.
+            </p>
+            <ConsultationTrigger variant="subtle" label="Human research consultation" />
+          </div>
         </div>
       </footer>
     </div>

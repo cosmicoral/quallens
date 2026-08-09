@@ -76,7 +76,9 @@ export async function getOrCreateResearcherProfile(
     `INSERT INTO "researcher_profile"
        ("user_id", "full_name", "email", "auth_provider", "orcid_id", "created_at")
      VALUES ($1, $2, $3, $4, $5, $6)
-     ON CONFLICT ("user_id") DO NOTHING`,
+     ON CONFLICT ("user_id") DO UPDATE SET
+       "orcid_id" = COALESCE(EXCLUDED."orcid_id", "researcher_profile"."orcid_id"),
+       "updated_at" = CURRENT_TIMESTAMP`,
     [
       user.id,
       identity.fullName,

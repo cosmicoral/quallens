@@ -16,14 +16,14 @@ export function RigorSection() {
         <div className="rigor-grid grid gap-12 px-6 py-12 sm:px-10 sm:py-16 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:px-16 lg:py-20">
           <div>
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--blue-light)]">
-              Qualitative reasoning, encoded
+              Peer-review reasoning, encoded
             </p>
             <h2 className="max-w-md text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-              Built for Social Science Rigor
+              Built for reviewer-grade rigor
             </h2>
             <p className="mt-5 max-w-md text-base leading-7 text-slate-300">
-              Qualisapio is designed around the distinctions qualitative
-              researchers actually make—not generic writing-quality signals.
+              Qualisapio applies the distinctions authors and peer reviewers actually
+              make in qualitative social science—not generic writing-quality checks.
             </p>
             <div className="mt-10 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-slate-300">
               <span className="size-2 rounded-full bg-[var(--blue-light)]" />

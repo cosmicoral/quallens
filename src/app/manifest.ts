@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Qualisapio",
     short_name: "Qualisapio",
-    description: "AI-powered review for qualitative social science.",
+    description: "AI peer review for authors and reviewers in qualitative social science.",
     start_url: "/",
     display: "standalone",
     background_color: "#f8fafc",

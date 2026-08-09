@@ -48,8 +48,8 @@ function FeatureList() {
           </svg>
         </FeatureIcon>
         <div>
-          <p className="text-sm font-bold">Built for social science</p>
-          <p className="mt-1 text-xs leading-5 text-[#334b63]">Purpose-built for qualitative researchers.</p>
+          <p className="text-sm font-bold">Authors and reviewers</p>
+          <p className="mt-1 text-xs leading-5 text-[#334b63]">Pre-submission feedback and reviewer-assist reports—not rewriting.</p>
         </div>
       </li>
     </ul>
@@ -71,7 +71,7 @@ function TrustBar() {
     {
       icon: "people",
       title: "Built for researchers",
-      copy: "Designed for qualitative social science workflows.",
+      copy: "For authors preparing submissions and reviewers conducting assessments.",
     },
     {
       icon: "globe",
@@ -141,8 +141,8 @@ export function AuthPage({
             </h2>
             <p className="mt-4 max-w-80 text-[15px] leading-6 text-[#102844] xl:mt-5 xl:text-base xl:leading-7">
               {signup
-                ? "Join Qualisapio to review qualitative research with AI-powered rigor, transparency, and care."
-                : "Return to your qualitative research reviews with clarity, rigor, and care."}
+                ? "Join Qualisapio for peer-review support—as an author or reviewer of qualitative manuscripts."
+                : "Return to your peer-review workspace."}
             </p>
             <FeatureList />
           </div>
@@ -170,7 +170,7 @@ export function AuthPage({
           <div className="px-2 pt-7 lg:hidden">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#0878b8]">Better science. Together.</p>
             <p className="mt-2 max-w-sm text-sm leading-6 text-[#536579]">
-              Researcher-first review with Google, ORCID, or email sign-in.
+              Peer review for authors and reviewers. Sign in with Google, ORCID, or email.
             </p>
           </div>
 

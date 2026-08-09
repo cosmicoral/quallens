@@ -21,12 +21,19 @@ export default function ReviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [usage, setUsage] = useState<UsageView | null>(null);
+  const [usageLoaded, setUsageLoaded] = useState(false);
 
   useEffect(() => {
     let active = true;
     loadUsage()
-      .then((value) => { if (active && value) setUsage(value); })
-      .catch(() => { /* The server still enforces usage if this indicator is unavailable. */ });
+      .then((value) => {
+        if (!active) return;
+        if (value) setUsage(value);
+        setUsageLoaded(true);
+      })
+      .catch(() => {
+        if (active) setUsageLoaded(true);
+      });
     return () => { active = false; };
   }, []);
 
@@ -60,20 +67,21 @@ export default function ReviewPage() {
     <>
       <div className="flex flex-col justify-between gap-5 border-b border-[var(--line)]/80 pb-7 sm:flex-row sm:items-end">
         <div>
-          <p className="eyebrow mb-2">Manuscript review workspace</p>
+          <p className="eyebrow mb-2">Peer-review workspace</p>
           <h1 className="font-serif text-[2.1rem] font-semibold leading-[1.04] tracking-[-0.04em] text-[var(--ink)] sm:text-4xl">
-            Submit a manuscript for a structured scholarly review.
+            Submit a manuscript for structured peer-review feedback.
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--slate)]">
-            Qualisapio reads the manuscript in full, maps its reported research
-            design, and audits major claims against the evidence presented.
+            Use Qualisapio as an author seeking revision guidance or as a reviewer
+            organizing your assessment. The panel returns constructive feedback on
+            evidence, design, theory, and claims—without rewriting the text.
           </p>
         </div>
         <Link
           href="/dashboard"
           className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-[var(--line-strong)] bg-white px-4 text-sm font-semibold text-[var(--ink)] shadow-sm transition hover:bg-[var(--paper-blue)]"
         >
-          Review history
+          Peer-review history
         </Link>
       </div>
 
@@ -170,7 +178,7 @@ export default function ReviewPage() {
                 <div>
                   <p className="text-sm font-semibold">Final synthesis</p>
                   <p className="mt-1 text-xs leading-5 text-slate-400">
-                    Prioritizes findings into a section-aware revision plan.
+                    Delivers a peer-review report with prioritized revisions.
                   </p>
                 </div>
               </li>
@@ -186,7 +194,7 @@ export default function ReviewPage() {
             {usage && (
               <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-[var(--line)] bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-[var(--ink)]">{usage.planName} review allowance</p>
+                  <p className="text-sm font-semibold text-[var(--ink)]">{usage.planName} peer-review allowance</p>
                   <p className="mt-1 text-xs text-[var(--muted)]">
                     {usage.remaining} remaining · {usage.used} of {usage.limit} successful reviews used
                     {usage.reserved > 0 ? " · one review in progress" : ""}
@@ -196,7 +204,11 @@ export default function ReviewPage() {
               </div>
             )}
 
-            <ReviewForm onSubmit={handleSubmit} submitting={submitting} disabled={usage ? !usage.canReview : false} />
+            <ReviewForm
+              onSubmit={handleSubmit}
+              submitting={submitting}
+              disabled={!usageLoaded || Boolean(usage && !usage.canReview)}
+            />
 
             {submitting && (
               <QualisapioAgentMascot illustrativeSequence className="mt-5" />
@@ -209,6 +221,11 @@ export default function ReviewPage() {
               >
                 <p className="font-semibold">The review could not be completed.</p>
                 <p className="mt-1 text-amber-900">{error}</p>
+                {errorCode === "active_review" && (
+                  <Link href="/dashboard" className="mt-3 inline-flex font-semibold text-[var(--blue-deep)] underline">
+                    Open review history
+                  </Link>
+                )}
                 {["quota_exhausted", "free_trial_used", "former_paid_user"].includes(errorCode ?? "") && (
                   <Link href="/pricing" className="mt-3 inline-flex font-semibold text-[var(--blue-deep)] underline">Compare Qualisapio plans</Link>
                 )}

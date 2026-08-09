@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ConsultationProvider } from "@/components/consultation/ConsultationProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Qualisapio — AI-Powered Review for Qualitative Social Science",
+  title: "Qualisapio — AI Peer Review for Authors and Reviewers",
   description:
-    "Rigorous, evidence-aware manuscript feedback built around how qualitative researchers actually reason.",
+    "Structured peer-review feedback and reviewer assistance for qualitative manuscripts—for authors before submission and reviewers during assessment.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <ConsultationProvider>{children}</ConsultationProvider>
+      </body>
     </html>
   );
 }

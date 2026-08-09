@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { AccountShell } from "@/components/account/AccountShell";
+import { ConnectedIdentities } from "@/components/account/ConnectedIdentities";
 import { OrcidBadge } from "@/components/account/OrcidBadge";
 import { BillingActions } from "@/components/billing/BillingActions";
 import { UsageSummary } from "@/components/billing/UsageSummary";
@@ -10,39 +10,14 @@ import { saveProfile } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-function IdentityRow({
-  provider,
-  connected,
-}: {
-  provider: "Google" | "ORCID" | "Email";
-  connected: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 border-b border-[var(--line)] py-4 last:border-0">
-      <div className="flex items-center gap-3">
-        {provider === "ORCID" ? (
-          <Image src="/brand/orcid.svg" alt="" width={26} height={26} />
-        ) : (
-          <span className="grid size-7 place-items-center rounded-full bg-[var(--paper-blue)] text-xs font-bold text-[var(--blue-deep)]" aria-hidden="true">
-            {provider.charAt(0)}
-          </span>
-        )}
-        <div>
-          <p className="text-sm font-semibold text-[var(--ink)]">{provider}</p>
-          {provider === "ORCID" && <p className="text-xs text-[var(--muted)]">Researcher identity</p>}
-        </div>
-      </div>
-      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${connected ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
-        {connected ? "Connected" : "Not connected"}
-      </span>
-    </div>
-  );
+function identityProviderConfigured(clientId?: string) {
+  return Boolean(clientId?.trim());
 }
 
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; error?: string; billing?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; billing?: string; linked?: string; identityError?: string }>;
 }) {
   const [session, params] = await Promise.all([requireSession("/settings"), searchParams]);
   const [profile, usage] = await Promise.all([
@@ -58,6 +33,18 @@ export default async function SettingsPage({
         <p className="mt-3 text-[var(--slate)]">Manage your public profile details and review connected identities.</p>
       </div>
 
+      {params.identityError && (
+        <p role="alert" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          {params.identityError === "orcid"
+            ? "ORCID could not be connected. The account may already belong to another Qualisapio user."
+            : "Google could not be connected. The account may already belong to another Qualisapio user."}
+        </p>
+      )}
+      {params.linked && (
+        <p role="status" className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          {params.linked === "orcid" ? "ORCID connected successfully." : "Google connected successfully."}
+        </p>
+      )}
       {params.saved && (
         <p role="status" className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Profile saved.
@@ -106,11 +93,15 @@ export default async function SettingsPage({
 
         <section className="rounded-2xl border border-[var(--line)] bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-xl font-semibold text-[var(--ink)]">Connected identities</h2>
-          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Account merging is not included in this MVP.</p>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            Link additional sign-in methods to this Qualisapio account. Account merging is not included in this MVP.
+          </p>
           <div className="mt-4">
-            <IdentityRow provider="Google" connected={profile.connectedProviders.includes("google")} />
-            <IdentityRow provider="ORCID" connected={profile.connectedProviders.includes("orcid")} />
-            <IdentityRow provider="Email" connected={profile.connectedProviders.includes("email")} />
+            <ConnectedIdentities
+              connectedProviders={profile.connectedProviders}
+              googleConfigured={identityProviderConfigured(process.env.GOOGLE_CLIENT_ID)}
+              orcidConfigured={identityProviderConfigured(process.env.ORCID_CLIENT_ID)}
+            />
           </div>
           {profile.orcidId && <div className="mt-5"><OrcidBadge orcidId={profile.orcidId} /></div>}
         </section>

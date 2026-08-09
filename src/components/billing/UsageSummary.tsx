@@ -21,7 +21,7 @@ export function UsageSummary({ usage, compact = false }: { usage: UsageView; com
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">
-            Review allowance
+            Peer-review allowance
           </p>
           <p className="mt-3 text-lg font-semibold tracking-[-0.02em] text-[var(--ink)]">{usage.planName}</p>
           <p className="mt-1 text-xs capitalize leading-5 text-[var(--muted)]">

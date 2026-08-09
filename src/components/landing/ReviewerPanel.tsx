@@ -51,11 +51,11 @@ export function ReviewerPanel() {
   return (
     <section id="reviewers" className="section-shell py-20 sm:py-28">
       <div className="mb-10 max-w-2xl sm:mb-14">
-        <p className="eyebrow">The reviewer panel</p>
-        <h2 className="section-title">One Reviewer. Many Perspectives.</h2>
+        <p className="eyebrow">The peer-review panel</p>
+        <h2 className="section-title">One review. Many reviewer lenses.</h2>
         <p className="section-copy">
-          Six specialized agents. One integrated qualitative review. Each lens
-          stays focused on a distinct part of scholarly reasoning.
+          Six specialist lenses mirror journal peer review—for authors testing a
+          submission and reviewers organizing a constructive assessment.
         </p>
       </div>
 
@@ -103,9 +103,10 @@ export function ReviewerPanel() {
 
       <div className="mt-6 rounded-2xl border border-[var(--blue-soft)] bg-[var(--paper-blue)] px-5 py-4 text-xs leading-5 text-[var(--slate)] sm:flex sm:items-center sm:justify-between sm:gap-6">
         <p>
-          <span className="font-semibold text-[var(--ink)]">How the panel works: </span>
+          <span className="font-semibold text-[var(--ink)]">How peer review runs: </span>
           Reader establishes context; Evidence, Research Design, and Theory run as
-          parallel specialist lenses; Overclaim checks scope; Final synthesizes.
+          parallel reviewer lenses; Overclaim checks scope; Final synthesizes a
+          revision-ready report.
         </p>
         <p className="mt-2 shrink-0 font-semibold text-[var(--blue)] sm:mt-0">
           All six reviewers active

@@ -2,10 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigger";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", match: (path: string) => path === "/dashboard" },
-  { href: "/review", label: "New review", match: (path: string) => path.startsWith("/review") },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    match: (path: string) => path === "/dashboard" || path.startsWith("/dashboard/"),
+  },
+  { href: "/review", label: "Peer review", match: (path: string) => path.startsWith("/review") },
   { href: "/pricing", label: "Plans", match: (path: string) => path.startsWith("/pricing") },
   { href: "/settings", label: "Settings", match: (path: string) => path.startsWith("/settings") },
 ] as const;
@@ -32,6 +37,7 @@ export function AccountNav() {
           </Link>
         );
       })}
+      <ConsultationTrigger variant="sidebar" label="Human consultation" />
     </nav>
   );
 }

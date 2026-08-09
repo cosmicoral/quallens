@@ -121,6 +121,10 @@ export async function POST(request: Request) {
     reviewId: reservation.id,
     createdAt: new Date().toISOString(),
   };
-  await markReviewRunCompleted(reservation.id, result);
+  try {
+    await markReviewRunCompleted(reservation.id, result);
+  } catch (error) {
+    console.error("Failed to persist review result for run", reservation.id, error);
+  }
   return NextResponse.json<ReviewResponse>({ ok: true, result });
 }

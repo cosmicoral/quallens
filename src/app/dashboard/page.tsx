@@ -30,14 +30,14 @@ export default async function DashboardPage({
             Welcome, {profile.fullName}
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-[var(--slate)]">
-            Begin a new structured review or return to your researcher profile.
+            Run peer review as an author or reviewer, or reopen past reports from your dashboard.
           </p>
         </div>
         <Link
           href="/review"
           className="account-primary-button inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[var(--ink)] px-5 text-sm font-semibold text-white hover:bg-[var(--navy)]"
         >
-          New manuscript review
+          New peer review
         </Link>
       </div>
 
@@ -55,10 +55,10 @@ export default async function DashboardPage({
           <div className="flex items-center justify-between gap-4 border-b border-[var(--line)]/70 pb-5">
             <div>
               <h2 className="text-xl font-semibold tracking-[-0.03em] text-[var(--ink)]">
-                Review history
+                Peer-review history
               </h2>
               <p className="mt-1.5 text-sm leading-6 text-[var(--muted)]">
-                Reopen completed reviews or track recent runs.
+                Reopen completed peer-review reports or track recent runs.
               </p>
             </div>
           </div>
@@ -72,13 +72,13 @@ export default async function DashboardPage({
               </div>
               <p className="mt-5 text-lg font-semibold tracking-[-0.02em] text-[var(--ink)]">No reviews yet</p>
               <p className="mx-auto mt-2.5 max-w-sm text-sm leading-6 text-[var(--slate)]">
-                Submit a qualitative manuscript to create your first evidence-aware review.
+                Submit a qualitative manuscript to create your first peer-review report—as an author or reviewer.
               </p>
               <Link
                 href="/review"
                 className="dashboard-empty-link mt-6 inline-flex items-center rounded-full border border-[var(--blue-soft)] bg-white px-4 py-2 text-sm font-semibold text-[var(--blue-deep)] hover:bg-[var(--paper-blue)]"
               >
-                Start a review
+                Start a peer review
               </Link>
             </div>
           ) : (

@@ -9,7 +9,7 @@ const plans = [
   {
     id: "free" as const,
     name: "Free",
-    description: "Try one complete Qualisapio review.",
+    description: "Try one complete Qualisapio peer review.",
     monthly: 0,
     annual: 0,
     allowance: "1 lifetime review",
@@ -17,7 +17,7 @@ const plans = [
   {
     id: "plus" as const,
     name: "Plus",
-    description: "For individual researchers reviewing regularly.",
+    description: "For authors and reviewers running peer review regularly.",
     monthly: 12,
     annual: 120,
     allowance: "5 reviews each month",
@@ -25,7 +25,7 @@ const plans = [
   {
     id: "pro" as const,
     name: "Pro",
-    description: "A larger allowance for active research workflows.",
+    description: "A larger allowance for active peer-review workflows.",
     monthly: 24,
     annual: 240,
     allowance: "12 reviews each month",

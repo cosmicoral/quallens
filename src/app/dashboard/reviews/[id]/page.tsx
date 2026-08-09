@@ -34,7 +34,7 @@ export default async function DashboardReviewPage({
     <AccountShell profile={profile}>
       <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[var(--line)]/80 pb-7 sm:flex-row sm:items-end">
         <div>
-          <p className="eyebrow mb-2">Review history</p>
+          <p className="eyebrow mb-2">Peer-review report</p>
           <h1 className="font-serif text-[2rem] font-semibold leading-[1.04] tracking-[-0.04em] text-[var(--ink)] sm:text-4xl">
             {reviewRun.manuscriptTitle}
           </h1>

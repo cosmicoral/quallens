@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandMark } from "./BrandMark";
+import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigger";
 
 export function SiteHeader() {
   return (
@@ -14,7 +15,7 @@ export function SiteHeader() {
             href="/review"
             className="hidden rounded-lg px-3 py-2 text-sm font-medium text-[var(--slate)] transition hover:bg-white hover:text-[var(--ink)] sm:inline-flex"
           >
-            Review
+            Peer review
           </Link>
           <Link
             href="/#how-it-works"
@@ -28,6 +29,7 @@ export function SiteHeader() {
           >
             Pricing
           </Link>
+          <ConsultationTrigger variant="nav" className="hidden md:inline-flex" />
           <Link
             href="/auth/login"
             className="hidden rounded-lg px-3 py-2 text-sm font-medium text-[var(--slate)] transition hover:bg-white hover:text-[var(--ink)] sm:inline-flex"
@@ -38,8 +40,8 @@ export function SiteHeader() {
             href="/review"
             className="ml-1 inline-flex items-center rounded-lg bg-[var(--ink)] px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--navy)] sm:px-4"
           >
-            <span className="sm:hidden">Start review</span>
-            <span className="hidden sm:inline">Review a manuscript</span>
+            <span className="sm:hidden">Peer review</span>
+            <span className="hidden sm:inline">Start peer review</span>
           </Link>
         </nav>
       </div>

@@ -97,4 +97,14 @@ describe("POST /api/review billing gate", () => {
     expect(mocks.markReviewRunFailed).toHaveBeenCalledWith("run_1", "unexpected_pipeline_error");
     expect(mocks.markReviewRunCompleted).not.toHaveBeenCalled();
   });
+
+  it("still returns a successful review when persistence fails", async () => {
+    mocks.markReviewRunCompleted.mockRejectedValue(new Error("Database unavailable"));
+    const response = await POST(request());
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      ok: true,
+      result: { reviewId: "run_1" },
+    });
+  });
 });

@@ -22,7 +22,7 @@ const steps: Array<{
   },
   {
     name: "Recommend",
-    description: "Produce prioritized, actionable feedback.",
+    description: "Produce prioritized, actionable peer-review recommendations.",
     icon: "recommend",
   },
 ];
@@ -32,10 +32,11 @@ export function Workflow() {
     <section id="how-it-works" className="border-y border-[var(--line)] bg-white">
       <div className="section-shell py-20 sm:py-24">
         <div className="mb-12 max-w-2xl">
-          <p className="eyebrow">Review workflow</p>
-          <h2 className="section-title">In the flow of a qualitative review</h2>
+          <p className="eyebrow">Peer-review workflow</p>
+          <h2 className="section-title">In the flow of a qualitative peer review</h2>
           <p className="section-copy">
-            A clear sequence from faithful reading to evidence-aware revision.
+            The same sequence authors and peer reviewers follow—from reading to
+            synthesis and prioritized recommendations.
           </p>
         </div>
 

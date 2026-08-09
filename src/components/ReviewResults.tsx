@@ -2,6 +2,7 @@ import { ScoreBadge } from "@/components/review/ScoreBadge";
 import { FinalReviewDetails } from "@/components/review/FinalReviewDetails";
 import { AgentMascot } from "@/components/review/AgentMascot";
 import { SpecialistReviewCard } from "@/components/review/SpecialistReviewCard";
+import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigger";
 import type { ReviewResult, Verdict } from "@/lib/types";
 
 const VERDICT_LABELS: Record<Verdict, string> = {
@@ -24,13 +25,17 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
   return (
     <section aria-labelledby="review-results-heading">
       <header className="mb-8 border-b border-[var(--line)] pb-6">
-        <p className="eyebrow">Review complete</p>
+        <p className="eyebrow">Peer review complete</p>
         <h2
           id="review-results-heading"
           className="text-3xl font-semibold tracking-[-0.04em] text-[var(--ink)] sm:text-4xl"
         >
           {result.manuscriptTitle}
         </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+          Peer-review report for this manuscript—for author revision or reviewer
+          reference. This supplements—not replaces—formal journal peer review.
+        </p>
         <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
           Review ID {result.reviewId}
         </p>
@@ -144,6 +149,11 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
           ))}
         </div>
       </section>
+
+      <p className="mt-8 text-center text-sm text-[var(--muted)]">
+        Want a human perspective on this manuscript?{" "}
+        <ConsultationTrigger variant="link" label="Human consultation" className="inline" />
+      </p>
     </section>
   );
 }
