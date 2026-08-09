@@ -12,6 +12,7 @@ import {
   type UserEntitlement,
 } from "./entitlement";
 import type { BillingInterval, Plan } from "./config";
+import type { ReviewResult } from "@/lib/types";
 
 interface SubscriptionRow {
   user_id: string;
@@ -43,10 +44,16 @@ export interface ReviewReservation {
 export interface RecentReviewRun {
   id: string;
   manuscriptTitle: string;
+  targetJournal: string | null;
   status: "pending" | "running" | "completed" | "failed";
   planAtRun: Plan;
   startedAt: Date;
   completedAt: Date | null;
+  hasStoredResult: boolean;
+}
+
+export interface StoredReviewRun extends RecentReviewRun {
+  result: ReviewResult | null;
 }
 
 function mapBillingRecord(row: SubscriptionRow): BillingRecord {
@@ -151,6 +158,7 @@ export async function getUsageView(userId: string, now = new Date()): Promise<Us
 export async function reserveReviewRun(
   userId: string,
   manuscriptTitle: string,
+  targetJournal?: string | null,
   now = new Date(),
 ): Promise<ReviewReservation> {
   const client = await getDatabase().connect();
@@ -182,13 +190,14 @@ export async function reserveReviewRun(
     const id = randomUUID();
     await client.query(
       `INSERT INTO "review_run"
-         ("id", "user_id", "manuscript_title", "plan_at_run", "status",
+         ("id", "user_id", "manuscript_title", "target_journal", "plan_at_run", "status",
           "started_at", "quota_period_start", "provider", "model")
-       VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7, $8)`,
+       VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8, $9)`,
       [
         id,
         userId,
         manuscriptTitle,
+        targetJournal?.trim() || null,
         entitlement.plan,
         now,
         entitlement.quotaPeriodStart,
@@ -214,12 +223,19 @@ export async function markReviewRunRunning(id: string) {
   );
 }
 
-export async function markReviewRunCompleted(id: string, completedAt = new Date()) {
+export async function markReviewRunCompleted(
+  id: string,
+  result?: ReviewResult,
+  completedAt = new Date(),
+) {
   await getDatabase().query(
     `UPDATE "review_run"
-     SET "status" = 'completed', "completed_at" = $2, "updated_at" = $2
+     SET "status" = 'completed',
+         "completed_at" = $2,
+         "result_payload" = $3,
+         "updated_at" = $2
      WHERE "id" = $1 AND "status" IN ('pending', 'running')`,
-    [id, completedAt],
+    [id, completedAt, result ? JSON.stringify(result) : null],
   );
 }
 
@@ -237,16 +253,19 @@ export async function markReviewRunFailed(
   );
 }
 
-export async function listRecentReviewRuns(userId: string, limit = 5): Promise<RecentReviewRun[]> {
+export async function listRecentReviewRuns(userId: string, limit = 10): Promise<RecentReviewRun[]> {
   const result = await getDatabase().query<{
     id: string;
     manuscript_title: string;
+    target_journal: string | null;
     status: RecentReviewRun["status"];
     plan_at_run: Plan;
     started_at: Date;
     completed_at: Date | null;
+    has_stored_result: boolean;
   }>(
-    `SELECT "id", "manuscript_title", "status", "plan_at_run", "started_at", "completed_at"
+    `SELECT "id", "manuscript_title", "target_journal", "status", "plan_at_run", "started_at", "completed_at",
+            ("result_payload" IS NOT NULL) AS "has_stored_result"
      FROM "review_run" WHERE "user_id" = $1
      ORDER BY "started_at" DESC LIMIT $2`,
     [userId, Math.max(1, Math.min(limit, 20))],
@@ -254,11 +273,48 @@ export async function listRecentReviewRuns(userId: string, limit = 5): Promise<R
   return result.rows.map((row) => ({
     id: row.id,
     manuscriptTitle: row.manuscript_title,
+    targetJournal: row.target_journal,
     status: row.status,
     planAtRun: row.plan_at_run,
     startedAt: row.started_at,
     completedAt: row.completed_at,
+    hasStoredResult: row.has_stored_result,
   }));
+}
+
+export async function getReviewRunForUser(
+  userId: string,
+  runId: string,
+): Promise<StoredReviewRun | null> {
+  const result = await getDatabase().query<{
+    id: string;
+    manuscript_title: string;
+    target_journal: string | null;
+    status: RecentReviewRun["status"];
+    plan_at_run: Plan;
+    started_at: Date;
+    completed_at: Date | null;
+    result_payload: ReviewResult | null;
+  }>(
+    `SELECT "id", "manuscript_title", "target_journal", "status", "plan_at_run", "started_at", "completed_at",
+            "result_payload"
+     FROM "review_run"
+     WHERE "id" = $1 AND "user_id" = $2`,
+    [runId, userId],
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    manuscriptTitle: row.manuscript_title,
+    targetJournal: row.target_journal,
+    status: row.status,
+    planAtRun: row.plan_at_run,
+    startedAt: row.started_at,
+    completedAt: row.completed_at,
+    hasStoredResult: row.result_payload != null,
+    result: row.result_payload,
+  };
 }
 
 export async function setStripeCustomerId(userId: string, customerId: string) {

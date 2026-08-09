@@ -18,7 +18,7 @@ export function SignOutButton() {
         router.push("/auth/login");
         router.refresh();
       }}
-      className="rounded-lg border border-[var(--line-strong)] bg-white px-3 py-2 text-sm font-medium text-[var(--slate)] shadow-sm transition hover:text-[var(--ink)] disabled:opacity-60"
+      className="rounded-lg border border-[var(--line-strong)] bg-white/90 px-3 py-2 text-sm font-medium text-[var(--slate)] shadow-sm transition hover:border-[var(--line)] hover:bg-white hover:text-[var(--ink)] disabled:opacity-60"
     >
       {busy ? "Signing out…" : "Sign out"}
     </button>

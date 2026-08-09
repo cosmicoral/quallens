@@ -66,9 +66,12 @@ describe("POST /api/review billing gate", () => {
   it("consumes a reservation only after a successful review", async () => {
     const response = await POST(request());
     expect(response.status).toBe(200);
-    expect(mocks.reserveReviewRun).toHaveBeenCalledWith("user_1", manuscript.title);
+    expect(mocks.reserveReviewRun).toHaveBeenCalledWith("user_1", manuscript.title, null);
     expect(mocks.markReviewRunRunning).toHaveBeenCalledWith("run_1");
-    expect(mocks.markReviewRunCompleted).toHaveBeenCalledWith("run_1");
+    expect(mocks.markReviewRunCompleted).toHaveBeenCalledWith(
+      "run_1",
+      expect.objectContaining({ reviewId: "run_1" }),
+    );
     expect(mocks.markReviewRunFailed).not.toHaveBeenCalled();
   });
 

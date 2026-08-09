@@ -29,6 +29,7 @@ export function ReviewForm({ onSubmit, submitting, disabled = false }: ReviewFor
   const [body, setBody] = useState("");
   const [methodology, setMethodology] = useState<Methodology>("interviews");
   const [discipline, setDiscipline] = useState("");
+  const [targetJournal, setTargetJournal] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +39,7 @@ export function ReviewForm({ onSubmit, submitting, disabled = false }: ReviewFor
       body,
       methodology,
       discipline: discipline || undefined,
+      targetJournal: targetJournal.trim() || undefined,
     });
   }
 
@@ -128,6 +130,27 @@ export function ReviewForm({ onSubmit, submitting, disabled = false }: ReviewFor
               className={inputClasses}
             />
           </div>
+        </div>
+
+        <div>
+          <div className="mb-2 flex items-baseline justify-between gap-4">
+            <label htmlFor="targetJournal" className="text-sm font-semibold text-[var(--ink)]">
+              Target journal
+            </label>
+            <span className="text-xs text-[var(--muted)]">Optional</span>
+          </div>
+          <input
+            id="targetJournal"
+            autoComplete="off"
+            value={targetJournal}
+            onChange={(e) => setTargetJournal(e.target.value)}
+            placeholder="e.g. Qualitative Research, American Sociological Review"
+            className={inputClasses}
+          />
+          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+            Saved with your review for history. Journal-aware guidance is planned; the current
+            review still focuses on the manuscript itself.
+          </p>
         </div>
 
         <div>

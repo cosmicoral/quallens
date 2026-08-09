@@ -62,12 +62,17 @@ export async function POST(request: Request) {
     body: body.body,
     methodology: body.methodology,
     discipline: body.discipline,
+    targetJournal: body.targetJournal?.trim() || undefined,
     authorNotes: body.authorNotes,
   };
 
   let reservation;
   try {
-    reservation = await reserveReviewRun(session.user.id, manuscript.title);
+    reservation = await reserveReviewRun(
+      session.user.id,
+      manuscript.title,
+      manuscript.targetJournal ?? null,
+    );
   } catch (error) {
     if (error instanceof BillingError) {
       const status = error.code === "active_review" ? 409 : 402;
@@ -111,6 +116,11 @@ export async function POST(request: Request) {
     );
   }
 
-  await markReviewRunCompleted(reservation.id);
-  return NextResponse.json<ReviewResponse>({ ok: true, result: pipelineResult.result });
+  const result = {
+    ...pipelineResult.result,
+    reviewId: reservation.id,
+    createdAt: new Date().toISOString(),
+  };
+  await markReviewRunCompleted(reservation.id, result);
+  return NextResponse.json<ReviewResponse>({ ok: true, result });
 }

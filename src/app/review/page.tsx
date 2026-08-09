@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewResults } from "@/components/ReviewResults";
 import { ResearchIcon } from "@/components/ResearchIcon";
-import { SiteHeader } from "@/components/SiteHeader";
 import { QualisapioAgentMascot } from "@/components/review/QualisapioAgentMascot";
 import type { ManuscriptInput, ReviewResponse, ReviewResult } from "@/lib/types";
 import type { UsageView } from "@/lib/billing/entitlement";
@@ -58,22 +57,27 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-
-      <main className="section-shell py-10 sm:py-14 lg:py-16">
-        <header className="mb-10 max-w-3xl sm:mb-12">
-          <p className="eyebrow">Manuscript review workspace</p>
-          <h1 className="text-4xl font-semibold tracking-[-0.05em] text-[var(--ink)] sm:text-5xl">
+    <>
+      <div className="flex flex-col justify-between gap-5 border-b border-[var(--line)]/80 pb-7 sm:flex-row sm:items-end">
+        <div>
+          <p className="eyebrow mb-2">Manuscript review workspace</p>
+          <h1 className="font-serif text-[2.1rem] font-semibold leading-[1.04] tracking-[-0.04em] text-[var(--ink)] sm:text-4xl">
             Submit a manuscript for a structured scholarly review.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--slate)] sm:text-lg">
+          <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--slate)]">
             Qualisapio reads the manuscript in full, maps its reported research
             design, and audits major claims against the evidence presented.
           </p>
-        </header>
+        </div>
+        <Link
+          href="/dashboard"
+          className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-[var(--line-strong)] bg-white px-4 text-sm font-semibold text-[var(--ink)] shadow-sm transition hover:bg-[var(--paper-blue)]"
+        >
+          Review history
+        </Link>
+      </div>
 
-        <div className="grid items-start gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8">
+      <div className="mt-7 grid items-start gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8">
           <aside className="rounded-2xl border border-[var(--line)] bg-[var(--ink)] p-6 text-white lg:sticky lg:top-24">
             <p className="mb-6 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--blue-light)]">
               What happens next
@@ -214,11 +218,10 @@ export default function ReviewPage() {
         </div>
 
         {result && (
-          <div className="mt-16 scroll-mt-24 sm:mt-20">
+          <div className="mt-12 scroll-mt-24 sm:mt-14">
             <ReviewResults result={result} />
           </div>
         )}
-      </main>
-    </div>
+    </>
   );
 }

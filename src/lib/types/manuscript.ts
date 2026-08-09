@@ -26,6 +26,11 @@ export interface ManuscriptInput {
   methodology?: Methodology;
   /** Target discipline or field, e.g. "sociology", "political science". */
   discipline?: string;
+  /**
+   * Optional target journal name (e.g. "Qualitative Research").
+   * Stored for review history and future journal-aware RAG; not used by agents in the MVP.
+   */
+  targetJournal?: string;
   /** Optional notes from the author to the reviewers. */
   authorNotes?: string;
 }
