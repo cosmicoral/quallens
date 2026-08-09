@@ -6,9 +6,10 @@ from a different angle, and a final reviewer synthesizes their assessments into
 a verdict with prioritized revision recommendations.
 
 > **Status: MVP.** The full frontend ↔ backend flow works end-to-end. The
-> **Manuscript Reader is LLM-backed** (Claude, via a swappable provider
-> abstraction) and produces a strict, validated structured manuscript
-> profile; the remaining reviewer agents still return mock data.
+> **Manuscript Reader and Evidence Auditor are LLM-backed** (Claude, via a
+> swappable provider abstraction). The Reader produces a strict manuscript
+> profile, then the Auditor checks its claims against the original manuscript;
+> the remaining reviewer agents still return mock data.
 
 ## The reviewer panel
 
@@ -45,6 +46,7 @@ quallens/
 │   │   ├── types/
 │   │   │   ├── manuscript.ts         # ManuscriptInput and related types
 │   │   │   ├── manuscript-profile.ts # Zod schema + ManuscriptProfile type
+│   │   │   ├── evidence-audit.ts      # Zod schema + EvidenceAudit type
 │   │   │   ├── review.ts             # ReviewResult, AgentReview, findings…
 │   │   │   └── index.ts
 │   │   ├── llm/
@@ -55,16 +57,17 @@ quallens/
 │   │   │   ├── types.ts              # AgentInfo + ReviewerAgent contracts
 │   │   │   ├── manuscript-reader.ts  # REAL: LLM-backed structured profiling
 │   │   │   ├── research-design-reviewer.ts   # mock
-│   │   │   ├── evidence-auditor.ts           # mock
+│   │   │   ├── evidence-auditor.ts           # REAL: claim-level evidence audit
 │   │   │   ├── theory-auditor.ts             # mock
 │   │   │   ├── overclaim-auditor.ts          # mock
 │   │   │   ├── final-reviewer.ts             # mock
 │   │   │   └── pipeline.ts           # Orchestrates reader → specialists → final
 │   │   └── mock/
-│   │       └── mock-review.ts        # Canned data for the not-yet-real agents
+│   │       └── mock-review.ts        # Canned data for the remaining mock agents
 │   └── test/
 │       ├── fixtures/
-│       │   └── qualitative-manuscript.ts  # Realistic manuscript + profile
+│       │   ├── qualitative-manuscript.ts  # Realistic manuscript + profile
+│       │   └── evidence-audit-fixtures.ts # Evidence audit scenarios
 │       └── fake-provider.ts          # LLMProvider test double
 ├── .env.example
 └── README.md
@@ -100,6 +103,16 @@ refuses, the output fails validation, or the provider errors, the API returns
 a typed error (`errorCode`: `missing_api_key` | `refusal` | `invalid_output`
 | `provider_error`) — never partial or fabricated fields.
 
+### The Evidence Auditor (LLM-backed)
+
+The Evidence Auditor receives both the original `ManuscriptInput` and the
+validated `ManuscriptProfile`. It starts from the Reader's
+`major_analytical_claims`, then inspects the original manuscript for supporting
+and complicating evidence. Its strict `EvidenceAudit` output records evidence
+type and distribution, support level, overclaim risk, reasoning, deviant cases,
+and claim-level revision advice. Claims that cannot be judged from the reported
+material are marked `cannot_assess` rather than guessed.
+
 ### LLM provider abstraction
 
 Agents depend on the `LLMProvider` interface (`src/lib/llm/types.ts`), not on
@@ -122,14 +135,20 @@ Adding a provider = implementing `LLMProvider` and registering it in
 3. The **Manuscript Reader runs first, for real**: the configured LLM
    produces a schema-validated `ManuscriptProfile`, attached to its
    `AgentReview`. A failure aborts the run with a typed error.
-4. The four remaining specialists (still mock) run, then the Final Reviewer
+4. The **Evidence Auditor runs second, for real**, using both the original
+   manuscript and the validated profile. A failure also aborts with a typed
+   error.
+5. The three remaining specialists (still mock) run, then the Final Reviewer
    (mock) synthesizes a `FinalAssessment`.
-5. The route returns a `ReviewResult`; the frontend renders the final verdict,
+6. The route returns a `ReviewResult`; the frontend renders the final verdict,
    strengths/weaknesses, recommendations, and each agent's findings.
 
 ### Key types (`src/lib/types/`)
 
 - `ManuscriptInput` — plain-text manuscript plus light metadata.
+- `ManuscriptProfile` — strict extraction of the manuscript's reported design,
+  findings, and major claims.
+- `EvidenceAudit` — strict claim-level support assessments and evidence items.
 - `ReviewerAgent` — the contract each specialist implements: `run(manuscript) → AgentReview`.
 - `AgentReview` — one agent's summary, 1–5 score, and list of `ReviewFinding`s
   (severity, location, recommendation).
@@ -162,12 +181,10 @@ curl -X POST http://localhost:3000/api/review \
 npm test
 ```
 
-Tests run offline against a `FakeProvider` (no API key needed):
-schema-validation tests for `ManuscriptProfile`, Manuscript Reader tests on a
-realistic qualitative manuscript fixture, a test showing how **missing
-reflexivity and sampling information** is represented (`null` fields +
-`missing_information` entries + findings), and typed-error tests for invalid
-model output.
+Tests run offline against a `FakeProvider` (no API key needed). They cover the
+strict Manuscript Profile and Evidence Audit schemas, both real agents, typed
+provider failures, thin evidence for a broad collective claim, and preservation
+of a deviant case in an otherwise supported bounded claim.
 
 ## Tech stack
 
@@ -179,7 +196,7 @@ model output.
 
 ## Intentionally out of scope (for now)
 
-- LLM-backed implementations of the other five agents (mock data)
+- LLM-backed implementations of the other four agents (mock data)
 - Authentication, databases, payments, queues
 - PDF parsing / file upload
 - RAG, external literature search, or citation checking

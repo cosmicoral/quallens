@@ -3,21 +3,24 @@ import type { AgentId, ManuscriptInput, ReviewResult } from "@/lib/types";
 import type { AgentInfo, ReviewerAgent } from "./types";
 import { manuscriptReader, readManuscript } from "./manuscript-reader";
 import { researchDesignReviewer } from "./research-design-reviewer";
-import { evidenceAuditor } from "./evidence-auditor";
+import { auditEvidence, evidenceAuditor } from "./evidence-auditor";
 import { theoryAuditor } from "./theory-auditor";
 import { overclaimAuditor } from "./overclaim-auditor";
 import { finalReviewer } from "./final-reviewer";
 
-/** Mock specialists — everything except the (real) Manuscript Reader. */
+/** Specialists that remain mocked after the Reader and Evidence Auditor. */
 const mockAgents: ReviewerAgent[] = [
   researchDesignReviewer,
-  evidenceAuditor,
   theoryAuditor,
   overclaimAuditor,
 ];
 
 /** Specialist agents in the order their reviews are reported (for display). */
-export const specialistAgents: AgentInfo[] = [manuscriptReader, ...mockAgents];
+export const specialistAgents: AgentInfo[] = [
+  manuscriptReader,
+  evidenceAuditor,
+  ...mockAgents,
+];
 
 export interface PipelineError {
   /** The agent that failed. */
@@ -32,11 +35,10 @@ export type ReviewPipelineResult =
 /**
  * Run the full review pipeline.
  *
- * The Manuscript Reader runs first, for real, against the configured LLM —
- * its structured profile leads the report and will ground the other agents
- * once they are LLM-backed. The remaining specialists still return mock
- * data, then the Final Reviewer synthesizes. A reader failure aborts the
- * pipeline with a typed error rather than fabricating a profile.
+ * The Manuscript Reader runs first. The real Evidence Auditor then checks the
+ * Reader's major claims against the original manuscript. The remaining three
+ * specialists and the Final Reviewer still return mock data. Either real
+ * agent can abort the pipeline with a typed error rather than fabricated data.
  */
 export async function runReviewPipeline(
   manuscript: ManuscriptInput,
@@ -50,10 +52,22 @@ export async function runReviewPipeline(
     };
   }
 
+  const evidenceResult = await auditEvidence(
+    manuscript,
+    readerResult.review.profile,
+    provider ?? undefined,
+  );
+  if (!evidenceResult.ok) {
+    return {
+      ok: false,
+      error: { agentId: evidenceAuditor.id, error: evidenceResult.error },
+    };
+  }
+
   const mockReviews = await Promise.all(
     mockAgents.map((agent) => agent.run(manuscript)),
   );
-  const agentReviews = [readerResult.review, ...mockReviews];
+  const agentReviews = [readerResult.review, evidenceResult.review, ...mockReviews];
   const finalAssessment = await finalReviewer.synthesize(manuscript, agentReviews);
 
   return {

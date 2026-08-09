@@ -11,7 +11,7 @@ import {
 import type { AgentInfo } from "./types";
 
 /**
- * Manuscript Reader — the first (and currently only) LLM-backed agent.
+ * Manuscript Reader — the first LLM-backed agent in the review pipeline.
  *
  * Reads the manuscript end-to-end and produces a strict, structured
  * ManuscriptProfile that grounds the other reviewers. It extracts and
@@ -58,8 +58,12 @@ function buildPrompt(manuscript: ManuscriptInput): string {
   return parts.join("\n");
 }
 
+export type ManuscriptReaderReview = AgentReview & {
+  profile: ManuscriptProfile;
+};
+
 export type ManuscriptReaderResult =
-  | { ok: true; review: AgentReview }
+  | { ok: true; review: ManuscriptReaderReview }
   | { ok: false; error: LLMError };
 
 /** Findings about missing methodological information, derived from the profile. */

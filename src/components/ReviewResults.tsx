@@ -1,4 +1,6 @@
-import type { ReviewResult, Severity, Verdict } from "@/lib/types";
+import { ScoreBadge } from "@/components/review/ScoreBadge";
+import { SpecialistReviewCard } from "@/components/review/SpecialistReviewCard";
+import type { ReviewResult, Verdict } from "@/lib/types";
 
 const VERDICT_LABELS: Record<Verdict, string> = {
   accept: "Accept",
@@ -8,145 +10,125 @@ const VERDICT_LABELS: Record<Verdict, string> = {
 };
 
 const VERDICT_STYLES: Record<Verdict, string> = {
-  accept:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  "minor-revisions":
-    "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300",
-  "major-revisions":
-    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  reject: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  accept: "border-sky-200 bg-sky-50 text-sky-900",
+  "minor-revisions": "border-slate-200 bg-slate-50 text-slate-800",
+  "major-revisions": "border-amber-200 bg-amber-50 text-amber-900",
+  reject: "border-rose-200 bg-rose-50 text-rose-900",
 };
-
-const SEVERITY_STYLES: Record<Severity, string> = {
-  minor: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  moderate: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  major: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-};
-
-function ScoreBadge({ score }: { score: number }) {
-  return (
-    <span className="shrink-0 rounded-md bg-zinc-100 px-2 py-1 font-mono text-xs font-medium dark:bg-zinc-800">
-      {score}/5
-    </span>
-  );
-}
 
 export function ReviewResults({ result }: { result: ReviewResult }) {
   const { finalAssessment: final } = result;
 
   return (
-    <div className="space-y-8">
-      {/* Final assessment */}
-      <section className="rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <h2 className="text-lg font-semibold">Final assessment</h2>
-          <span
-            className={`rounded-full px-3 py-1 text-sm font-medium ${VERDICT_STYLES[final.verdict]}`}
-          >
-            {VERDICT_LABELS[final.verdict]}
-          </span>
-          <ScoreBadge score={final.overallScore} />
-        </div>
-        <p className="mb-6 text-zinc-700 dark:text-zinc-300">{final.summary}</p>
+    <section aria-labelledby="review-results-heading">
+      <header className="mb-8 border-b border-[var(--line)] pb-6">
+        <p className="eyebrow">Review complete</p>
+        <h2
+          id="review-results-heading"
+          className="text-3xl font-semibold tracking-[-0.04em] text-[var(--ink)] sm:text-4xl"
+        >
+          {result.manuscriptTitle}
+        </h2>
+        <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
+          Review ID {result.reviewId}
+        </p>
+      </header>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div>
-            <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
-              Strengths
-            </h3>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-              {final.strengths.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
+      <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+        <article className="rounded-2xl bg-[var(--ink)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.18)] sm:p-8">
+          <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--blue-light)]">
+                Overall Assessment
+              </p>
+              <span
+                className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${VERDICT_STYLES[final.verdict]}`}
+              >
+                {VERDICT_LABELS[final.verdict]}
+              </span>
+            </div>
+            <ScoreBadge score={final.overallScore} large />
           </div>
-          <div>
-            <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-red-700 dark:text-red-400">
-              Weaknesses
-            </h3>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-              {final.weaknesses.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
+          <p className="max-w-2xl text-base leading-7 text-slate-200">{final.summary}</p>
+          <div className="mt-8 border-t border-white/10 pt-5 text-xs text-slate-400">
+            Final synthesis is currently an MVP output; inspect the live Reader
+            and Evidence Auditor panels below for manuscript-specific analysis.
           </div>
-        </div>
+        </article>
 
-        <div className="mt-6">
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            Recommended revisions
-          </h3>
-          <ol className="list-decimal space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-            {final.recommendations.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Per-agent reviews */}
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">Specialist reviews</h2>
-        <div className="space-y-4">
-          {result.agentReviews.map((review) => (
-            <details
-              key={review.agentId}
-              className="group rounded-xl border border-zinc-200 dark:border-zinc-800"
-            >
-              <summary className="flex cursor-pointer items-center justify-between gap-3 p-5">
-                <span className="font-medium">{review.agentName}</span>
-                <span className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-500">
-                    {review.findings.length} finding
-                    {review.findings.length === 1 ? "" : "s"}
+        <div className="grid gap-5">
+          <article className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.05)]">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--blue)]">
+              Key Strengths
+            </h3>
+            <ul className="space-y-3 text-sm leading-6 text-[var(--slate)]">
+              {final.strengths.map((strength) => (
+                <li key={strength} className="flex gap-3">
+                  <span className="mt-1 grid size-4 shrink-0 place-items-center rounded-full bg-[var(--paper-blue)] text-[10px] font-bold text-[var(--blue)]">
+                    ✓
                   </span>
-                  <ScoreBadge score={review.score} />
+                  <span>{strength}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.05)]">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--amber)]">
+              Priority Revisions
+            </h3>
+            <ol className="space-y-3 text-sm leading-6 text-[var(--slate)]">
+              {final.recommendations.map((recommendation, index) => (
+                <li key={recommendation} className="flex gap-3">
+                  <span className="font-mono text-xs font-semibold text-[var(--amber)]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span>{recommendation}</span>
+                </li>
+              ))}
+            </ol>
+          </article>
+        </div>
+      </div>
+
+      {final.weaknesses.length > 0 && (
+        <div className="mt-5 rounded-2xl border border-[var(--line)] bg-[var(--paper-warm)] p-5">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--slate)]">
+            Review concerns
+          </h3>
+          <ul className="grid gap-2 text-sm leading-6 text-[var(--slate)] sm:grid-cols-2">
+            {final.weaknesses.map((weakness) => (
+              <li key={weakness} className="flex gap-2.5">
+                <span aria-hidden="true" className="text-[var(--amber)]">
+                  —
                 </span>
-              </summary>
-              <div className="border-t border-zinc-200 p-5 dark:border-zinc-800">
-                <p className="mb-4 text-sm text-zinc-700 dark:text-zinc-300">
-                  {review.summary}
-                </p>
-                <ul className="space-y-3">
-                  {review.findings.map((finding) => (
-                    <li
-                      key={finding.id}
-                      className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900"
-                    >
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span
-                          className={`rounded px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[finding.severity]}`}
-                        >
-                          {finding.severity}
-                        </span>
-                        <span className="text-sm font-medium">
-                          {finding.title}
-                        </span>
-                        {finding.location && (
-                          <span className="text-xs text-zinc-500">
-                            ({finding.location})
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                        {finding.detail}
-                      </p>
-                      {finding.recommendation && (
-                        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                          <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                            Suggestion:{" "}
-                          </span>
-                          {finding.recommendation}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </details>
+                <span>{weakness}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <section aria-labelledby="specialist-reviews-heading" className="mt-14 sm:mt-16">
+        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="eyebrow">Panel findings</p>
+            <h3
+              id="specialist-reviews-heading"
+              className="text-2xl font-semibold tracking-[-0.03em] text-[var(--ink)] sm:text-3xl"
+            >
+              Specialist Reviews
+            </h3>
+          </div>
+          <p className="text-xs text-[var(--muted)]">Open a reviewer to inspect its reasoning.</p>
+        </div>
+
+        <div className="space-y-3">
+          {result.agentReviews.map((review) => (
+            <SpecialistReviewCard key={review.agentId} review={review} />
           ))}
         </div>
       </section>
-    </div>
+    </section>
   );
 }

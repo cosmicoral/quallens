@@ -2,11 +2,13 @@ import type { AgentId, AgentReview, FinalAssessment } from "@/lib/types";
 
 /**
  * Canned review data for the reviewer agents that are not yet LLM-backed.
- * The Manuscript Reader is real (see src/lib/agents/manuscript-reader.ts)
- * and no longer has a mock entry here.
+ * The Manuscript Reader and Evidence Auditor are real and have no entries here.
  */
 
-export type MockableAgentId = Exclude<AgentId, "final-reviewer" | "manuscript-reader">;
+export type MockableAgentId = Exclude<
+  AgentId,
+  "final-reviewer" | "manuscript-reader" | "evidence-auditor"
+>;
 
 const MOCK_AGENT_REVIEWS: Record<MockableAgentId, AgentReview> = {
   "research-design-reviewer": {
@@ -35,35 +37,6 @@ const MOCK_AGENT_REVIEWS: Record<MockableAgentId, AgentReview> = {
         location: "Methods",
         recommendation:
           "Add a brief positionality statement and reflect on its implications for the analysis.",
-      },
-    ],
-  },
-  "evidence-auditor": {
-    agentId: "evidence-auditor",
-    agentName: "Evidence Auditor",
-    summary:
-      "Most thematic claims are supported by interview excerpts, but several key claims rest on a single quotation and negative cases are not discussed.",
-    score: 3,
-    findings: [
-      {
-        id: "ea-1",
-        severity: "moderate",
-        title: "Thin evidentiary base for theme 2",
-        detail:
-          "The second theme ('institutional distrust') is supported by quotations from only two of the reported participants, yet is presented as pervasive.",
-        location: "Findings, theme 2",
-        recommendation:
-          "Report how many participants expressed this theme, or soften the claim about its prevalence.",
-      },
-      {
-        id: "ea-2",
-        severity: "minor",
-        title: "No treatment of disconfirming cases",
-        detail:
-          "The analysis does not indicate whether any participants contradicted the main themes, which weakens confidence in the coding.",
-        location: "Findings",
-        recommendation:
-          "Describe negative or deviant cases and how they were handled in the analysis.",
       },
     ],
   },

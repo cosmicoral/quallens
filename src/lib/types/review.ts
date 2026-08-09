@@ -1,4 +1,6 @@
 import type { ManuscriptProfile } from "./manuscript-profile";
+import type { EvidenceAudit } from "./evidence-audit";
+import type { ResearchDesignAudit } from "./research-design-audit";
 
 /**
  * Review output types.
@@ -53,6 +55,10 @@ export interface AgentReview {
    * Downstream agents will use it to ground their reviews.
    */
   profile?: ManuscriptProfile;
+  /** Structured claim-level audit — produced by the Evidence Auditor only. */
+  evidenceAudit?: EvidenceAudit;
+  /** Structured design audit — produced by the Research Design Reviewer only. */
+  researchDesignAudit?: ResearchDesignAudit;
 }
 
 /** Synthesis produced by the Final Reviewer agent. */
