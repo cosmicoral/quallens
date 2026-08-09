@@ -23,7 +23,7 @@ const reviewers: Array<{
     id: "research-design-reviewer",
     name: "Research Design Reviewer",
     description: "Evaluates sampling, methods, reflexivity, and research design.",
-    status: "In development",
+    status: "Active",
   },
   {
     id: "theory-auditor",
@@ -90,8 +90,9 @@ export function ReviewerPanel() {
       </ul>
 
       <p className="mt-6 text-xs leading-5 text-[var(--muted)]">
-        Manuscript Reader and Evidence Auditor are live. The remaining
-        specialist outputs are currently represented by structured MVP data.
+        Manuscript Reader, Evidence Auditor, and Research Design Reviewer are
+        live. The remaining specialist outputs are currently represented by
+        structured MVP data.
       </p>
     </section>
   );

@@ -2,44 +2,19 @@ import type { AgentId, AgentReview, FinalAssessment } from "@/lib/types";
 
 /**
  * Canned review data for the reviewer agents that are not yet LLM-backed.
- * The Manuscript Reader and Evidence Auditor are real and have no entries here.
+ * The Manuscript Reader, Evidence Auditor, and Research Design Reviewer are
+ * real and have no entries here.
  */
 
 export type MockableAgentId = Exclude<
   AgentId,
-  "final-reviewer" | "manuscript-reader" | "evidence-auditor"
+  | "final-reviewer"
+  | "manuscript-reader"
+  | "evidence-auditor"
+  | "research-design-reviewer"
 >;
 
 const MOCK_AGENT_REVIEWS: Record<MockableAgentId, AgentReview> = {
-  "research-design-reviewer": {
-    agentId: "research-design-reviewer",
-    agentName: "Research Design Reviewer",
-    summary:
-      "The interview-based design is broadly appropriate for the research question, but the sampling strategy and stopping criteria are under-specified.",
-    score: 3,
-    findings: [
-      {
-        id: "rd-1",
-        severity: "major",
-        title: "Sampling strategy not justified",
-        detail:
-          "Participants are described as 'purposively sampled' but no criteria are given for inclusion, exclusion, or how saturation was assessed.",
-        location: "Methods, sampling subsection",
-        recommendation:
-          "State the sampling frame, inclusion criteria, and how the final sample size was determined.",
-      },
-      {
-        id: "rd-2",
-        severity: "moderate",
-        title: "Positionality not addressed",
-        detail:
-          "The author's relationship to the field site and participants is not discussed, though it plausibly shaped access and interpretation.",
-        location: "Methods",
-        recommendation:
-          "Add a brief positionality statement and reflect on its implications for the analysis.",
-      },
-    ],
-  },
   "theory-auditor": {
     agentId: "theory-auditor",
     agentName: "Theory Auditor",

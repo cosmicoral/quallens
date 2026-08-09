@@ -9,6 +9,7 @@ import {
   broadClaimManuscript,
   broadClaimProfile,
 } from "@/test/fixtures/evidence-audit-fixtures";
+import { underreportedDesignAudit } from "@/test/fixtures/research-design-fixtures";
 import { auditEvidence } from "./evidence-auditor";
 import { runReviewPipeline } from "./pipeline";
 
@@ -127,16 +128,21 @@ describe("auditEvidence", () => {
     expect(result.error.code).toBe("refusal");
   });
 
-  it("runs after the Manuscript Reader and leads the remaining specialists", async () => {
-    const provider = new SequenceProvider([broadClaimProfile, broadClaimAudit]);
+  it("runs both live specialist audits after the Manuscript Reader", async () => {
+    const provider = new SequenceProvider([
+      broadClaimProfile,
+      broadClaimAudit,
+      underreportedDesignAudit,
+    ]);
 
     const result = await runReviewPipeline(broadClaimManuscript, provider);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(provider.requests).toHaveLength(2);
+    expect(provider.requests).toHaveLength(3);
     expect(provider.requests[0].system).toMatch(/Manuscript Reader/);
     expect(provider.requests[1].system).toMatch(/Evidence Auditor/);
+    expect(provider.requests[2].system).toMatch(/Research Design Reviewer/);
     expect(result.result.agentReviews.map((review) => review.agentId)).toEqual([
       "manuscript-reader",
       "evidence-auditor",
@@ -145,5 +151,8 @@ describe("auditEvidence", () => {
       "overclaim-auditor",
     ]);
     expect(result.result.agentReviews[1].evidenceAudit).toEqual(broadClaimAudit);
+    expect(result.result.agentReviews[2].researchDesignAudit).toEqual(
+      underreportedDesignAudit,
+    );
   });
 });

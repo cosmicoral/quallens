@@ -1,6 +1,7 @@
 import { ResearchIcon } from "@/components/ResearchIcon";
 import type { AgentReview, ReviewFinding, Severity } from "@/lib/types";
 import { EvidenceAuditDetails } from "./EvidenceAuditDetails";
+import { ResearchDesignAuditDetails } from "./ResearchDesignAuditDetails";
 import { ScoreBadge } from "./ScoreBadge";
 
 const SEVERITY_STYLES: Record<Severity, string> = {
@@ -48,9 +49,13 @@ function FindingList({ findings }: { findings: ReviewFinding[] }) {
 
 export function SpecialistReviewCard({ review }: { review: AgentReview }) {
   const isActive =
-    review.agentId === "manuscript-reader" || review.agentId === "evidence-auditor";
+    review.agentId === "manuscript-reader" ||
+    review.agentId === "evidence-auditor" ||
+    review.agentId === "research-design-reviewer";
   const itemCount = review.evidenceAudit
     ? `${review.evidenceAudit.claims.length} claim${review.evidenceAudit.claims.length === 1 ? "" : "s"}`
+    : review.researchDesignAudit
+      ? "9 design dimensions"
     : `${review.findings.length} finding${review.findings.length === 1 ? "" : "s"}`;
 
   return (
@@ -101,6 +106,8 @@ export function SpecialistReviewCard({ review }: { review: AgentReview }) {
         <p className="mb-5 max-w-3xl text-sm leading-6 text-[var(--slate)]">{review.summary}</p>
         {review.evidenceAudit ? (
           <EvidenceAuditDetails audit={review.evidenceAudit} />
+        ) : review.researchDesignAudit ? (
+          <ResearchDesignAuditDetails audit={review.researchDesignAudit} />
         ) : (
           <FindingList findings={review.findings} />
         )}
