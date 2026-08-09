@@ -51,7 +51,7 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
           </div>
           <p className="max-w-2xl text-base leading-7 text-slate-200">{final.summary}</p>
           <div className="mt-8 border-t border-white/10 pt-5 text-xs text-slate-400">
-            Final synthesis is currently an MVP output; inspect the four live
+            Final synthesis is currently an MVP output; inspect the five live
             specialist panels below for manuscript-specific analysis.
           </div>
         </article>

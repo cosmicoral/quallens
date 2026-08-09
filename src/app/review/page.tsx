@@ -5,6 +5,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewResults } from "@/components/ReviewResults";
 import { ResearchIcon } from "@/components/ResearchIcon";
 import { SiteHeader } from "@/components/SiteHeader";
+import { QualLensAgentMascot } from "@/components/review/QualLensAgentMascot";
 import type { ManuscriptInput, ReviewResponse, ReviewResult } from "@/lib/types";
 
 export default function ReviewPage() {
@@ -122,13 +123,29 @@ export default function ReviewPage() {
                 </div>
               </li>
               <li className="flex gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 text-[var(--blue-light)]">
+                  <ResearchIcon name="overclaim-auditor" className="size-5" />
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold">Overclaim Auditor</p>
+                    <span className="rounded-full bg-sky-400/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-sky-200">
+                      Active
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    Tests causal, population, novelty, and recommendation scope.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 text-slate-300">
                   <ResearchIcon name="synthesize" className="size-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold">Specialist synthesis</p>
+                  <p className="text-sm font-semibold">Final synthesis</p>
                   <p className="mt-1 text-xs leading-5 text-slate-400">
-                    Overclaim and final review remain MVP outputs.
+                    The Final Reviewer remains an MVP output.
                   </p>
                 </div>
               </li>
@@ -144,43 +161,7 @@ export default function ReviewPage() {
             <ReviewForm onSubmit={handleSubmit} submitting={submitting} />
 
             {submitting && (
-              <div
-                role="status"
-                aria-live="polite"
-                className="mt-5 flex items-center gap-4 rounded-2xl border border-[var(--blue-soft)] bg-[var(--paper-blue)] p-5"
-              >
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-[var(--blue)] shadow-sm">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    className="size-5 animate-spin"
-                    fill="none"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="9"
-                      stroke="currentColor"
-                      strokeOpacity="0.22"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M21 12a9 9 0 0 0-9-9"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-[var(--ink)]">
-                    Reviewing the manuscript
-                  </p>
-                  <p className="mt-0.5 text-sm text-[var(--slate)]">
-                    Reading in context, then checking claims against the evidence.
-                  </p>
-                </div>
-              </div>
+              <QualLensAgentMascot illustrativeSequence className="mt-5" />
             )}
 
             {error && (

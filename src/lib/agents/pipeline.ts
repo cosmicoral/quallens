@@ -1,6 +1,6 @@
 import type { LLMError, LLMProvider } from "@/lib/llm";
 import type { AgentId, ManuscriptInput, ReviewResult } from "@/lib/types";
-import type { AgentInfo, ReviewerAgent } from "./types";
+import type { AgentInfo } from "./types";
 import { manuscriptReader, readManuscript } from "./manuscript-reader";
 import {
   researchDesignReviewer,
@@ -8,11 +8,8 @@ import {
 } from "./research-design-reviewer";
 import { auditEvidence, evidenceAuditor } from "./evidence-auditor";
 import { auditTheory, theoryAuditor } from "./theory-auditor";
-import { overclaimAuditor } from "./overclaim-auditor";
+import { auditOverclaims, overclaimAuditor } from "./overclaim-auditor";
 import { finalReviewer } from "./final-reviewer";
-
-/** Specialists that remain mocked after the four live reviewers. */
-const mockAgents: ReviewerAgent[] = [overclaimAuditor];
 
 /** Specialist agents in the order their reviews are reported (for display). */
 export const specialistAgents: AgentInfo[] = [
@@ -20,7 +17,7 @@ export const specialistAgents: AgentInfo[] = [
   evidenceAuditor,
   researchDesignReviewer,
   theoryAuditor,
-  ...mockAgents,
+  overclaimAuditor,
 ];
 
 export interface PipelineError {
@@ -37,9 +34,10 @@ export type ReviewPipelineResult =
  * Run the full review pipeline.
  *
  * The Manuscript Reader runs first. Evidence, Research Design, and Theory then
- * run in parallel against the original manuscript and validated profile.
- * Overclaim and the Final Reviewer still return mock data. Any real agent can
- * abort the pipeline with a typed error rather than fabricated data.
+ * run in parallel against the original manuscript and validated profile. The
+ * Overclaim Auditor then also consumes the completed Evidence Audit. Only the
+ * Final Reviewer still returns mock data. Any real agent can abort the pipeline
+ * with a typed error rather than fabricated data.
  */
 export async function runReviewPipeline(
   manuscript: ManuscriptInput,
@@ -84,15 +82,25 @@ export async function runReviewPipeline(
     };
   }
 
-  const mockReviews = await Promise.all(
-    mockAgents.map((agent) => agent.run(manuscript)),
+  const overclaimResult = await auditOverclaims(
+    manuscript,
+    readerResult.review.profile,
+    evidenceResult.review.evidenceAudit,
+    provider ?? undefined,
   );
+  if (!overclaimResult.ok) {
+    return {
+      ok: false,
+      error: { agentId: overclaimAuditor.id, error: overclaimResult.error },
+    };
+  }
+
   const agentReviews = [
     readerResult.review,
     evidenceResult.review,
     researchDesignResult.review,
     theoryResult.review,
-    ...mockReviews,
+    overclaimResult.review,
   ];
   const finalAssessment = await finalReviewer.synthesize(manuscript, agentReviews);
 

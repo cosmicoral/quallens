@@ -11,6 +11,7 @@ import {
 } from "@/test/fixtures/evidence-audit-fixtures";
 import { underreportedDesignAudit } from "@/test/fixtures/research-design-fixtures";
 import { mentionedTheoryAudit } from "@/test/fixtures/theory-audit-fixtures";
+import { culturalOverreachAudit } from "@/test/fixtures/overclaim-audit-fixtures";
 import { auditEvidence } from "./evidence-auditor";
 import { runReviewPipeline } from "./pipeline";
 
@@ -135,17 +136,22 @@ describe("auditEvidence", () => {
       broadClaimAudit,
       underreportedDesignAudit,
       mentionedTheoryAudit,
+      culturalOverreachAudit,
     ]);
 
     const result = await runReviewPipeline(broadClaimManuscript, provider);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(provider.requests).toHaveLength(4);
+    expect(provider.requests).toHaveLength(5);
     expect(provider.requests[0].system).toMatch(/Manuscript Reader/);
     expect(provider.requests[1].system).toMatch(/Evidence Auditor/);
     expect(provider.requests[2].system).toMatch(/Research Design Reviewer/);
     expect(provider.requests[3].system).toMatch(/Theory Auditor/);
+    expect(provider.requests[4].system).toMatch(/Overclaim & Contribution Auditor/);
+    expect(provider.requests[4].prompt).toContain(
+      '"support_assessment": "partially_supported"',
+    );
     expect(result.result.agentReviews.map((review) => review.agentId)).toEqual([
       "manuscript-reader",
       "evidence-auditor",
@@ -158,5 +164,8 @@ describe("auditEvidence", () => {
       underreportedDesignAudit,
     );
     expect(result.result.agentReviews[3].theoryAudit).toEqual(mentionedTheoryAudit);
+    expect(result.result.agentReviews[4].overclaimAudit).toEqual(
+      culturalOverreachAudit,
+    );
   });
 });

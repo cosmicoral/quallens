@@ -6,10 +6,11 @@ from a different angle, and a final reviewer synthesizes their assessments into
 a verdict with prioritized revision recommendations.
 
 > **Status: MVP.** The full frontend ↔ backend flow works end-to-end. The
-> **Manuscript Reader, Evidence Auditor, Research Design Reviewer, and Theory
-> Auditor are LLM-backed** (Claude, via a swappable provider abstraction). The
-> Reader produces a strict manuscript profile, then all three specialist
-> reviewers inspect the original manuscript; Overclaim and Final remain mocked.
+> **The Manuscript Reader and all four specialist auditors are LLM-backed**
+> (Claude, via a swappable provider abstraction). The Reader produces a strict
+> profile; Evidence, Research Design, and Theory inspect the manuscript in
+> parallel; then Overclaim also uses the real Evidence Audit. Final remains
+> mocked.
 
 ## The reviewer panel
 
@@ -49,6 +50,7 @@ quallens/
 │   │   │   ├── evidence-audit.ts      # Zod schema + EvidenceAudit type
 │   │   │   ├── research-design-audit.ts # Zod schema + ResearchDesignAudit
 │   │   │   ├── theory-audit.ts        # Zod schema + TheoryAudit
+│   │   │   ├── overclaim-audit.ts     # Zod schema + OverclaimAudit
 │   │   │   ├── review.ts             # ReviewResult, AgentReview, findings…
 │   │   │   └── index.ts
 │   │   ├── llm/
@@ -61,7 +63,7 @@ quallens/
 │   │   │   ├── research-design-reviewer.ts   # REAL: design audit
 │   │   │   ├── evidence-auditor.ts           # REAL: claim-level evidence audit
 │   │   │   ├── theory-auditor.ts             # REAL: theoretical integration audit
-│   │   │   ├── overclaim-auditor.ts          # mock
+│   │   │   ├── overclaim-auditor.ts          # REAL: claim-scope audit
 │   │   │   ├── final-reviewer.ts             # mock
 │   │   │   └── pipeline.ts           # Orchestrates reader → specialists → final
 │   │   └── mock/
@@ -71,7 +73,8 @@ quallens/
 │       │   ├── qualitative-manuscript.ts  # Realistic manuscript + profile
 │       │   ├── evidence-audit-fixtures.ts # Evidence audit scenarios
 │       │   ├── research-design-fixtures.ts # Design review scenarios
-│       │   └── theory-audit-fixtures.ts # Theory integration scenarios
+│       │   ├── theory-audit-fixtures.ts # Theory integration scenarios
+│       │   └── overclaim-audit-fixtures.ts # Claim-scope scenarios
 │       └── fake-provider.ts          # LLMProvider test double
 ├── .env.example
 └── README.md
@@ -136,6 +139,15 @@ conceptual drift, assesses whether theory changes empirical interpretation,
 and tests whether theoretical contribution claims are proportionate to the
 analysis. It does not invent mechanisms or treat citation as integration.
 
+### The Overclaim Auditor (LLM-backed)
+
+The Overclaim Auditor receives the original manuscript, validated profile, and
+completed real `EvidenceAudit`. Its strict `OverclaimAudit` distinguishes
+well-bounded qualitative claims from causal, population, cultural, novelty,
+policy, practical, and conclusion-stage overreach. It preserves contextual
+transferability and participant perceptions while separating minor wording
+calibration from serious scope problems.
+
 ### LLM provider abstraction
 
 Agents depend on the `LLMProvider` interface (`src/lib/llm/types.ts`), not on
@@ -161,9 +173,10 @@ Adding a provider = implementing `LLMProvider` and registering it in
 4. The **Evidence Auditor, Research Design Reviewer, and Theory Auditor run in
    parallel, for real**, using both the original manuscript and the validated
    profile. A failure from any specialist aborts with a typed error.
-5. The Overclaim specialist (still mock) runs, then the Final Reviewer (mock)
-   synthesizes a `FinalAssessment`.
-6. The route returns a `ReviewResult`; the frontend renders the final verdict,
+5. The **Overclaim Auditor runs for real** using the original manuscript,
+   validated profile, and completed Evidence Audit.
+6. The Final Reviewer (mock) synthesizes a `FinalAssessment`.
+7. The route returns a `ReviewResult`; the frontend renders the final verdict,
    strengths/weaknesses, recommendations, and each agent's findings.
 
 ### Key types (`src/lib/types/`)
@@ -176,6 +189,8 @@ Adding a provider = implementing `LLMProvider` and registering it in
   and revision priorities.
 - `TheoryAudit` — strict framework, concept-consistency, integration, drift,
   and theoretical-contribution assessments.
+- `OverclaimAudit` — strict claim-level risk, overreach basis, patterns, and
+  scope-revision assessments.
 - `ReviewerAgent` — the contract each specialist implements: `run(manuscript) → AgentReview`.
 - `AgentReview` — one agent's summary, 1–5 score, and list of `ReviewFinding`s
   (severity, location, recommendation).
@@ -209,10 +224,10 @@ npm test
 ```
 
 Tests run offline against a `FakeProvider` (no API key needed). They cover the
-strict Manuscript Profile, Evidence Audit, Research Design Audit, and Theory
-Audit schemas; all four real agents; typed provider failures; evidence and
-design scenarios; theory name-checking versus integration; and conceptual
-drift.
+strict Manuscript Profile and all four specialist audit schemas; all five real
+agents; typed provider failures; bounded versus population claims; participant
+perception versus causality; evidence and design scenarios; and theory
+integration and drift.
 
 ## Tech stack
 
@@ -224,7 +239,7 @@ drift.
 
 ## Intentionally out of scope (for now)
 
-- LLM-backed implementations of Overclaim and Final (mock data)
+- LLM-backed Final Reviewer synthesis (currently mock data)
 - Authentication, databases, payments, queues
 - PDF parsing / file upload
 - RAG, external literature search, or citation checking

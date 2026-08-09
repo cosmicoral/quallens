@@ -35,7 +35,7 @@ const reviewers: Array<{
     id: "overclaim-auditor",
     name: "Overclaim Auditor",
     description: "Flags claims that exceed the evidence, sample, or study design.",
-    status: "In development",
+    status: "Active",
   },
   {
     id: "final-reviewer",
@@ -90,9 +90,8 @@ export function ReviewerPanel() {
       </ul>
 
       <p className="mt-6 text-xs leading-5 text-[var(--muted)]">
-        Manuscript Reader, Evidence Auditor, Research Design Reviewer, and
-        Theory Auditor are live. Overclaim and Final currently use structured
-        MVP data.
+        Manuscript Reader and all four specialist auditors are live. Final
+        synthesis currently uses structured MVP data.
       </p>
     </section>
   );

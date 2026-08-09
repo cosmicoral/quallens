@@ -2,6 +2,8 @@ import type { ManuscriptProfile } from "./manuscript-profile";
 import type { EvidenceAudit } from "./evidence-audit";
 import type { ResearchDesignAudit } from "./research-design-audit";
 import type { TheoryAudit } from "./theory-audit";
+import type { OverclaimAudit } from "./overclaim-audit";
+import type { FinalReview } from "./final-review";
 
 /**
  * Review output types.
@@ -62,6 +64,8 @@ export interface AgentReview {
   researchDesignAudit?: ResearchDesignAudit;
   /** Structured theory audit — produced by the Theory Auditor only. */
   theoryAudit?: TheoryAudit;
+  /** Structured scope audit — produced by the Overclaim Auditor only. */
+  overclaimAudit?: OverclaimAudit;
 }
 
 /** Synthesis produced by the Final Reviewer agent. */
@@ -83,6 +87,9 @@ export interface ReviewResult {
   /** ISO 8601 timestamp of when the review completed. */
   createdAt: string;
   agentReviews: AgentReview[];
+  /** Structured, section-aware synthesis from the real Final Reviewer. */
+  finalReview?: FinalReview;
+  /** Legacy summary retained additively for existing API consumers. */
   finalAssessment: FinalAssessment;
 }
 
