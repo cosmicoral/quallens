@@ -1,0 +1,1503 @@
+{
+  "version": 1,
+  "description": "Qualisapio curated RAG corpus checklist (30 methodologies, 40 theories, 30 journal profiles).",
+  "entries": [
+    {
+      "id": "methodology.reflexive-thematic-analysis",
+      "type": "methodology",
+      "title": "Reflexive Thematic Analysis",
+      "file": "methodology/reflexive-thematic-analysis.md",
+      "status": "stub",
+      "phase": 1,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.codebook-thematic-analysis",
+      "type": "methodology",
+      "title": "Codebook Thematic Analysis",
+      "file": "methodology/codebook-thematic-analysis.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.constructivist-grounded-theory",
+      "type": "methodology",
+      "title": "Constructivist Grounded Theory (Charmaz)",
+      "file": "methodology/constructivist-grounded-theory.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.objectivist-grounded-theory",
+      "type": "methodology",
+      "title": "Objectivist Grounded Theory",
+      "file": "methodology/objectivist-grounded-theory.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.ethnography-general",
+      "type": "methodology",
+      "title": "Ethnography (General)",
+      "file": "methodology/ethnography-general.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "ethnography",
+        "everyday-life"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.multi-sited-ethnography",
+      "type": "methodology",
+      "title": "Multi-sited Ethnography",
+      "file": "methodology/multi-sited-ethnography.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "ethnography"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.digital-online-ethnography",
+      "type": "methodology",
+      "title": "Digital and Online Ethnography",
+      "file": "methodology/digital-online-ethnography.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "digital-society",
+        "ethnography"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.netnography",
+      "type": "methodology",
+      "title": "Netnography",
+      "file": "methodology/netnography.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "consumption",
+        "digital-society"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.autoethnography",
+      "type": "methodology",
+      "title": "Autoethnography",
+      "file": "methodology/autoethnography.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.phenomenology-qualitative",
+      "type": "methodology",
+      "title": "Phenomenology (Qualitative)",
+      "file": "methodology/phenomenology-qualitative.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.interpretive-phenomenological-analysis",
+      "type": "methodology",
+      "title": "Interpretive Phenomenological Analysis (IPA)",
+      "file": "methodology/interpretive-phenomenological-analysis.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.narrative-analysis",
+      "type": "methodology",
+      "title": "Narrative Analysis",
+      "file": "methodology/narrative-analysis.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.biographical-life-history",
+      "type": "methodology",
+      "title": "Biographical and Life History Methods",
+      "file": "methodology/biographical-life-history.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.discourse-analysis-intro",
+      "type": "methodology",
+      "title": "Discourse Analysis (Introductory)",
+      "file": "methodology/discourse-analysis-intro.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.critical-discourse-analysis",
+      "type": "methodology",
+      "title": "Critical Discourse Analysis",
+      "file": "methodology/critical-discourse-analysis.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.conversation-analysis",
+      "type": "methodology",
+      "title": "Conversation Analysis",
+      "file": "methodology/conversation-analysis.md",
+      "status": "planned",
+      "phase": 3,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.qualitative-case-study",
+      "type": "methodology",
+      "title": "Qualitative Case Study",
+      "file": "methodology/qualitative-case-study.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.comparative-qualitative-case-study",
+      "type": "methodology",
+      "title": "Comparative Qualitative Case Study",
+      "file": "methodology/comparative-qualitative-case-study.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.interview-methods-semi-structured",
+      "type": "methodology",
+      "title": "Semi-structured Interview Methods",
+      "file": "methodology/interview-methods-semi-structured.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.focus-groups",
+      "type": "methodology",
+      "title": "Focus Groups",
+      "file": "methodology/focus-groups.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.visual-methods-photo-elicitation",
+      "type": "methodology",
+      "title": "Visual Methods and Photo Elicitation",
+      "file": "methodology/visual-methods-photo-elicitation.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "material-culture"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.sensory-ethnography",
+      "type": "methodology",
+      "title": "Sensory Ethnography",
+      "file": "methodology/sensory-ethnography.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "food",
+        "embodiment"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.mobile-go-along-methods",
+      "type": "methodology",
+      "title": "Mobile and Go-along Methods",
+      "file": "methodology/mobile-go-along-methods.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "everyday-life",
+        "social-practices"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.document-analysis-qualitative",
+      "type": "methodology",
+      "title": "Qualitative Document Analysis",
+      "file": "methodology/document-analysis-qualitative.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.archival-qualitative-research",
+      "type": "methodology",
+      "title": "Archival Qualitative Research",
+      "file": "methodology/archival-qualitative-research.md",
+      "status": "planned",
+      "phase": 3,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.participatory-community-based-qualitative",
+      "type": "methodology",
+      "title": "Participatory and Community-based Qualitative Research",
+      "file": "methodology/participatory-community-based-qualitative.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.feminist-qualitative-methodology",
+      "type": "methodology",
+      "title": "Feminist Qualitative Methodology",
+      "file": "methodology/feminist-qualitative-methodology.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "gender"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.decolonial-postcolonial-qualitative-methods",
+      "type": "methodology",
+      "title": "Decolonial and Postcolonial Qualitative Methods",
+      "file": "methodology/decolonial-postcolonial-qualitative-methods.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.situational-analysis-clarke",
+      "type": "methodology",
+      "title": "Situational Analysis (Clarke)",
+      "file": "methodology/situational-analysis-clarke.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "STS",
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "methodology.qualitative-content-analysis-mayring",
+      "type": "methodology",
+      "title": "Qualitative Content Analysis (Mayring-style)",
+      "file": "methodology/qualitative-content-analysis-mayring.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "research-design"
+      ]
+    },
+    {
+      "id": "theory.practice-theory-general",
+      "type": "theory",
+      "title": "Practice Theory (General)",
+      "file": "theory/practice-theory-general.md",
+      "status": "stub",
+      "phase": 1,
+      "domains": [
+        "social-practices",
+        "everyday-life"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.social-practices-theory",
+      "type": "theory",
+      "title": "Social Practices Theory (Shove, Warde, Watson)",
+      "file": "theory/social-practices-theory.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "social-practices",
+        "sustainability"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.practice-theory-sustainability-transitions",
+      "type": "theory",
+      "title": "Practice Theory and Sustainability Transitions",
+      "file": "theory/practice-theory-sustainability-transitions.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "sustainability",
+        "social-practices"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.bourdieu-habitus-field-capital",
+      "type": "theory",
+      "title": "Bourdieu: Habitus, Field, and Capital",
+      "file": "theory/bourdieu-habitus-field-capital.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.bourdieu-consumption-taste",
+      "type": "theory",
+      "title": "Bourdieu Applied to Consumption and Taste",
+      "file": "theory/bourdieu-consumption-taste.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "consumption"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.giddens-structuration",
+      "type": "theory",
+      "title": "Giddens: Structuration and Everyday Life",
+      "file": "theory/giddens-structuration.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "everyday-life"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.de-certeau-everyday-tactics",
+      "type": "theory",
+      "title": "de Certeau: Tactics and Everyday Life",
+      "file": "theory/de-certeau-everyday-tactics.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "everyday-life"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.consumer-culture-theory",
+      "type": "theory",
+      "title": "Consumer Culture Theory (CCT)",
+      "file": "theory/consumer-culture-theory.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "consumption"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.material-culture-studies",
+      "type": "theory",
+      "title": "Material Culture Studies",
+      "file": "theory/material-culture-studies.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "material-culture"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.commodity-biographies",
+      "type": "theory",
+      "title": "Commodity Biographies and Biographical Objects",
+      "file": "theory/commodity-biographies.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "material-culture",
+        "consumption"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.sts-sociotechnical-systems",
+      "type": "theory",
+      "title": "STS: Sociotechnical Systems",
+      "file": "theory/sts-sociotechnical-systems.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "STS",
+        "technology-and-society"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.actor-network-theory",
+      "type": "theory",
+      "title": "Actor–Network Theory (ANT)",
+      "file": "theory/actor-network-theory.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "STS"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.assemblage-thinking",
+      "type": "theory",
+      "title": "Assemblage Thinking (Qualitative Use)",
+      "file": "theory/assemblage-thinking.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "STS"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.infrastructure-studies-repair",
+      "type": "theory",
+      "title": "Infrastructure Studies and Repair",
+      "file": "theory/infrastructure-studies-repair.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "STS",
+        "technology-and-society"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.platform-society",
+      "type": "theory",
+      "title": "Platform Society and Platformization",
+      "file": "theory/platform-society.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "digital-society"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.affordances-sociomateriality",
+      "type": "theory",
+      "title": "Affordances and Sociomateriality",
+      "file": "theory/affordances-sociomateriality.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "technology-and-society"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.domestication-of-technology",
+      "type": "theory",
+      "title": "Domestication of Technology",
+      "file": "theory/domestication-of-technology.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "technology-and-society",
+        "everyday-life"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.algorithmic-datafied-everyday-life",
+      "type": "theory",
+      "title": "Algorithmic and Datafied Everyday Life",
+      "file": "theory/algorithmic-datafied-everyday-life.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "digital-society"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.feminist-theory-qualitative",
+      "type": "theory",
+      "title": "Feminist Theory for Qualitative Empirics",
+      "file": "theory/feminist-theory-qualitative.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "gender"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.intersectionality",
+      "type": "theory",
+      "title": "Intersectionality",
+      "file": "theory/intersectionality.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "gender",
+        "ethnicity"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.performativity-butler",
+      "type": "theory",
+      "title": "Performativity (Butler)",
+      "file": "theory/performativity-butler.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "gender",
+        "embodiment"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.embodiment-phenomenological-sociology",
+      "type": "theory",
+      "title": "Embodiment and Phenomenological Sociology",
+      "file": "theory/embodiment-phenomenological-sociology.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "embodiment"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.care-ethics-social-reproduction",
+      "type": "theory",
+      "title": "Care Ethics and Social Reproduction",
+      "file": "theory/care-ethics-social-reproduction.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "gender"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.masculinities",
+      "type": "theory",
+      "title": "Masculinities (Plural Masculinities)",
+      "file": "theory/masculinities.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "gender"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.critical-race-theory-social-science",
+      "type": "theory",
+      "title": "Critical Race Theory (Social Science Use)",
+      "file": "theory/critical-race-theory-social-science.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "ethnicity"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.racism-racialization",
+      "type": "theory",
+      "title": "Racism and Racialization (Processual)",
+      "file": "theory/racism-racialization.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "ethnicity"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.diaspora-transnationalism",
+      "type": "theory",
+      "title": "Diaspora and Transnationalism",
+      "file": "theory/diaspora-transnationalism.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "migration"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.postcolonial-theory-applied",
+      "type": "theory",
+      "title": "Postcolonial Theory (Applied Carefully)",
+      "file": "theory/postcolonial-theory-applied.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "ethnicity"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.decolonial-thought",
+      "type": "theory",
+      "title": "Decolonial Thought (Scope Note)",
+      "file": "theory/decolonial-thought.md",
+      "status": "planned",
+      "phase": 3,
+      "domains": [
+        "ethnicity"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.super-diversity",
+      "type": "theory",
+      "title": "Super-diversity (Vertovec)",
+      "file": "theory/super-diversity.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "migration",
+        "ethnicity"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.foucault-discourse-power",
+      "type": "theory",
+      "title": "Foucault: Discourse, Power/Knowledge, Governmentality",
+      "file": "theory/foucault-discourse-power.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.governmentality-neoliberalism",
+      "type": "theory",
+      "title": "Governmentality and Neoliberalism",
+      "file": "theory/governmentality-neoliberalism.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.critical-theory-frankfurt",
+      "type": "theory",
+      "title": "Critical Theory (Frankfurt Legacy, Light Touch)",
+      "file": "theory/critical-theory-frankfurt.md",
+      "status": "planned",
+      "phase": 3,
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.bourdieu-vs-foucault",
+      "type": "theory",
+      "title": "Bourdieu vs Foucault: When to Use Which",
+      "file": "theory/bourdieu-vs-foucault.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.institutional-organizational-theory-qualitative",
+      "type": "theory",
+      "title": "Institutional and Organizational Theory (Qualitative)",
+      "file": "theory/institutional-organizational-theory-qualitative.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "organization"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.lefebvre-space-everyday-life",
+      "type": "theory",
+      "title": "Lefebvre: Space and Everyday Life",
+      "file": "theory/lefebvre-space-everyday-life.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "everyday-life"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.more-than-human-multispecies",
+      "type": "theory",
+      "title": "More-than-human and Multispecies Turn",
+      "file": "theory/more-than-human-multispecies.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "sustainability",
+        "environment"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.political-ecology-qualitative",
+      "type": "theory",
+      "title": "Political Ecology (Qualitative Entry)",
+      "file": "theory/political-ecology-qualitative.md",
+      "status": "planned",
+      "phase": 2,
+      "domains": [
+        "sustainability",
+        "environment"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.food-studies-provisioning",
+      "type": "theory",
+      "title": "Food Studies: Provisioning and Moral Economy",
+      "file": "theory/food-studies-provisioning.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "food",
+        "consumption"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "theory.sustainable-consumption-theories",
+      "type": "theory",
+      "title": "Sustainable Consumption: Theories of Change",
+      "file": "theory/sustainable-consumption-theories.md",
+      "status": "planned",
+      "phase": 1,
+      "domains": [
+        "sustainability",
+        "consumption"
+      ],
+      "agents": [
+        "theory-auditor",
+        "overclaim-auditor"
+      ]
+    },
+    {
+      "id": "journal.the-sociological-review",
+      "type": "journal_profile",
+      "title": "The Sociological Review",
+      "file": "journals/the-sociological-review.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "sociology",
+        "qualitative"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.sociology-bsa",
+      "type": "journal_profile",
+      "title": "Sociology (BSA)",
+      "file": "journals/sociology-bsa.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.british-journal-of-sociology",
+      "type": "journal_profile",
+      "title": "British Journal of Sociology",
+      "file": "journals/british-journal-of-sociology.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.journal-of-consumer-culture",
+      "type": "journal_profile",
+      "title": "Journal of Consumer Culture",
+      "file": "journals/journal-of-consumer-culture.md",
+      "status": "stub",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "consumption",
+        "cultural-sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.consumption-markets-culture",
+      "type": "journal_profile",
+      "title": "Consumption, Markets & Culture",
+      "file": "journals/consumption-markets-culture.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "consumption"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.journal-of-material-culture",
+      "type": "journal_profile",
+      "title": "Journal of Material Culture",
+      "file": "journals/journal-of-material-culture.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "material-culture"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.cultural-sociology",
+      "type": "journal_profile",
+      "title": "Cultural Sociology",
+      "file": "journals/cultural-sociology.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "cultural-sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.qualitative-research",
+      "type": "journal_profile",
+      "title": "Qualitative Research",
+      "file": "journals/qualitative-research.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.media-culture-society",
+      "type": "journal_profile",
+      "title": "Media, Culture & Society",
+      "file": "journals/media-culture-society.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "digital-society",
+        "media"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.new-media-society",
+      "type": "journal_profile",
+      "title": "New Media & Society",
+      "file": "journals/new-media-society.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "digital-society"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.information-communication-society",
+      "type": "journal_profile",
+      "title": "Information, Communication & Society",
+      "file": "journals/information-communication-society.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "digital-society"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.international-journal-cultural-studies",
+      "type": "journal_profile",
+      "title": "International Journal of Cultural Studies",
+      "file": "journals/international-journal-cultural-studies.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "UK",
+      "domains": [
+        "cultural-studies"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.body-society",
+      "type": "journal_profile",
+      "title": "Body & Society",
+      "file": "journals/body-society.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "UK",
+      "domains": [
+        "embodiment",
+        "gender"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.time-society",
+      "type": "journal_profile",
+      "title": "Time & Society",
+      "file": "journals/time-society.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "UK",
+      "domains": [
+        "everyday-life"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.ethnic-and-racial-studies",
+      "type": "journal_profile",
+      "title": "Ethnic and Racial Studies",
+      "file": "journals/ethnic-and-racial-studies.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "ethnicity",
+        "migration"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.gender-place-culture",
+      "type": "journal_profile",
+      "title": "Gender, Place & Culture",
+      "file": "journals/gender-place-culture.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "gender"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.european-journal-social-theory",
+      "type": "journal_profile",
+      "title": "European Journal of Social Theory",
+      "file": "journals/european-journal-social-theory.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "Europe",
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.european-societies",
+      "type": "journal_profile",
+      "title": "European Societies",
+      "file": "journals/european-societies.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.social-movement-studies",
+      "type": "journal_profile",
+      "title": "Social Movement Studies",
+      "file": "journals/social-movement-studies.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.forum-qualitative-sozialforschung",
+      "type": "journal_profile",
+      "title": "Forum Qualitative Sozialforschung (FQS)",
+      "file": "journals/forum-qualitative-sozialforschung.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "Europe",
+      "domains": [
+        "qualitative"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.acta-sociologica",
+      "type": "journal_profile",
+      "title": "Acta Sociologica",
+      "file": "journals/acta-sociologica.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.poetics",
+      "type": "journal_profile",
+      "title": "Poetics",
+      "file": "journals/poetics.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "cultural-sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.organization-studies",
+      "type": "journal_profile",
+      "title": "Organization Studies",
+      "file": "journals/organization-studies.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "organization"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.geoforum",
+      "type": "journal_profile",
+      "title": "Geoforum",
+      "file": "journals/geoforum.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "environment",
+        "space"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.environment-and-planning-e",
+      "type": "journal_profile",
+      "title": "Environment and Planning E: Nature and Space",
+      "file": "journals/environment-and-planning-e.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "UK",
+      "domains": [
+        "environment",
+        "sustainability"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.social-studies-of-science",
+      "type": "journal_profile",
+      "title": "Social Studies of Science",
+      "file": "journals/social-studies-of-science.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "STS"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.science-as-culture",
+      "type": "journal_profile",
+      "title": "Science as Culture",
+      "file": "journals/science-as-culture.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "UK",
+      "domains": [
+        "STS"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.migration-studies",
+      "type": "journal_profile",
+      "title": "Migration Studies",
+      "file": "journals/migration-studies.md",
+      "status": "planned",
+      "phase": 1,
+      "region": "UK",
+      "domains": [
+        "migration"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.current-sociology",
+      "type": "journal_profile",
+      "title": "Current Sociology",
+      "file": "journals/current-sociology.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "International",
+      "domains": [
+        "sociology"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    },
+    {
+      "id": "journal.distinktion-journal-social-theory",
+      "type": "journal_profile",
+      "title": "Distinktion: Journal of Social Theory",
+      "file": "journals/distinktion-journal-social-theory.md",
+      "status": "planned",
+      "phase": 2,
+      "region": "Europe",
+      "domains": [
+        "social-theory"
+      ],
+      "agents": [
+        "final-reviewer"
+      ]
+    }
+  ]
+}

@@ -54,7 +54,7 @@ export function ReviewerPanel() {
         <p className="eyebrow">The peer-review panel</p>
         <h2 className="section-title">One review. Many reviewer lenses.</h2>
         <p className="section-copy">
-          Six specialist lenses mirror journal peer review—for authors testing a
+          Six AI specialist reviewers mirror journal peer review—for authors testing a
           submission and reviewers organizing a constructive assessment.
         </p>
       </div>

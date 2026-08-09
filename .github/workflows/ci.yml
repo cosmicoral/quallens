@@ -18,6 +18,7 @@ jobs:
 
       - run: npm ci
       - run: npm test
+      - run: npm run corpus:validate
       - run: npm run build
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/qualisapio

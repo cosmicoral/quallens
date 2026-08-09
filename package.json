@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "migrate": "node scripts/migrate.mjs",
+    "corpus:validate": "node scripts/corpus-ingest.mjs",
+    "corpus:init-stubs": "node scripts/corpus-ingest.mjs --init-stubs",
+    "corpus:ingest": "node scripts/corpus-ingest.mjs --ingest",
     "lint": "eslint",
     "test": "vitest run"
   },

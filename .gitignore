@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# rag corpus generated artifacts (future)
+/corpus/.embeddings/
+/corpus/.cache/
