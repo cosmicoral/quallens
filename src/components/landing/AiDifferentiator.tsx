@@ -42,7 +42,14 @@ export function AiDifferentiator() {
             </p>
             <p className="mt-4 max-w-md text-sm leading-6 text-[var(--muted)]">
               It supports your judgment. It does not predict journal acceptance or
-              replace human peer review.
+              replace human peer review.{" "}
+              <a
+                href="#coming-soon-revisions"
+                className="font-medium text-[var(--blue-deep)] underline decoration-[var(--blue-soft)] underline-offset-2 transition hover:text-[var(--blue)]"
+              >
+                Smarter revision guidance — coming soon
+              </a>
+              .
             </p>
           </div>
 

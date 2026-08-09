@@ -5,6 +5,7 @@ import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigg
 import { SiteHeader } from "@/components/SiteHeader";
 import { AiDifferentiator } from "@/components/landing/AiDifferentiator";
 import { BenefitsSection } from "@/components/landing/BenefitsSection";
+import { ComingSoonRevisionSection } from "@/components/landing/ComingSoonRevisionSection";
 import { ReviewerPanel } from "@/components/landing/ReviewerPanel";
 import { RigorSection } from "@/components/landing/RigorSection";
 import { Workflow } from "@/components/landing/Workflow";
@@ -105,6 +106,7 @@ export default function Home() {
         <BenefitsSection />
         <ReviewerPanel />
         <AiDifferentiator />
+        <ComingSoonRevisionSection />
         <Workflow />
         <RigorSection />
 
