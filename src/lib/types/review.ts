@@ -10,7 +10,7 @@ import type { FinalReview } from "./final-review";
  *
  * A review run fans the manuscript out to specialist reviewer agents; each
  * produces an AgentReview, and the Final Reviewer synthesizes them into an
- * overall verdict.
+ * overall revision-readiness judgment.
  */
 
 export type AgentId =

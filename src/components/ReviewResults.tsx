@@ -1,4 +1,5 @@
 import { ScoreBadge } from "@/components/review/ScoreBadge";
+import { FinalReviewDetails } from "@/components/review/FinalReviewDetails";
 import { SpecialistReviewCard } from "@/components/review/SpecialistReviewCard";
 import type { ReviewResult, Verdict } from "@/lib/types";
 
@@ -34,7 +35,11 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
         </p>
       </header>
 
-      <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+      {result.finalReview ? (
+        <FinalReviewDetails review={result.finalReview} />
+      ) : (
+        <>
+          <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <article className="rounded-2xl bg-[var(--ink)] p-6 text-white shadow-[0_24px_60px_rgba(15,23,42,0.18)] sm:p-8">
           <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
             <div>
@@ -51,8 +56,8 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
           </div>
           <p className="max-w-2xl text-base leading-7 text-slate-200">{final.summary}</p>
           <div className="mt-8 border-t border-white/10 pt-5 text-xs text-slate-400">
-            Final synthesis is currently an MVP output; inspect the five live
-            specialist panels below for manuscript-specific analysis.
+            Legacy summary view. The specialist panels below retain the detailed
+            manuscript-specific analysis.
           </div>
         </article>
 
@@ -107,6 +112,8 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
             ))}
           </ul>
         </div>
+      )}
+        </>
       )}
 
       <section aria-labelledby="specialist-reviews-heading" className="mt-14 sm:mt-16">

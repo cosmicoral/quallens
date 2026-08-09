@@ -42,7 +42,7 @@ const reviewers: Array<{
     name: "Final Reviewer",
     description:
       "Synthesizes specialist reviews into prioritized, constructive feedback.",
-    status: "In development",
+    status: "Active",
   },
 ];
 
@@ -90,8 +90,8 @@ export function ReviewerPanel() {
       </ul>
 
       <p className="mt-6 text-xs leading-5 text-[var(--muted)]">
-        Manuscript Reader and all four specialist auditors are live. Final
-        synthesis currently uses structured MVP data.
+        All six reviewers are live and produce schema-validated,
+        manuscript-specific analysis.
       </p>
     </section>
   );

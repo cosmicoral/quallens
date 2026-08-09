@@ -145,7 +145,7 @@ export default function ReviewPage() {
                 <div>
                   <p className="text-sm font-semibold">Final synthesis</p>
                   <p className="mt-1 text-xs leading-5 text-slate-400">
-                    The Final Reviewer remains an MVP output.
+                    Prioritizes findings into a section-aware revision plan.
                   </p>
                 </div>
               </li>

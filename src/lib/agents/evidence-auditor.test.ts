@@ -12,6 +12,7 @@ import {
 import { underreportedDesignAudit } from "@/test/fixtures/research-design-fixtures";
 import { mentionedTheoryAudit } from "@/test/fixtures/theory-audit-fixtures";
 import { culturalOverreachAudit } from "@/test/fixtures/overclaim-audit-fixtures";
+import { strongSynthesisFixture } from "@/test/fixtures/final-review-fixtures";
 import { auditEvidence } from "./evidence-auditor";
 import { runReviewPipeline } from "./pipeline";
 
@@ -130,27 +131,32 @@ describe("auditEvidence", () => {
     expect(result.error.code).toBe("refusal");
   });
 
-  it("runs both live specialist audits after the Manuscript Reader", async () => {
+  it("runs all live reviewers in pipeline order", async () => {
     const provider = new SequenceProvider([
       broadClaimProfile,
       broadClaimAudit,
       underreportedDesignAudit,
       mentionedTheoryAudit,
       culturalOverreachAudit,
+      strongSynthesisFixture.finalReview,
     ]);
 
     const result = await runReviewPipeline(broadClaimManuscript, provider);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(provider.requests).toHaveLength(5);
+    expect(provider.requests).toHaveLength(6);
     expect(provider.requests[0].system).toMatch(/Manuscript Reader/);
     expect(provider.requests[1].system).toMatch(/Evidence Auditor/);
     expect(provider.requests[2].system).toMatch(/Research Design Reviewer/);
     expect(provider.requests[3].system).toMatch(/Theory Auditor/);
     expect(provider.requests[4].system).toMatch(/Overclaim & Contribution Auditor/);
+    expect(provider.requests[5].system).toMatch(/Final Reviewer/);
     expect(provider.requests[4].prompt).toContain(
       '"support_assessment": "partially_supported"',
+    );
+    expect(provider.requests[5].prompt).toContain(
+      '"claim_id": "claim-1"',
     );
     expect(result.result.agentReviews.map((review) => review.agentId)).toEqual([
       "manuscript-reader",
@@ -167,5 +173,6 @@ describe("auditEvidence", () => {
     expect(result.result.agentReviews[4].overclaimAudit).toEqual(
       culturalOverreachAudit,
     );
+    expect(result.result.finalReview).toEqual(strongSynthesisFixture.finalReview);
   });
 });

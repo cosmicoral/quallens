@@ -3,14 +3,14 @@
 **QualLens** is a multi-agent reviewer for qualitative social science research.
 You submit a manuscript; a panel of specialist reviewer agents each examines it
 from a different angle, and a final reviewer synthesizes their assessments into
-a verdict with prioritized revision recommendations.
+a revision-readiness judgment with prioritized recommendations.
 
 > **Status: MVP.** The full frontend ↔ backend flow works end-to-end. The
-> **The Manuscript Reader and all four specialist auditors are LLM-backed**
+> **All six reviewers are LLM-backed**
 > (Claude, via a swappable provider abstraction). The Reader produces a strict
 > profile; Evidence, Research Design, and Theory inspect the manuscript in
-> parallel; then Overclaim also uses the real Evidence Audit. Final remains
-> mocked.
+> parallel; Overclaim also uses the real Evidence Audit; then Final produces a
+> structured, section-aware synthesis of every validated review.
 
 ## The reviewer panel
 
@@ -27,8 +27,8 @@ a verdict with prioritized revision recommendations.
 
 A single Next.js (App Router) application — no separate backend service. The
 review pipeline lives in `src/lib/agents/` and is invoked by the
-`POST /api/review` route handler, so swapping the mock agents for real
-LLM-backed ones later requires no changes to the API surface or the frontend.
+`POST /api/review` route handler. Each agent uses the same provider abstraction
+and typed error model.
 
 ```
 quallens/
@@ -51,6 +51,7 @@ quallens/
 │   │   │   ├── research-design-audit.ts # Zod schema + ResearchDesignAudit
 │   │   │   ├── theory-audit.ts        # Zod schema + TheoryAudit
 │   │   │   ├── overclaim-audit.ts     # Zod schema + OverclaimAudit
+│   │   │   ├── final-review.ts         # Zod schema + FinalReview
 │   │   │   ├── review.ts             # ReviewResult, AgentReview, findings…
 │   │   │   └── index.ts
 │   │   ├── llm/
@@ -64,17 +65,16 @@ quallens/
 │   │   │   ├── evidence-auditor.ts           # REAL: claim-level evidence audit
 │   │   │   ├── theory-auditor.ts             # REAL: theoretical integration audit
 │   │   │   ├── overclaim-auditor.ts          # REAL: claim-scope audit
-│   │   │   ├── final-reviewer.ts             # mock
+│   │   │   ├── final-reviewer.ts             # REAL: prioritized synthesis
 │   │   │   └── pipeline.ts           # Orchestrates reader → specialists → final
-│   │   └── mock/
-│   │       └── mock-review.ts        # Canned data for the remaining mock agents
 │   └── test/
 │       ├── fixtures/
 │       │   ├── qualitative-manuscript.ts  # Realistic manuscript + profile
 │       │   ├── evidence-audit-fixtures.ts # Evidence audit scenarios
 │       │   ├── research-design-fixtures.ts # Design review scenarios
 │       │   ├── theory-audit-fixtures.ts # Theory integration scenarios
-│       │   └── overclaim-audit-fixtures.ts # Claim-scope scenarios
+│       │   ├── overclaim-audit-fixtures.ts # Claim-scope scenarios
+│       │   └── final-review-fixtures.ts # Final synthesis scenarios
 │       └── fake-provider.ts          # LLMProvider test double
 ├── .env.example
 └── README.md
@@ -148,6 +148,15 @@ policy, practical, and conclusion-stage overreach. It preserves contextual
 transferability and participant perceptions while separating minor wording
 calibration from serious scope problems.
 
+### The Final Reviewer (LLM-backed)
+
+The Final Reviewer receives the original manuscript, validated profile, and all
+four completed specialist audits. Its strict `FinalReview` prioritizes rather
+than concatenates their findings, preserves specialist uncertainty, assesses
+each main manuscript section, traces cross-section coherence, and returns at
+most five actionable revisions. Its recommendation describes revision
+readiness, not journal acceptance or rejection.
+
 ### LLM provider abstraction
 
 Agents depend on the `LLMProvider` interface (`src/lib/llm/types.ts`), not on
@@ -175,9 +184,11 @@ Adding a provider = implementing `LLMProvider` and registering it in
    profile. A failure from any specialist aborts with a typed error.
 5. The **Overclaim Auditor runs for real** using the original manuscript,
    validated profile, and completed Evidence Audit.
-6. The Final Reviewer (mock) synthesizes a `FinalAssessment`.
-7. The route returns a `ReviewResult`; the frontend renders the final verdict,
-   strengths/weaknesses, recommendations, and each agent's findings.
+6. The **Final Reviewer runs for real** using the original manuscript, profile,
+   and all four completed specialist audits. It returns a validated `FinalReview`
+   plus a legacy `FinalAssessment` compatibility view.
+7. The route returns a `ReviewResult`; the frontend renders the structured final
+   synthesis first, followed by each specialist audit.
 
 ### Key types (`src/lib/types/`)
 
@@ -191,12 +202,13 @@ Adding a provider = implementing `LLMProvider` and registering it in
   and theoretical-contribution assessments.
 - `OverclaimAudit` — strict claim-level risk, overreach basis, patterns, and
   scope-revision assessments.
+- `FinalReview` — strict section-aware synthesis, cross-section coherence,
+  revision-readiness recommendation, concerns, strengths, and up to five priorities.
 - `ReviewerAgent` — the contract each specialist implements: `run(manuscript) → AgentReview`.
 - `AgentReview` — one agent's summary, 1–5 score, and list of `ReviewFinding`s
   (severity, location, recommendation).
-- `FinalAssessment` — verdict (`accept` … `reject`), overall score, strengths,
-  weaknesses, prioritized recommendations.
-- `ReviewResult` — the full run: all agent reviews plus the final assessment.
+- `FinalAssessment` — legacy compatibility view derived from `FinalReview`.
+- `ReviewResult` — the full run: all specialist reviews plus both final views.
 
 ## Getting started
 
@@ -224,8 +236,8 @@ npm test
 ```
 
 Tests run offline against a `FakeProvider` (no API key needed). They cover the
-strict Manuscript Profile and all four specialist audit schemas; all five real
-agents; typed provider failures; bounded versus population claims; participant
+strict Manuscript Profile, all four specialist schemas, and the Final Review
+schema; all six real agents; typed provider failures; bounded versus population claims; participant
 perception versus causality; evidence and design scenarios; and theory
 integration and drift.
 
@@ -239,7 +251,6 @@ integration and drift.
 
 ## Intentionally out of scope (for now)
 
-- LLM-backed Final Reviewer synthesis (currently mock data)
 - Authentication, databases, payments, queues
 - PDF parsing / file upload
 - RAG, external literature search, or citation checking
@@ -247,8 +258,6 @@ integration and drift.
 
 ## Roadmap
 
-1. Implement the remaining agents behind the existing `LLMProvider`
-   abstraction, grounded on the Manuscript Reader's profile.
-2. Stream per-agent progress to the review page.
-3. Manuscript file upload (PDF/DOCX) and parsing.
-4. Persist review history.
+1. Stream per-agent progress to the review page.
+2. Manuscript file upload (PDF/DOCX) and parsing.
+3. Persist review history.

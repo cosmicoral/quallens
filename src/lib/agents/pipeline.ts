@@ -9,7 +9,7 @@ import {
 import { auditEvidence, evidenceAuditor } from "./evidence-auditor";
 import { auditTheory, theoryAuditor } from "./theory-auditor";
 import { auditOverclaims, overclaimAuditor } from "./overclaim-auditor";
-import { finalReviewer } from "./final-reviewer";
+import { finalReviewer, synthesizeFinalReview } from "./final-reviewer";
 
 /** Specialist agents in the order their reviews are reported (for display). */
 export const specialistAgents: AgentInfo[] = [
@@ -35,9 +35,9 @@ export type ReviewPipelineResult =
  *
  * The Manuscript Reader runs first. Evidence, Research Design, and Theory then
  * run in parallel against the original manuscript and validated profile. The
- * Overclaim Auditor then also consumes the completed Evidence Audit. Only the
- * Final Reviewer still returns mock data. Any real agent can abort the pipeline
- * with a typed error rather than fabricated data.
+ * Overclaim Auditor then also consumes the completed Evidence Audit. The Final
+ * Reviewer runs last, synthesizing all four specialist audits. Any agent can
+ * abort the pipeline with a typed error rather than fabricated data.
  */
 export async function runReviewPipeline(
   manuscript: ManuscriptInput,
@@ -102,7 +102,21 @@ export async function runReviewPipeline(
     theoryResult.review,
     overclaimResult.review,
   ];
-  const finalAssessment = await finalReviewer.synthesize(manuscript, agentReviews);
+  const finalResult = await synthesizeFinalReview(
+    manuscript,
+    readerResult.review.profile,
+    evidenceResult.review.evidenceAudit,
+    researchDesignResult.review.researchDesignAudit,
+    theoryResult.review.theoryAudit,
+    overclaimResult.review.overclaimAudit,
+    provider ?? undefined,
+  );
+  if (!finalResult.ok) {
+    return {
+      ok: false,
+      error: { agentId: finalReviewer.id, error: finalResult.error },
+    };
+  }
 
   return {
     ok: true,
@@ -111,7 +125,8 @@ export async function runReviewPipeline(
       manuscriptTitle: manuscript.title,
       createdAt: new Date().toISOString(),
       agentReviews,
-      finalAssessment,
+      finalReview: finalResult.finalReview,
+      finalAssessment: finalResult.finalAssessment,
     },
   };
 }

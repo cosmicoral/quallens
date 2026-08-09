@@ -11,9 +11,9 @@ export interface AgentInfo {
 /**
  * Contract for a specialist reviewer agent.
  *
- * Mock agents implement this directly. LLM-backed agents expose their own
- * typed-result entry points and are wired explicitly in the pipeline, so
- * failures surface as typed errors rather than thrown exceptions.
+ * LLM-backed agents expose typed-result entry points and are wired explicitly
+ * in the pipeline, so failures surface as typed errors rather than thrown
+ * exceptions. This interface remains available for compatible implementations.
  */
 export interface ReviewerAgent extends AgentInfo {
   run(manuscript: ManuscriptInput): Promise<AgentReview>;
