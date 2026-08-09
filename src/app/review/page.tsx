@@ -106,13 +106,29 @@ export default function ReviewPage() {
                 </div>
               </li>
               <li className="flex gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 text-[var(--blue-light)]">
+                  <ResearchIcon name="theory-auditor" className="size-5" />
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold">Theory Auditor</p>
+                    <span className="rounded-full bg-sky-400/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-sky-200">
+                      Active
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    Traces frameworks, concepts, integration, and conceptual drift.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 text-slate-300">
                   <ResearchIcon name="synthesize" className="size-5" />
                 </span>
                 <div>
                   <p className="text-sm font-semibold">Specialist synthesis</p>
                   <p className="mt-1 text-xs leading-5 text-slate-400">
-                    Theory, overclaim, and final review remain MVP outputs.
+                    Overclaim and final review remain MVP outputs.
                   </p>
                 </div>
               </li>

@@ -2,8 +2,8 @@ import type { AgentId, AgentReview, FinalAssessment } from "@/lib/types";
 
 /**
  * Canned review data for the reviewer agents that are not yet LLM-backed.
- * The Manuscript Reader, Evidence Auditor, and Research Design Reviewer are
- * real and have no entries here.
+ * The Manuscript Reader, Evidence Auditor, Research Design Reviewer, and Theory
+ * Auditor are real and have no entries here.
  */
 
 export type MockableAgentId = Exclude<
@@ -12,28 +12,10 @@ export type MockableAgentId = Exclude<
   | "manuscript-reader"
   | "evidence-auditor"
   | "research-design-reviewer"
+  | "theory-auditor"
 >;
 
 const MOCK_AGENT_REVIEWS: Record<MockableAgentId, AgentReview> = {
-  "theory-auditor": {
-    agentId: "theory-auditor",
-    agentName: "Theory Auditor",
-    summary:
-      "The manuscript engages a relevant theoretical framework, but the link between the framework and the coding scheme is asserted rather than demonstrated.",
-    score: 3,
-    findings: [
-      {
-        id: "ta-1",
-        severity: "moderate",
-        title: "Framework applied post hoc",
-        detail:
-          "The theoretical framework appears only in the introduction and discussion; the analysis section never shows how it informed coding or interpretation.",
-        location: "Analysis; Discussion",
-        recommendation:
-          "Show explicitly how the framework's concepts map onto the codes and themes, or reframe the study as inductive.",
-      },
-    ],
-  },
   "overclaim-auditor": {
     agentId: "overclaim-auditor",
     agentName: "Overclaim & Contribution Auditor",

@@ -29,7 +29,7 @@ const reviewers: Array<{
     id: "theory-auditor",
     name: "Theory Auditor",
     description: "Examines whether theory is actually operationalized in analysis.",
-    status: "In development",
+    status: "Active",
   },
   {
     id: "overclaim-auditor",
@@ -90,9 +90,9 @@ export function ReviewerPanel() {
       </ul>
 
       <p className="mt-6 text-xs leading-5 text-[var(--muted)]">
-        Manuscript Reader, Evidence Auditor, and Research Design Reviewer are
-        live. The remaining specialist outputs are currently represented by
-        structured MVP data.
+        Manuscript Reader, Evidence Auditor, Research Design Reviewer, and
+        Theory Auditor are live. Overclaim and Final currently use structured
+        MVP data.
       </p>
     </section>
   );

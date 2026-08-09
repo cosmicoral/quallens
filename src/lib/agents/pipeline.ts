@@ -7,18 +7,19 @@ import {
   reviewResearchDesign,
 } from "./research-design-reviewer";
 import { auditEvidence, evidenceAuditor } from "./evidence-auditor";
-import { theoryAuditor } from "./theory-auditor";
+import { auditTheory, theoryAuditor } from "./theory-auditor";
 import { overclaimAuditor } from "./overclaim-auditor";
 import { finalReviewer } from "./final-reviewer";
 
-/** Specialists that remain mocked after the three live reviewers. */
-const mockAgents: ReviewerAgent[] = [theoryAuditor, overclaimAuditor];
+/** Specialists that remain mocked after the four live reviewers. */
+const mockAgents: ReviewerAgent[] = [overclaimAuditor];
 
 /** Specialist agents in the order their reviews are reported (for display). */
 export const specialistAgents: AgentInfo[] = [
   manuscriptReader,
   evidenceAuditor,
   researchDesignReviewer,
+  theoryAuditor,
   ...mockAgents,
 ];
 
@@ -35,11 +36,10 @@ export type ReviewPipelineResult =
 /**
  * Run the full review pipeline.
  *
- * The Manuscript Reader runs first. The Evidence Auditor and Research Design
- * Reviewer then run in parallel against the original manuscript and validated
- * profile. Theory, Overclaim, and the Final Reviewer still return mock data.
- * Any real agent can abort the pipeline with a typed error rather than
- * fabricated data.
+ * The Manuscript Reader runs first. Evidence, Research Design, and Theory then
+ * run in parallel against the original manuscript and validated profile.
+ * Overclaim and the Final Reviewer still return mock data. Any real agent can
+ * abort the pipeline with a typed error rather than fabricated data.
  */
 export async function runReviewPipeline(
   manuscript: ManuscriptInput,
@@ -53,13 +53,14 @@ export async function runReviewPipeline(
     };
   }
 
-  const [evidenceResult, researchDesignResult] = await Promise.all([
+  const [evidenceResult, researchDesignResult, theoryResult] = await Promise.all([
     auditEvidence(manuscript, readerResult.review.profile, provider ?? undefined),
     reviewResearchDesign(
       manuscript,
       readerResult.review.profile,
       provider ?? undefined,
     ),
+    auditTheory(manuscript, readerResult.review.profile, provider ?? undefined),
   ]);
   if (!evidenceResult.ok) {
     return {
@@ -76,6 +77,12 @@ export async function runReviewPipeline(
       },
     };
   }
+  if (!theoryResult.ok) {
+    return {
+      ok: false,
+      error: { agentId: theoryAuditor.id, error: theoryResult.error },
+    };
+  }
 
   const mockReviews = await Promise.all(
     mockAgents.map((agent) => agent.run(manuscript)),
@@ -84,6 +91,7 @@ export async function runReviewPipeline(
     readerResult.review,
     evidenceResult.review,
     researchDesignResult.review,
+    theoryResult.review,
     ...mockReviews,
   ];
   const finalAssessment = await finalReviewer.synthesize(manuscript, agentReviews);

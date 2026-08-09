@@ -6,10 +6,10 @@ from a different angle, and a final reviewer synthesizes their assessments into
 a verdict with prioritized revision recommendations.
 
 > **Status: MVP.** The full frontend ↔ backend flow works end-to-end. The
-> **Manuscript Reader, Evidence Auditor, and Research Design Reviewer are
-> LLM-backed** (Claude, via a swappable provider abstraction). The Reader
-> produces a strict manuscript profile, then both specialist reviewers inspect
-> the original manuscript; Theory, Overclaim, and Final remain mocked.
+> **Manuscript Reader, Evidence Auditor, Research Design Reviewer, and Theory
+> Auditor are LLM-backed** (Claude, via a swappable provider abstraction). The
+> Reader produces a strict manuscript profile, then all three specialist
+> reviewers inspect the original manuscript; Overclaim and Final remain mocked.
 
 ## The reviewer panel
 
@@ -48,6 +48,7 @@ quallens/
 │   │   │   ├── manuscript-profile.ts # Zod schema + ManuscriptProfile type
 │   │   │   ├── evidence-audit.ts      # Zod schema + EvidenceAudit type
 │   │   │   ├── research-design-audit.ts # Zod schema + ResearchDesignAudit
+│   │   │   ├── theory-audit.ts        # Zod schema + TheoryAudit
 │   │   │   ├── review.ts             # ReviewResult, AgentReview, findings…
 │   │   │   └── index.ts
 │   │   ├── llm/
@@ -59,7 +60,7 @@ quallens/
 │   │   │   ├── manuscript-reader.ts  # REAL: LLM-backed structured profiling
 │   │   │   ├── research-design-reviewer.ts   # REAL: design audit
 │   │   │   ├── evidence-auditor.ts           # REAL: claim-level evidence audit
-│   │   │   ├── theory-auditor.ts             # mock
+│   │   │   ├── theory-auditor.ts             # REAL: theoretical integration audit
 │   │   │   ├── overclaim-auditor.ts          # mock
 │   │   │   ├── final-reviewer.ts             # mock
 │   │   │   └── pipeline.ts           # Orchestrates reader → specialists → final
@@ -69,7 +70,8 @@ quallens/
 │       ├── fixtures/
 │       │   ├── qualitative-manuscript.ts  # Realistic manuscript + profile
 │       │   ├── evidence-audit-fixtures.ts # Evidence audit scenarios
-│       │   └── research-design-fixtures.ts # Design review scenarios
+│       │   ├── research-design-fixtures.ts # Design review scenarios
+│       │   └── theory-audit-fixtures.ts # Theory integration scenarios
 │       └── fake-provider.ts          # LLMProvider test double
 ├── .env.example
 └── README.md
@@ -125,6 +127,15 @@ coherence. It preserves missing or unassessable information and does not treat
 small non-random samples, absent universal saturation claims, or lack of
 statistical generalisability as automatic qualitative design defects.
 
+### The Theory Auditor (LLM-backed)
+
+The Theory Auditor receives the same original manuscript and validated profile.
+Its strict `TheoryAudit` distinguishes named frameworks from operationalized
+analysis, traces concept definitions and consistency across sections, surfaces
+conceptual drift, assesses whether theory changes empirical interpretation,
+and tests whether theoretical contribution claims are proportionate to the
+analysis. It does not invent mechanisms or treat citation as integration.
+
 ### LLM provider abstraction
 
 Agents depend on the `LLMProvider` interface (`src/lib/llm/types.ts`), not on
@@ -147,11 +158,11 @@ Adding a provider = implementing `LLMProvider` and registering it in
 3. The **Manuscript Reader runs first, for real**: the configured LLM
    produces a schema-validated `ManuscriptProfile`, attached to its
    `AgentReview`. A failure aborts the run with a typed error.
-4. The **Evidence Auditor and Research Design Reviewer run in parallel, for
-   real**, using both the original manuscript and the validated profile. A
-   failure from either aborts with a typed error.
-5. The two remaining specialists (still mock) run, then the Final Reviewer
-   (mock) synthesizes a `FinalAssessment`.
+4. The **Evidence Auditor, Research Design Reviewer, and Theory Auditor run in
+   parallel, for real**, using both the original manuscript and the validated
+   profile. A failure from any specialist aborts with a typed error.
+5. The Overclaim specialist (still mock) runs, then the Final Reviewer (mock)
+   synthesizes a `FinalAssessment`.
 6. The route returns a `ReviewResult`; the frontend renders the final verdict,
    strengths/weaknesses, recommendations, and each agent's findings.
 
@@ -163,6 +174,8 @@ Adding a provider = implementing `LLMProvider` and registering it in
 - `EvidenceAudit` — strict claim-level support assessments and evidence items.
 - `ResearchDesignAudit` — strict dimension-level design assessments, concerns,
   and revision priorities.
+- `TheoryAudit` — strict framework, concept-consistency, integration, drift,
+  and theoretical-contribution assessments.
 - `ReviewerAgent` — the contract each specialist implements: `run(manuscript) → AgentReview`.
 - `AgentReview` — one agent's summary, 1–5 score, and list of `ReviewFinding`s
   (severity, location, recommendation).
@@ -196,10 +209,10 @@ npm test
 ```
 
 Tests run offline against a `FakeProvider` (no API key needed). They cover the
-strict Manuscript Profile, Evidence Audit, and Research Design Audit schemas;
-all three real agents; typed provider failures; thin evidence for a broad
-collective claim; preservation of a deviant case; and both under-reported and
-well-bounded qualitative design scenarios.
+strict Manuscript Profile, Evidence Audit, Research Design Audit, and Theory
+Audit schemas; all four real agents; typed provider failures; evidence and
+design scenarios; theory name-checking versus integration; and conceptual
+drift.
 
 ## Tech stack
 
@@ -211,7 +224,7 @@ well-bounded qualitative design scenarios.
 
 ## Intentionally out of scope (for now)
 
-- LLM-backed implementations of Theory, Overclaim, and Final (mock data)
+- LLM-backed implementations of Overclaim and Final (mock data)
 - Authentication, databases, payments, queues
 - PDF parsing / file upload
 - RAG, external literature search, or citation checking

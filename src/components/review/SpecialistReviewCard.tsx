@@ -3,6 +3,7 @@ import type { AgentReview, ReviewFinding, Severity } from "@/lib/types";
 import { EvidenceAuditDetails } from "./EvidenceAuditDetails";
 import { ResearchDesignAuditDetails } from "./ResearchDesignAuditDetails";
 import { ScoreBadge } from "./ScoreBadge";
+import { TheoryAuditDetails } from "./TheoryAuditDetails";
 
 const SEVERITY_STYLES: Record<Severity, string> = {
   minor: "border-slate-200 bg-slate-50 text-slate-700",
@@ -51,12 +52,15 @@ export function SpecialistReviewCard({ review }: { review: AgentReview }) {
   const isActive =
     review.agentId === "manuscript-reader" ||
     review.agentId === "evidence-auditor" ||
-    review.agentId === "research-design-reviewer";
+    review.agentId === "research-design-reviewer" ||
+    review.agentId === "theory-auditor";
   const itemCount = review.evidenceAudit
     ? `${review.evidenceAudit.claims.length} claim${review.evidenceAudit.claims.length === 1 ? "" : "s"}`
     : review.researchDesignAudit
       ? "9 design dimensions"
-    : `${review.findings.length} finding${review.findings.length === 1 ? "" : "s"}`;
+      : review.theoryAudit
+        ? `${review.theoryAudit.frameworks.length} framework${review.theoryAudit.frameworks.length === 1 ? "" : "s"}`
+        : `${review.findings.length} finding${review.findings.length === 1 ? "" : "s"}`;
 
   return (
     <details
@@ -108,6 +112,8 @@ export function SpecialistReviewCard({ review }: { review: AgentReview }) {
           <EvidenceAuditDetails audit={review.evidenceAudit} />
         ) : review.researchDesignAudit ? (
           <ResearchDesignAuditDetails audit={review.researchDesignAudit} />
+        ) : review.theoryAudit ? (
+          <TheoryAuditDetails audit={review.theoryAudit} />
         ) : (
           <FindingList findings={review.findings} />
         )}

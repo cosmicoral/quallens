@@ -10,6 +10,7 @@ import {
   broadClaimProfile,
 } from "@/test/fixtures/evidence-audit-fixtures";
 import { underreportedDesignAudit } from "@/test/fixtures/research-design-fixtures";
+import { mentionedTheoryAudit } from "@/test/fixtures/theory-audit-fixtures";
 import { auditEvidence } from "./evidence-auditor";
 import { runReviewPipeline } from "./pipeline";
 
@@ -133,16 +134,18 @@ describe("auditEvidence", () => {
       broadClaimProfile,
       broadClaimAudit,
       underreportedDesignAudit,
+      mentionedTheoryAudit,
     ]);
 
     const result = await runReviewPipeline(broadClaimManuscript, provider);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(provider.requests).toHaveLength(3);
+    expect(provider.requests).toHaveLength(4);
     expect(provider.requests[0].system).toMatch(/Manuscript Reader/);
     expect(provider.requests[1].system).toMatch(/Evidence Auditor/);
     expect(provider.requests[2].system).toMatch(/Research Design Reviewer/);
+    expect(provider.requests[3].system).toMatch(/Theory Auditor/);
     expect(result.result.agentReviews.map((review) => review.agentId)).toEqual([
       "manuscript-reader",
       "evidence-auditor",
@@ -154,5 +157,6 @@ describe("auditEvidence", () => {
     expect(result.result.agentReviews[2].researchDesignAudit).toEqual(
       underreportedDesignAudit,
     );
+    expect(result.result.agentReviews[3].theoryAudit).toEqual(mentionedTheoryAudit);
   });
 });

@@ -15,9 +15,9 @@ const ERROR_STATUS: Record<LLMErrorCode, number> = {
  * POST /api/review
  *
  * Accepts a ManuscriptInput and returns a ReviewResult. The Manuscript
- * Reader, Evidence Auditor, and Research Design Reviewer run against a real
- * LLM; the remaining agents return mock data. Agent failures surface as typed
- * errors (errorCode) — never invented data.
+ * Reader, Evidence, Research Design, and Theory run against a real LLM;
+ * Overclaim and Final return mock data. Agent failures surface as typed errors
+ * (errorCode) — never invented data.
  */
 export async function POST(request: Request) {
   let body: Partial<ManuscriptInput>;

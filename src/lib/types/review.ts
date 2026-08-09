@@ -1,6 +1,7 @@
 import type { ManuscriptProfile } from "./manuscript-profile";
 import type { EvidenceAudit } from "./evidence-audit";
 import type { ResearchDesignAudit } from "./research-design-audit";
+import type { TheoryAudit } from "./theory-audit";
 
 /**
  * Review output types.
@@ -59,6 +60,8 @@ export interface AgentReview {
   evidenceAudit?: EvidenceAudit;
   /** Structured design audit — produced by the Research Design Reviewer only. */
   researchDesignAudit?: ResearchDesignAudit;
+  /** Structured theory audit — produced by the Theory Auditor only. */
+  theoryAudit?: TheoryAudit;
 }
 
 /** Synthesis produced by the Final Reviewer agent. */
