@@ -1,0 +1,114 @@
+.pricing-page {
+  --pricing-card-padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .pricing-page {
+    --pricing-card-padding: 1.75rem;
+  }
+}
+
+.pricing-account .pricing-page {
+  max-width: none;
+  padding-inline: 0;
+  padding-bottom: 2.5rem;
+  padding-top: 0;
+}
+
+.pricing-account .pricing-layout {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pricing-account .pricing-plans-section {
+  order: 1;
+}
+
+.pricing-account .pricing-hero {
+  order: 2;
+  position: static;
+  margin-top: 0.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.pricing-account .pricing-plans-eyebrow {
+  display: block;
+}
+
+.pricing-plans-eyebrow {
+  display: none;
+}
+
+.pricing-account .pricing-hero-art {
+  display: block;
+  max-width: 22rem;
+}
+
+.pricing-account .pricing-hero-copy {
+  max-width: 42rem;
+}
+
+.pricing-account .pricing-hero-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.02;
+}
+
+.pricing-account .pricing-interval-toggle {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .pricing-account .pricing-interval-toggle {
+    width: fit-content;
+    margin-inline: auto;
+  }
+}
+
+.pricing-plans-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+  .pricing-plans-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .pricing-plans-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pricing-account .pricing-plans-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 720px) {
+  .pricing-account .pricing-plans-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1180px) {
+  .pricing-account .pricing-plans-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pricing-price-amount {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  line-height: 1.05;
+}
+
+.pricing-account .pricing-price-amount {
+  font-size: clamp(1.625rem, 3.2vw, 2.125rem);
+}
+
+.pricing-account .pricing-plan-card {
+  min-height: 0;
+  padding: var(--pricing-card-padding);
+}

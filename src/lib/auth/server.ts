@@ -2,11 +2,15 @@ import "server-only";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
+import { resolveAppOrigin, resolveOrcidRedirectUri } from "@/lib/app-url";
 import { getDatabase } from "./db";
 import { mapOrcidProfile } from "./identity";
 
 function createAuth() {
+  const appOrigin = resolveAppOrigin();
+
   return betterAuth({
+    baseURL: appOrigin,
     database: getDatabase(),
     emailAndPassword: {
       enabled: true,
@@ -35,7 +39,7 @@ function createAuth() {
             issuer: "https://orcid.org",
             clientId: process.env.ORCID_CLIENT_ID ?? "",
             clientSecret: process.env.ORCID_CLIENT_SECRET ?? "",
-            redirectURI: process.env.ORCID_REDIRECT_URI,
+            redirectURI: resolveOrcidRedirectUri(),
             scopes: ["openid"],
             pkce: true,
             mapProfileToUser: mapOrcidProfile,

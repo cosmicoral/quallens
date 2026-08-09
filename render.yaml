@@ -1,0 +1,64 @@
+# Qualisapio — Render Blueprint (Web Service + external Neon Postgres)
+#
+# Manual steps that still require external dashboards:
+#   1. Create a Neon project and paste DATABASE_URL when Blueprint prompts.
+#   2. Set ANTHROPIC_API_KEY (required for reviews).
+#   3. Optional: Google / ORCID / Stripe credentials.
+#
+# Automated by this Blueprint:
+#   - BETTER_AUTH_SECRET generation
+#   - Production app URLs for auth + billing redirects
+#   - Database migrations on every deploy (preDeployCommand)
+#   - ORCID redirect URI derivation from the app origin
+
+services:
+  - type: web
+    name: qualisapio
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci && npm run build
+    preDeployCommand: npm run migrate
+    startCommand: npm start
+    healthCheckPath: /api/auth/ok
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: BETTER_AUTH_URL
+        value: https://qualisapio.onrender.com
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://qualisapio.onrender.com
+      - key: DATABASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        value: anthropic
+      - key: LLM_MODEL
+        value: claude-opus-5
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: ORCID_CLIENT_ID
+        sync: false
+      - key: ORCID_CLIENT_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_PLUS_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_PLUS_ANNUAL
+        sync: false
+      - key: STRIPE_PRICE_PRO_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_PRO_ANNUAL
+        sync: false

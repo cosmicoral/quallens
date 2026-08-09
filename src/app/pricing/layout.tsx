@@ -13,5 +13,9 @@ export default async function PricingLayout({ children }: { children: ReactNode 
   }
 
   const profile = await getOrCreateResearcherProfile(session.user);
-  return <AccountShell profile={profile}>{children}</AccountShell>;
+  return (
+    <AccountShell profile={profile}>
+      <div className="pricing-account">{children}</div>
+    </AccountShell>
+  );
 }

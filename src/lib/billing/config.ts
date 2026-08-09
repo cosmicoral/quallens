@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolveAppOrigin } from "@/lib/app-url";
 
 export const PLAN_CONFIG = {
   free: {
@@ -74,11 +75,10 @@ export function getPlanForPriceId(
 }
 
 export function getAppUrl(environment: BillingEnvironment = process.env): string {
-  const configured = environment.NEXT_PUBLIC_APP_URL?.trim();
-  if (!configured) throw new Error("NEXT_PUBLIC_APP_URL is required for billing redirects.");
+  const configured = resolveAppOrigin(environment);
   const url = new URL(configured);
   if (url.protocol !== "https:" && url.hostname !== "localhost") {
-    throw new Error("NEXT_PUBLIC_APP_URL must use HTTPS outside localhost.");
+    throw new Error("App origin must use HTTPS outside localhost.");
   }
   return url.origin;
 }
