@@ -15,7 +15,7 @@ const METHODOLOGIES: { value: Methodology; label: string }[] = [
 ];
 
 const inputClasses =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-900";
+  "w-full rounded-xl border border-[var(--line-strong)] bg-white px-4 py-3 text-sm text-[var(--ink)] shadow-[inset_0_1px_1px_rgba(15,23,42,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-[var(--blue)] focus:ring-4 focus:ring-sky-100";
 
 interface ReviewFormProps {
   onSubmit: (manuscript: ManuscriptInput) => void;
@@ -41,95 +41,161 @@ export function ReviewForm({ onSubmit, submitting }: ReviewFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label htmlFor="title" className="mb-1.5 block text-sm font-medium">
-          Title <span className="text-red-500">*</span>
-        </label>
-        <input
-          id="title"
-          required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Manuscript title"
-          className={inputClasses}
-        />
+    <form
+      onSubmit={handleSubmit}
+      aria-busy={submitting}
+      className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-[0_18px_55px_rgba(15,23,42,0.07)]"
+    >
+      <div className="border-b border-[var(--line)] bg-[var(--paper-warm)] px-5 py-5 sm:px-7 sm:py-6">
+        <div className="flex items-start gap-4">
+          <span className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl border border-white bg-white/80 text-[var(--ink)] shadow-sm">
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none">
+              <path
+                d="M6 3.5h9l3 3V20.5H6zM15 3.5v3h3M9 11h6M9 14.5h6"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <div>
+            <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--ink)]">
+              Manuscript details
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-[var(--slate)]">
+              Provide the manuscript as submitted. Optional metadata helps the
+              Reader preserve disciplinary and methodological context.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="space-y-6 px-5 py-6 sm:px-7 sm:py-8">
         <div>
-          <label
-            htmlFor="methodology"
-            className="mb-1.5 block text-sm font-medium"
-          >
-            Methodology
-          </label>
-          <select
-            id="methodology"
-            value={methodology}
-            onChange={(e) => setMethodology(e.target.value as Methodology)}
-            className={inputClasses}
-          >
-            {METHODOLOGIES.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="discipline"
-            className="mb-1.5 block text-sm font-medium"
-          >
-            Discipline
-          </label>
+          <div className="mb-2 flex items-baseline justify-between gap-4">
+            <label htmlFor="title" className="text-sm font-semibold text-[var(--ink)]">
+              Manuscript title <span className="text-[var(--amber)]">*</span>
+            </label>
+            <span className="text-xs text-[var(--muted)]">Required</span>
+          </div>
           <input
-            id="discipline"
-            value={discipline}
-            onChange={(e) => setDiscipline(e.target.value)}
-            placeholder="e.g. sociology"
+            id="title"
+            required
+            autoComplete="off"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter the full manuscript title"
             className={inputClasses}
           />
         </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="methodology"
+              className="mb-2 block text-sm font-semibold text-[var(--ink)]"
+            >
+              Methodological tradition
+            </label>
+            <select
+              id="methodology"
+              value={methodology}
+              onChange={(e) => setMethodology(e.target.value as Methodology)}
+              className={inputClasses}
+            >
+              {METHODOLOGIES.map((method) => (
+                <option key={method.value} value={method.value}>
+                  {method.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="discipline"
+              className="mb-2 block text-sm font-semibold text-[var(--ink)]"
+            >
+              Discipline or field
+            </label>
+            <input
+              id="discipline"
+              autoComplete="off"
+              value={discipline}
+              onChange={(e) => setDiscipline(e.target.value)}
+              placeholder="e.g. sociology, anthropology"
+              className={inputClasses}
+            />
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-2 flex items-baseline justify-between gap-4">
+            <label htmlFor="abstract" className="text-sm font-semibold text-[var(--ink)]">
+              Abstract
+            </label>
+            <span className="text-xs text-[var(--muted)]">Optional</span>
+          </div>
+          <textarea
+            id="abstract"
+            rows={4}
+            value={abstract}
+            onChange={(e) => setAbstract(e.target.value)}
+            placeholder="Paste the abstract exactly as written"
+            className={`${inputClasses} resize-y leading-6`}
+          />
+        </div>
+
+        <div>
+          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+            <label htmlFor="body" className="text-sm font-semibold text-[var(--ink)]">
+              Full manuscript text <span className="text-[var(--amber)]">*</span>
+            </label>
+            <span className="font-mono text-[11px] text-[var(--muted)]">
+              {body.length.toLocaleString()} characters
+            </span>
+          </div>
+          <textarea
+            id="body"
+            required
+            rows={18}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Paste the full manuscript, including methods, findings, discussion, and references where available."
+            className={`${inputClasses} min-h-[28rem] resize-y font-mono text-[13px] leading-6`}
+          />
+          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+            Include quotations, fieldnotes, tables described in text, and deviant
+            cases so evidence support can be assessed faithfully.
+          </p>
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="abstract" className="mb-1.5 block text-sm font-medium">
-          Abstract
-        </label>
-        <textarea
-          id="abstract"
-          rows={3}
-          value={abstract}
-          onChange={(e) => setAbstract(e.target.value)}
-          placeholder="Paste the abstract (optional)"
-          className={inputClasses}
-        />
+      <div className="flex flex-col gap-4 border-t border-[var(--line)] bg-[var(--paper)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+        <p className="max-w-md text-xs leading-5 text-[var(--muted)]">
+          QualLens records missing information as missing—it does not fill gaps
+          with invented evidence.
+        </p>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--blue)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--blue-deep)] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {submitting ? (
+            <>
+              <span
+                aria-hidden="true"
+                className="size-4 animate-spin rounded-full border-2 border-white/35 border-t-white"
+              />
+              Reviewing manuscript
+            </>
+          ) : (
+            <>
+              Run structured review <span aria-hidden="true">→</span>
+            </>
+          )}
+        </button>
       </div>
-
-      <div>
-        <label htmlFor="body" className="mb-1.5 block text-sm font-medium">
-          Manuscript text <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="body"
-          required
-          rows={12}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Paste the full manuscript text"
-          className={`${inputClasses} font-mono text-xs leading-relaxed`}
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded-lg bg-indigo-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {submitting ? "Reviewing…" : "Run review"}
-      </button>
     </form>
   );
 }

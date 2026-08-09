@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "QualLens — Multi-agent review for qualitative research",
+  title: "QualLens — AI-Powered Review for Qualitative Social Science",
   description:
-    "QualLens runs your qualitative social science manuscript through a panel of specialist reviewer agents and returns a structured, actionable review.",
+    "Rigorous, evidence-aware manuscript feedback built around how qualitative researchers actually reason.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
