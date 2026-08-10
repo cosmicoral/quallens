@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrandMark } from "@/components/BrandMark";
 import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigger";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export function PublicPricingShell({ children }: { children: ReactNode }) {
   return (
@@ -21,6 +22,7 @@ export function PublicPricingShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       {children}
+      <SiteFooter />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BrandMark } from "@/components/BrandMark";
-import { ConsultationTrigger } from "@/components/consultation/ConsultationTrigger";
+import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AiDifferentiator } from "@/components/landing/AiDifferentiator";
 import { BenefitsSection } from "@/components/landing/BenefitsSection";
@@ -134,17 +133,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-[var(--line)] bg-white">
-        <div className="section-shell flex flex-col gap-5 py-8 sm:flex-row sm:items-center sm:justify-between">
-          <BrandMark compact />
-          <div className="flex flex-col items-start gap-2 sm:items-end">
-            <p className="text-xs text-[var(--muted)]">
-              Peer review for authors and reviewers in qualitative social science. Not a substitute for journal peer review.
-            </p>
-            <ConsultationTrigger variant="subtle" label="Human research consultation" />
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

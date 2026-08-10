@@ -5,6 +5,7 @@ import { BrandMark } from "@/components/BrandMark";
 import type { ResearcherProfile } from "@/lib/auth/profile";
 import { AccountNav } from "./AccountNav";
 import { SignOutButton } from "./SignOutButton";
+import { StudioAttribution } from "@/components/StudioAttribution";
 import "./account-workspace.css";
 
 export function AccountShell({
@@ -55,6 +56,8 @@ export function AccountShell({
               Question · Uncover · Understand · Contribute
             </p>
           </div>
+
+          <StudioAttribution className="hidden px-1 text-[11px] leading-5 text-[var(--muted)] lg:block" />
         </aside>
         <main className="min-w-0">{children}</main>
       </div>
