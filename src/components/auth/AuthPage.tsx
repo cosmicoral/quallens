@@ -127,7 +127,7 @@ export function AuthPage({
           <div className="absolute -right-24 top-12 size-72 rounded-full bg-[#d6e8ef]/45 blur-3xl" aria-hidden="true" />
 
           <div className="absolute inset-x-0 top-0 z-10 px-9 py-7 xl:px-12 xl:py-8 2xl:px-14">
-            <Link href="/" aria-label="Qualisapio home" className="inline-flex rounded-lg">
+            <Link href="/" aria-label="QualiSapio home" className="inline-flex rounded-lg">
               <BrandMark />
             </Link>
           </div>
@@ -141,7 +141,7 @@ export function AuthPage({
             </h2>
             <p className="mt-4 max-w-80 text-[15px] leading-6 text-[#102844] xl:mt-5 xl:text-base xl:leading-7">
               {signup
-                ? "Join Qualisapio for peer-review support—as an author or reviewer of qualitative manuscripts."
+                ? "Join QualiSapio for peer-review support—as an author or reviewer of qualitative manuscripts."
                 : "Return to your peer-review workspace."}
             </p>
             <FeatureList />
@@ -150,7 +150,7 @@ export function AuthPage({
           <div className="absolute -right-[5%] bottom-0 left-[14%] h-[54%]">
             <Image
               src="/mascot/auth-signup.png"
-              alt="Qualisapio spotted white cat researcher working with a laptop, notebook, and books"
+              alt="QualiSapio spotted white cat researcher working with a laptop, notebook, and books"
               fill
               loading="eager"
               fetchPriority="high"
@@ -163,7 +163,7 @@ export function AuthPage({
 
         <section className="flex min-h-screen min-w-0 flex-col bg-[radial-gradient(circle_at_25%_10%,#ffffff_0%,#f8fafc_60%)] px-3 py-3 sm:px-6 sm:py-6 lg:min-h-[calc(100vh-7rem)] lg:justify-center lg:border-l-0 lg:px-8 lg:py-8 xl:px-12 2xl:px-16">
           <header className="flex items-center justify-between px-2 py-2 sm:px-1 lg:hidden">
-            <Link href="/" aria-label="Qualisapio home"><BrandMark compact /></Link>
+            <Link href="/" aria-label="QualiSapio home"><BrandMark compact /></Link>
             <Link href="/" className="text-sm font-medium text-[#536579] hover:text-[#102844]">Back home</Link>
           </header>
 
@@ -181,7 +181,7 @@ export function AuthPage({
           <div className="relative mx-auto mb-4 h-56 w-full max-w-md overflow-hidden rounded-2xl border border-[#e2d7c8] bg-[linear-gradient(145deg,#fbf8f2,#eee3d4)] lg:hidden">
             <Image
               src="/mascot/auth-signup.png"
-              alt="Qualisapio spotted white cat researcher working with a laptop, notebook, and books"
+              alt="QualiSapio spotted white cat researcher working with a laptop, notebook, and books"
               fill
               loading="eager"
               sizes="(max-width: 1023px) 28rem, 0px"

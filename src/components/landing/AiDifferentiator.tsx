@@ -36,7 +36,7 @@ export function AiDifferentiator() {
               More than a single prompt to a general model
             </h2>
             <p className="mt-5 max-w-md text-base leading-7 text-[var(--slate)]">
-              Qualisapio orchestrates multiple AI reviewers with strict qualitative
+              QualiSapio orchestrates multiple AI reviewers with strict qualitative
               schemas—so feedback reflects how authors and peer reviewers actually
               examine evidence, methods, theory, and claims.
             </p>

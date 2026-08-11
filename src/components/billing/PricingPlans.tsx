@@ -8,7 +8,7 @@ const plans = [
   {
     id: "free" as const,
     name: "Free",
-    description: "Try one complete Qualisapio peer review.",
+    description: "Try one complete QualiSapio peer review.",
     monthly: 0,
     annual: 0,
     allowance: "1 lifetime review",
@@ -59,13 +59,22 @@ export function PricingPlans() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ plan, interval }),
       });
-      const data = await response.json().catch(() => ({})) as { url?: string; error?: string; errorCode?: string };
+      const data = await response.json().catch(() => ({})) as {
+        url?: string;
+        error?: string;
+        errorCode?: string;
+        missingKeys?: string[];
+      };
       if (response.status === 401) {
         setError("Your session expired. Refresh the page or sign in again from Settings.");
         setLoading(null);
         return;
       }
-      if (!response.ok || !data.url) throw new Error(data.error ?? "Checkout is unavailable.");
+      if (!response.ok || !data.url) {
+        const missing =
+          data.missingKeys?.length ? ` Missing on server: ${data.missingKeys.join(", ")}.` : "";
+        throw new Error((data.error ?? "Checkout is unavailable.") + missing);
+      }
       window.location.assign(data.url);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Checkout is unavailable.");

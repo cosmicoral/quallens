@@ -2,10 +2,13 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   checkoutSelectionSchema,
   getApprovedPriceId,
+  getMissingBillingEnvKeys,
   getPlanForPriceId,
 } from "./config";
+import { BillingError } from "./errors";
 
 const env = {
+  STRIPE_SECRET_KEY: "sk_test_example",
   STRIPE_PRICE_PLUS_MONTHLY: "price_plus_monthly",
   STRIPE_PRICE_PLUS_ANNUAL: "price_plus_annual",
   STRIPE_PRICE_PRO_MONTHLY: "price_pro_monthly",
@@ -36,5 +39,20 @@ describe("approved Stripe price mapping", () => {
       }).success,
     ).toBe(false);
     expect(checkoutSelectionSchema.safeParse({ plan: "enterprise", interval: "monthly" }).success).toBe(false);
+  });
+
+  it("reports missing billing env keys", () => {
+    expect(getMissingBillingEnvKeys({})).toEqual([
+      "STRIPE_SECRET_KEY",
+      "STRIPE_PRICE_PLUS_MONTHLY",
+      "STRIPE_PRICE_PLUS_ANNUAL",
+      "STRIPE_PRICE_PRO_MONTHLY",
+      "STRIPE_PRICE_PRO_ANNUAL",
+    ]);
+    expect(getMissingBillingEnvKeys(env)).toEqual([]);
+  });
+
+  it("throws billing_not_configured when a price env var is missing", () => {
+    expect(() => getApprovedPriceId({ plan: "plus", interval: "monthly" }, {})).toThrow(BillingError);
   });
 });

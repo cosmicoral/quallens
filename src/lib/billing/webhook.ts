@@ -133,7 +133,7 @@ export async function processStripeEvent(
   const userId = resolved.userHint
     ?? resolved.subscription.metadata.qualLensUserId
     ?? await dependencies.store.findUserIdByCustomer(customerId);
-  if (!userId) throw new Error("Stripe subscription could not be reconciled to a Qualisapio user.");
+  if (!userId) throw new Error("Stripe subscription could not be reconciled to a QualiSapio user.");
 
   const update = normalizeSubscription(
     resolved.subscription,

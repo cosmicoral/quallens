@@ -36,6 +36,7 @@ function dependencies(overrides: Partial<CheckoutDependencies> = {}): CheckoutDe
     setStripeCustomerId: vi.fn(),
     appUrl: "https://qualisapio.test",
     environment: {
+      STRIPE_SECRET_KEY: "sk_test_example",
       STRIPE_PRICE_PLUS_MONTHLY: "price_plus_monthly",
       STRIPE_PRICE_PLUS_ANNUAL: "price_plus_annual",
       STRIPE_PRICE_PRO_MONTHLY: "price_pro_monthly",

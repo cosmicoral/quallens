@@ -37,7 +37,7 @@ export function StudioAttribution({
 }) {
   return (
     <p className={className}>
-      Qualisapio is developed by{" "}
+      QualiSapio is developed by{" "}
       <a
         href={STUDIO.url}
         target="_blank"

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Qualisapio — AI Peer Review for Authors and Reviewers",
+  title: "QualiSapio — AI Peer Review for Authors and Reviewers",
   description:
     "Structured peer-review feedback and reviewer assistance for qualitative manuscripts—for authors before submission and reviewers during assessment.",
 };

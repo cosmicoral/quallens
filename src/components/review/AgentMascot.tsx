@@ -9,27 +9,27 @@ interface AgentMascotPresentation {
 const AGENT_MASCOTS: Record<AgentId, AgentMascotPresentation> = {
   "manuscript-reader": {
     src: "/mascot/agents/reader.png",
-    alt: "Qualisapio Manuscript Reader mascot reading a manuscript",
+    alt: "QualiSapio Manuscript Reader mascot reading a manuscript",
   },
   "evidence-auditor": {
     src: "/mascot/agents/evidence.png",
-    alt: "Qualisapio Evidence Auditor mascot examining evidence with a magnifying glass",
+    alt: "QualiSapio Evidence Auditor mascot examining evidence with a magnifying glass",
   },
   "research-design-reviewer": {
     src: "/mascot/agents/research-design.png",
-    alt: "Qualisapio Research Design Reviewer mascot thoughtfully reviewing methodology notes",
+    alt: "QualiSapio Research Design Reviewer mascot thoughtfully reviewing methodology notes",
   },
   "theory-auditor": {
     src: "/mascot/agents/theory.png",
-    alt: "Qualisapio Theory Auditor mascot presenting a conceptual diagram",
+    alt: "QualiSapio Theory Auditor mascot presenting a conceptual diagram",
   },
   "overclaim-auditor": {
     src: "/mascot/agents/overclaim.png",
-    alt: "Qualisapio Overclaim Auditor mascot annotating a manuscript with a red pen",
+    alt: "QualiSapio Overclaim Auditor mascot annotating a manuscript with a red pen",
   },
   "final-reviewer": {
     src: "/mascot/agents/final-reviewer.png",
-    alt: "Qualisapio Final Reviewer mascot holding a completed review summary",
+    alt: "QualiSapio Final Reviewer mascot holding a completed review summary",
   },
 };
 

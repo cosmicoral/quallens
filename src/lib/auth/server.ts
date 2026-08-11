@@ -51,10 +51,10 @@ function createAuth() {
   });
 }
 
-export type QualisapioAuth = ReturnType<typeof createAuth>;
-let auth: QualisapioAuth | undefined;
+export type QualiSapioAuth = ReturnType<typeof createAuth>;
+let auth: QualiSapioAuth | undefined;
 
-export function getAuth(): QualisapioAuth {
+export function getAuth(): QualiSapioAuth {
   auth ??= createAuth();
   return auth;
 }

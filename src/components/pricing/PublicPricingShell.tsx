@@ -9,7 +9,7 @@ export function PublicPricingShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[var(--paper)]">
       <header className="border-b border-[var(--line)] bg-white/85 backdrop-blur-xl">
         <div className="mx-auto flex h-18 max-w-[92rem] items-center justify-between px-5 sm:px-8">
-          <Link href="/" aria-label="Qualisapio home">
+          <Link href="/" aria-label="QualiSapio home">
             <BrandMark compact />
           </Link>
           <div className="flex items-center gap-4 text-sm">

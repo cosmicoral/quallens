@@ -1,6 +1,6 @@
-# Qualisapio
+# QualiSapio
 
-**Qualisapio** is an AI-powered multi-agent reviewer purpose-built for qualitative social science research.
+**QualiSapio** is an AI-powered multi-agent reviewer purpose-built for qualitative social science research.
 You submit a manuscript; a panel of specialist reviewer agents each examines it
 from a different angle, and a final reviewer synthesizes their assessments into
 a revision-readiness judgment with prioritized recommendations.
@@ -93,7 +93,7 @@ quallens/
 
 ### Authentication
 
-Qualisapio uses one authentication framework: [Better Auth](https://www.better-auth.com/)
+QualiSapio uses one authentication framework: [Better Auth](https://www.better-auth.com/)
 with PostgreSQL. Google is configured as a built-in social provider; ORCID uses
 its supported OpenID Connect discovery document through Better Auth's generic
 OAuth provider; and email/password uses Better Auth's password hashing and
@@ -258,7 +258,7 @@ For production on Render + Neon, see [Production deployment](#production-deploym
 
 ## Production deployment
 
-Qualisapio is a single Next.js app with long-running `/api/review` requests (six
+QualiSapio is a single Next.js app with long-running `/api/review` requests (six
 LLM agents). **Render Free Web Service + Neon Free Postgres** is the recommended
 $0-platform stack: a persistent Node process avoids the short timeouts on
 serverless hosts, and Neon holds auth, billing, and review history.
@@ -411,7 +411,7 @@ URL to the new domain and redeploy.
 
 ## Billing and review allowances
 
-Qualisapio uses Stripe Billing and Stripe-hosted Checkout/Customer Portal pages.
+QualiSapio uses Stripe Billing and Stripe-hosted Checkout/Customer Portal pages.
 Stripe webhooks are authoritative: returning from Checkout does not itself
 grant access. The local `subscription` row is a projection of verified Stripe
 events, while `review_run` records quota reservations and outcomes.
@@ -493,7 +493,7 @@ For production, use the same variables on Render (see
 [Production deployment](#production-deployment)), register
 `https://YOUR-SERVICE.onrender.com/api/stripe/webhook` with the six events above,
 and start in Stripe test mode. Moving to live mode later requires replacing all
-Stripe keys, Price IDs, and the webhook signing secret together. Qualisapio does
+Stripe keys, Price IDs, and the webhook signing secret together. QualiSapio does
 not create products, switch modes, or charge live cards itself.
 
 Or hit the API directly:
@@ -539,17 +539,17 @@ integration and drift.
 The MVP described above is **manuscript-grounded**: six specialist agents and a
 Final Reviewer reason over the submitted text, with strict schemas and no
 external retrieval. Everything below is **planned, not implemented**. It
-extends Qualisapio toward methodology-aware, socially informed qualitative
+extends QualiSapio toward methodology-aware, socially informed qualitative
 review—without replacing human peer review or predicting journal acceptance.
 
 ### Design principles
 
-Qualisapio will use retrieval only where external knowledge improves the review
+QualiSapio will use retrieval only where external knowledge improves the review
 task. Internal evidence coherence, claim proportionality, and manuscript-level
 reasoning should remain grounded primarily in the submitted manuscript rather
 than external retrieval.
 
-Future development should preserve methodological pluralism: Qualisapio should
+Future development should preserve methodological pluralism: QualiSapio should
 adapt to different qualitative traditions rather than enforcing a single
 universal standard of rigor.
 
@@ -591,7 +591,7 @@ Retrieval-augmented review using **publicly available** target-journal materials
 
 Users could select a target journal and receive feedback that distinguishes
 **general manuscript quality** from **journal-specific fit and expectations**.
-Qualisapio will **not** predict acceptance. Retrieved journal guidance should
+QualiSapio will **not** predict acceptance. Retrieved journal guidance should
 be **cited or traceable in the UI** where it informs a recommendation.
 
 #### Social-science methodology RAG
@@ -656,7 +656,7 @@ Supports iterative academic writing rather than one-off scoring.
 
 Explicit qualitative support for researcher positionality, reflexivity,
 insider/outsider positioning, power relations, field relationships, and
-interpretation boundaries. Qualisapio will **never invent** a positionality
+interpretation boundaries. QualiSapio will **never invent** a positionality
 statement; it will report what is present, what is missing, and where reflexive
 implications matter analytically.
 
@@ -727,5 +727,5 @@ Focus: specialization, collaboration, routing optimization, and formal evaluatio
   reviewers, measuring agreement on priorities, hallucination rate,
   evidence-grounding accuracy, overclaim detection precision, methodological
   fairness across paradigms, usefulness/actionability, and latency/cost per full
-  review. Human peer review remains the reference standard; Qualisapio aims to
+  review. Human peer review remains the reference standard; QualiSapio aims to
   **complement**, not replace, expert judgment.

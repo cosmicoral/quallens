@@ -25,7 +25,7 @@ const reviewerBenefits = [
   {
     title: "Keep your judgment in charge",
     description:
-      "Qualisapio surfaces manuscript-grounded findings and preserves uncertainty—it does not replace your expert evaluation.",
+      "QualiSapio surfaces manuscript-grounded findings and preserves uncertainty—it does not replace your expert evaluation.",
   },
   {
     title: "Move from reading to recommendations",
@@ -39,10 +39,10 @@ export function BenefitsSection() {
     <section id="benefits" className="border-y border-[var(--line)] bg-white">
       <div className="section-shell py-20 sm:py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="eyebrow">Why Qualisapio</p>
+          <p className="eyebrow">Why QualiSapio</p>
           <h2 className="section-title">AI peer review that earns researcher trust</h2>
           <p className="section-copy mx-auto">
-            Qualisapio is an AI product built for qualitative social science—not a general
+            QualiSapio is an AI product built for qualitative social science—not a general
             writing assistant. A coordinated panel reads your manuscript and returns
             reviewer-grade feedback authors and peer reviewers can act on.
           </p>

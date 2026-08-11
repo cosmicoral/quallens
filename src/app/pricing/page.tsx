@@ -4,7 +4,7 @@ import "@/components/pricing/pricing.css";
 import pricingMascot from "../../../public/mascot/qualisapio-pricing.png";
 
 export const metadata = {
-  title: "Pricing — Qualisapio",
+  title: "Pricing — QualiSapio",
   description: "Peer-review plans for authors and reviewers working on qualitative manuscripts.",
 };
 
@@ -25,7 +25,7 @@ export default function PricingPage() {
             <div className="relative aspect-[1402/1122]">
               <Image
                 src={pricingMascot}
-                alt="Qualisapio scholarly kitten in a navy blazer at a research desk"
+                alt="QualiSapio scholarly kitten in a navy blazer at a research desk"
                 fill
                 className="object-cover"
                 sizes="20rem"
@@ -38,7 +38,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <section aria-label="Qualisapio plans" className="pricing-plans-section min-w-0">
+        <section aria-label="QualiSapio plans" className="pricing-plans-section min-w-0">
           <p className="pricing-plans-eyebrow eyebrow mb-5">Peer-review plans</p>
           <PricingPlans />
         </section>

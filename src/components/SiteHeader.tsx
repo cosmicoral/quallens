@@ -11,7 +11,7 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[color:rgba(248,250,252,0.9)] backdrop-blur-xl">
       <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link href={homeHref} aria-label="Qualisapio home" className="rounded-md focus-ring">
+        <Link href={homeHref} aria-label="QualiSapio home" className="rounded-md focus-ring">
           <BrandMark compact />
         </Link>
 

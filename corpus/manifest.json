@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Qualisapio curated RAG corpus checklist (30 methodologies, 40 theories, 30 journal profiles).",
+  "description": "QualiSapio curated RAG corpus checklist (30 methodologies, 40 theories, 30 journal profiles).",
   "entries": [
     {
       "id": "methodology.reflexive-thematic-analysis",

@@ -44,9 +44,9 @@ export const CONSULTATION_COPY = {
     "Complimentary 30-minute introductory consultation for new clients.",
   cta: "Book a free introductory consultation",
   email: "coralhanyu@outlook.com",
-  mailtoSubject: "Qualisapio Research Consultation",
+  mailtoSubject: "QualiSapio Research Consultation",
   mailtoBodyIntro:
-    "Hello,\n\nI would like to book a complimentary 30-minute introductory consultation through Qualisapio.\n\nThank you.",
+    "Hello,\n\nI would like to book a complimentary 30-minute introductory consultation through QualiSapio.\n\nThank you.",
   integrity:
     "Consultation supports research development and critical feedback. It does not include ghostwriting, fabricated data, or guarantees of publication.",
 } as const;
@@ -59,7 +59,7 @@ function consultationMailBody(options?: {
     const details = [
       "Hello,",
       "",
-      "I would like to book a complimentary 30-minute introductory consultation through Qualisapio.",
+      "I would like to book a complimentary 30-minute introductory consultation through QualiSapio.",
       "",
     ];
     if (options.requesterName) details.push(`Name: ${options.requesterName}`);

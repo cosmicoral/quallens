@@ -36,8 +36,8 @@ export default async function SettingsPage({
       {params.identityError && (
         <p role="alert" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           {params.identityError === "orcid"
-            ? "ORCID could not be connected. The account may already belong to another Qualisapio user."
-            : "Google could not be connected. The account may already belong to another Qualisapio user."}
+            ? "ORCID could not be connected. The account may already belong to another QualiSapio user."
+            : "Google could not be connected. The account may already belong to another QualiSapio user."}
         </p>
       )}
       {params.linked && (
@@ -94,7 +94,7 @@ export default async function SettingsPage({
         <section className="rounded-2xl border border-[var(--line)] bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-xl font-semibold text-[var(--ink)]">Connected identities</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-            Link additional sign-in methods to this Qualisapio account. Account merging is not included in this MVP.
+            Link additional sign-in methods to this QualiSapio account. Account merging is not included in this MVP.
           </p>
           <div className="mt-4">
             <ConnectedIdentities
@@ -113,7 +113,7 @@ export default async function SettingsPage({
             <p className="eyebrow">Billing</p>
             <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--ink)]">Plan and subscription</h2>
             <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--slate)]">
-              Checkout and subscription management are handled securely by Stripe. Qualisapio access changes only after a verified webhook updates your account.
+              Checkout and subscription management are handled securely by Stripe. QualiSapio access changes only after a verified webhook updates your account.
             </p>
             {usage.cancelAtPeriodEnd && <p className="mt-3 text-sm font-semibold text-amber-900">Cancellation is scheduled for the end of the current paid period.</p>}
             <div className="mt-5"><BillingActions canManageBilling={usage.canManageBilling} /></div>

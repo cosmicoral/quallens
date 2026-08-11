@@ -1,4 +1,4 @@
-# Qualisapio — Render Blueprint (Web Service + external Neon Postgres)
+# QualiSapio — Render Blueprint (Web Service + external Neon Postgres)
 #
 # Manual steps that still require external dashboards:
 #   1. Create a Neon project and paste DATABASE_URL when Blueprint prompts.

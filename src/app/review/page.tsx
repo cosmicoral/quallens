@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewResults } from "@/components/ReviewResults";
 import { ResearchIcon } from "@/components/ResearchIcon";
-import { QualisapioAgentMascot } from "@/components/review/QualisapioAgentMascot";
+import { QualiSapioAgentMascot } from "@/components/review/QualiSapioAgentMascot";
 import type { ManuscriptInput, ReviewResponse, ReviewResult } from "@/lib/types";
 import type { UsageView } from "@/lib/billing/entitlement";
 
@@ -72,7 +72,7 @@ export default function ReviewPage() {
             Submit a manuscript for structured peer-review feedback.
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--slate)]">
-            Use Qualisapio as an author seeking revision guidance or as a reviewer
+            Use QualiSapio as an author seeking revision guidance or as a reviewer
             organizing your assessment. The panel returns constructive feedback on
             evidence, design, theory, and claims—without rewriting the text.
           </p>
@@ -211,7 +211,7 @@ export default function ReviewPage() {
             />
 
             {submitting && (
-              <QualisapioAgentMascot illustrativeSequence className="mt-5" />
+              <QualiSapioAgentMascot illustrativeSequence className="mt-5" />
             )}
 
             {error && (
@@ -227,7 +227,7 @@ export default function ReviewPage() {
                   </Link>
                 )}
                 {["quota_exhausted", "free_trial_used", "former_paid_user"].includes(errorCode ?? "") && (
-                  <Link href="/pricing" className="mt-3 inline-flex font-semibold text-[var(--blue-deep)] underline">Compare Qualisapio plans</Link>
+                  <Link href="/pricing" className="mt-3 inline-flex font-semibold text-[var(--blue-deep)] underline">Compare QualiSapio plans</Link>
                 )}
               </div>
             )}

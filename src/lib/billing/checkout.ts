@@ -1,7 +1,12 @@
 import "server-only";
 import type Stripe from "stripe";
 import { isInternalOrcidEmail } from "@/lib/auth/identity";
-import { getAppUrl, getApprovedPriceId, type CheckoutSelection } from "./config";
+import {
+  getAppUrl,
+  getApprovedPriceId,
+  getMissingBillingEnvKeys,
+  type CheckoutSelection,
+} from "./config";
 import { hasPaidAccess } from "./entitlement";
 import { BillingError } from "./errors";
 import {
@@ -67,6 +72,14 @@ export async function createCheckoutSession(
   selection: CheckoutSelection,
   dependencies: CheckoutDependencies = defaultDependencies(),
 ) {
+  const missingKeys = getMissingBillingEnvKeys(dependencies.environment);
+  if (missingKeys.length > 0) {
+    throw new BillingError(
+      "billing_not_configured",
+      `Billing is not configured. Missing: ${missingKeys.join(", ")}`,
+    );
+  }
+
   const record = await dependencies.getBillingRecord(user.id);
   if (hasPaidAccess(record)) {
     throw new BillingError(

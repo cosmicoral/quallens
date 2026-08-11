@@ -54,7 +54,7 @@ From author guidelines (headings, word limits if published).
 |-----------------|------------|
 | | |
 
-## Qualisapio notes
+## QualiSapio notes
 
 Curated mismatch patterns (not official publisher policy).
 

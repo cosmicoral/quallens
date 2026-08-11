@@ -31,7 +31,7 @@ export default function Home() {
               <span className="block text-[var(--blue)]">qualitative manuscripts</span>
             </h1>
             <p className="mt-7 max-w-lg text-lg leading-8 text-[var(--slate)] sm:text-xl">
-              Qualisapio runs a panel of six AI specialist reviewers on your
+              QualiSapio runs a panel of six AI specialist reviewers on your
               manuscript—then synthesizes a structured, revision-ready report for
               authors preparing a submission or reviewers organizing constructive feedback.
             </p>
@@ -87,7 +87,7 @@ export default function Home() {
             <div className="relative aspect-[4/3] min-h-[360px] sm:min-h-[500px] lg:min-h-[610px]">
               <Image
                 src="/mascot/qualisapio-hero.png"
-                alt="The Qualisapio spotted white kitten reviewing an annotated manuscript in a scholarly office"
+                alt="The QualiSapio spotted white kitten reviewing an annotated manuscript in a scholarly office"
                 fill
                 sizes="(max-width: 1024px) 100vw, 56vw"
                 className="object-cover object-center"

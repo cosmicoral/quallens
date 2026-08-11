@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { resolveAppOrigin } from "@/lib/app-url";
+import { BillingError } from "./errors";
 
 export const PLAN_CONFIG = {
   free: {
@@ -51,13 +52,32 @@ const PRICE_ENV_KEYS = {
 
 type BillingEnvironment = Record<string, string | undefined>;
 
+export const REQUIRED_BILLING_ENV_KEYS = [
+  "STRIPE_SECRET_KEY",
+  "STRIPE_PRICE_PLUS_MONTHLY",
+  "STRIPE_PRICE_PLUS_ANNUAL",
+  "STRIPE_PRICE_PRO_MONTHLY",
+  "STRIPE_PRICE_PRO_ANNUAL",
+] as const;
+
+export function getMissingBillingEnvKeys(
+  environment: BillingEnvironment = process.env,
+): string[] {
+  return REQUIRED_BILLING_ENV_KEYS.filter((key) => !environment[key]?.trim());
+}
+
 export function getApprovedPriceId(
   selection: CheckoutSelection,
   environment: BillingEnvironment = process.env,
 ): string {
   const key = PRICE_ENV_KEYS[selection.plan][selection.interval];
   const priceId = environment[key]?.trim();
-  if (!priceId) throw new Error(`${key} is required for Stripe Checkout.`);
+  if (!priceId) {
+    throw new BillingError(
+      "billing_not_configured",
+      `${key} is required for Stripe Checkout.`,
+    );
+  }
   return priceId;
 }
 

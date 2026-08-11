@@ -55,7 +55,7 @@ export function ComingSoonRevisionSection() {
             Revision advice rooted in how qualitative research is actually reviewed
           </h2>
           <p className="section-copy mx-auto">
-            Qualisapio already runs six specialist reviewers on your manuscript. Next,
+            QualiSapio already runs six specialist reviewers on your manuscript. Next,
             feedback will also draw on a built-in library of qualitative methods, social
             theory, and journal expectations—so you know what to fix before you submit,
             or while working through reviewer comments.
@@ -85,7 +85,7 @@ export function ComingSoonRevisionSection() {
               Why this is not another general AI writing tool
             </h3>
             <p className="mt-1 text-sm text-[var(--slate)]">
-              Chat tools are built to produce fluent text. Qualisapio is built for
+              Chat tools are built to produce fluent text. QualiSapio is built for
               peer review in qualitative social science—structured, manuscript-grounded,
               and clear about what it does and does not know.
             </p>
@@ -120,7 +120,7 @@ export function ComingSoonRevisionSection() {
                   </span>
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--blue)]">
-                      Qualisapio
+                      QualiSapio
                     </p>
                     <p className="mt-1 text-sm leading-6 text-[var(--ink)]">{qualisapio}</p>
                   </div>
@@ -132,7 +132,7 @@ export function ComingSoonRevisionSection() {
 
         <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-6 text-[var(--muted)]">
           The library will use curated methods and theory guides plus public journal
-          information—not downloaded papers or automated literature searches. Qualisapio
+          information—not downloaded papers or automated literature searches. QualiSapio
           will not predict acceptance or replace human peer review.
         </p>
       </div>

@@ -5,11 +5,11 @@ import {
   ResearchIcon,
   type ResearchIconName,
 } from "@/components/ResearchIcon";
-import styles from "./QualisapioAgentMascot.module.css";
+import styles from "./QualiSapioAgentMascot.module.css";
 import { AgentMascot } from "./AgentMascot";
 import type { AgentId } from "@/lib/types";
 
-export type QualisapioMascotStage =
+export type QualiSapioMascotStage =
   | "reading"
   | "evidence"
   | "research-design"
@@ -26,7 +26,7 @@ interface StagePresentation {
   agentId: AgentId;
 }
 
-const STAGES: Record<QualisapioMascotStage, StagePresentation> = {
+const STAGES: Record<QualiSapioMascotStage, StagePresentation> = {
   reading: {
     label: "Reading the manuscript",
     description: "Building a faithful map of the study before specialist review.",
@@ -78,7 +78,7 @@ const STAGES: Record<QualisapioMascotStage, StagePresentation> = {
   },
 };
 
-const ILLUSTRATIVE_SEQUENCE: QualisapioMascotStage[] = [
+const ILLUSTRATIVE_SEQUENCE: QualiSapioMascotStage[] = [
   "reading",
   "evidence",
   "research-design",
@@ -89,7 +89,7 @@ const ILLUSTRATIVE_SEQUENCE: QualisapioMascotStage[] = [
 
 const WORKFLOW_GROUPS: Array<{
   label: string;
-  stages: QualisapioMascotStage[];
+  stages: QualiSapioMascotStage[];
 }> = [
   { label: "Reader", stages: ["reading"] },
   {
@@ -100,12 +100,12 @@ const WORKFLOW_GROUPS: Array<{
   { label: "Synthesis", stages: ["synthesis", "complete"] },
 ];
 
-export function QualisapioAgentMascot({
+export function QualiSapioAgentMascot({
   stage = "reading",
   illustrativeSequence = false,
   className = "",
 }: {
-  stage?: QualisapioMascotStage;
+  stage?: QualiSapioMascotStage;
   /** Cycles workflow examples; it is not backend stage telemetry. */
   illustrativeSequence?: boolean;
   className?: string;
@@ -131,7 +131,7 @@ export function QualisapioAgentMascot({
 
   return (
     <section
-      aria-label="Qualisapio review progress"
+      aria-label="QualiSapio review progress"
       className={`overflow-hidden rounded-2xl border border-[var(--blue-soft)] bg-[var(--paper-blue)] shadow-[0_18px_45px_rgba(15,23,42,0.08)] ${className}`}
     >
       <div className="grid sm:grid-cols-[minmax(13rem,0.82fr)_minmax(0,1.18fr)]">
@@ -200,12 +200,12 @@ export function QualisapioAgentMascot({
           </div>
 
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--blue)]">
-            Qualisapio agent workspace
+            QualiSapio agent workspace
           </p>
           <h3 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--ink)] sm:text-2xl">
             {isComplete
-              ? "Your Qualisapio review is ready."
-              : "Qualisapio is reviewing your manuscript."}
+              ? "Your QualiSapio review is ready."
+              : "QualiSapio is reviewing your manuscript."}
           </h3>
 
           <div

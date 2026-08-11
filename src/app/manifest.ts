@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Qualisapio",
-    short_name: "Qualisapio",
+    name: "QualiSapio",
+    short_name: "QualiSapio",
     description: "AI peer review for authors and reviewers in qualitative social science.",
     start_url: "/",
     display: "standalone",

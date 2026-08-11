@@ -56,7 +56,7 @@ Distinct from pure Bourdieusian field analysis when practice arrays are the unit
 - Is "practice" analytically defined or used loosely?
 - Do findings show how practices are constituted and linked?
 
-## Qualisapio notes
+## QualiSapio notes
 
 Common in UK/European qualitative sociology — check operationalization, not vocabulary.
 

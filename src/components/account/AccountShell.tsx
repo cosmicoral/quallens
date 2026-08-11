@@ -19,7 +19,7 @@ export function AccountShell({
     <div className="account-shell min-h-screen">
       <header className="account-shell-header border-b backdrop-blur-xl">
         <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <Link href="/dashboard" aria-label="Qualisapio dashboard" className="rounded-md focus-ring">
+          <Link href="/dashboard" aria-label="QualiSapio dashboard" className="rounded-md focus-ring">
             <BrandMark compact />
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
@@ -42,7 +42,7 @@ export function AccountShell({
             <div className="relative aspect-[3/4] overflow-hidden bg-[var(--paper-warm)]">
               <Image
                 src="/mascot/qualisapio-dashboard-campus.png"
-                alt="Qualisapio scholarly cat mascot walking on a university campus"
+                alt="QualiSapio scholarly cat mascot walking on a university campus"
                 fill
                 sizes="13.5rem"
                 className="object-cover object-[center_28%] scale-[1.02]"

@@ -184,7 +184,7 @@ export async function reserveReviewRun(
         : entitlement.reason === "former_paid_user"
           ? "former_paid_user"
           : "quota_exhausted";
-      throw new BillingError(code, "Your current Qualisapio review allowance has been used.");
+      throw new BillingError(code, "Your current QualiSapio review allowance has been used.");
     }
 
     const id = randomUUID();

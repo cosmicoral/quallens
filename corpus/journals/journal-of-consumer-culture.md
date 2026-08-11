@@ -75,7 +75,7 @@ qualitative submissions.
 | Consumption, Markets & Culture | More marketing/consumer research interface |
 | Cultural Sociology | Broader cultural sociology; consumption not required |
 
-## Qualisapio notes
+## QualiSapio notes
 
 Flag submissions that mention "consumer culture" in title but analyze attitudes only.
 

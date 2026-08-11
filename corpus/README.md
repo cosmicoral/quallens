@@ -1,4 +1,4 @@
-# Qualisapio RAG corpus (scaffold)
+# QualiSapio RAG corpus (scaffold)
 
 Curated knowledge base for mid-term RAG: **30 methodologies**, **40 social-science
 theories**, and **30 journal profiles** (public guidelines — not full papers).

@@ -44,7 +44,7 @@ Related traditions; when to prefer an alternative framework.
 - 
 - 
 
-## Qualisapio notes
+## QualiSapio notes
 
 Curated guidance for Theory Auditor / Overclaim agents.
 

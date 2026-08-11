@@ -197,7 +197,7 @@ export function ReviewForm({ onSubmit, submitting, disabled = false }: ReviewFor
 
       <div className="flex flex-col gap-4 border-t border-[var(--line)] bg-[var(--paper)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
         <p className="max-w-md text-xs leading-5 text-[var(--muted)]">
-          Qualisapio supports authors and reviewers with peer-review feedback only—it
+          QualiSapio supports authors and reviewers with peer-review feedback only—it
           records missing information as missing and does not invent evidence or rewrite
           the manuscript.
         </p>

@@ -4,7 +4,7 @@ import { CONSULTATION_COPY, consultationMailtoHref } from "./copy";
 describe("consultation copy", () => {
   it("builds the consultation mailto link with recipient and subject", () => {
     expect(consultationMailtoHref()).toBe(
-      "mailto:coralhanyu@outlook.com?subject=Qualisapio%20Research%20Consultation&body=Hello%2C%0A%0AI%20would%20like%20to%20book%20a%20complimentary%2030-minute%20introductory%20consultation%20through%20Qualisapio.%0A%0AThank%20you.",
+      "mailto:coralhanyu@outlook.com?subject=QualiSapio%20Research%20Consultation&body=Hello%2C%0A%0AI%20would%20like%20to%20book%20a%20complimentary%2030-minute%20introductory%20consultation%20through%20QualiSapio.%0A%0AThank%20you.",
     );
   });
 

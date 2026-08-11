@@ -48,7 +48,7 @@ Patterns that trigger reviewer criticism (method label vs actual practice).
 |----------------|----------------|
 | | |
 
-## Qualisapio notes
+## QualiSapio notes
 
 Curated guidance for the Research Design agent (not official publisher text).
 

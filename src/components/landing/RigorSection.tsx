@@ -22,7 +22,7 @@ export function RigorSection() {
               Built for reviewer-grade rigor
             </h2>
             <p className="mt-5 max-w-md text-base leading-7 text-slate-300">
-              Qualisapio applies the distinctions authors and peer reviewers actually
+              QualiSapio applies the distinctions authors and peer reviewers actually
               make in qualitative social science—not generic writing-quality checks.
             </p>
             <div className="mt-10 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-slate-300">

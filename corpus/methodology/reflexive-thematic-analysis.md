@@ -60,7 +60,7 @@ transparent reflexivity — not inter-rater reliability as default gold standard
 | Codebook TA | Pre-defined codes; less reflexive theme generation |
 | Grounded theory | Theory generation focus; different procedural logic |
 
-## Qualisapio notes
+## QualiSapio notes
 
 High-frequency method label in submissions — check **label vs actual analytic practice**.
 
