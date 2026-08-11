@@ -22,6 +22,8 @@ services:
     buildCommand: npm ci --include=dev && npm run migrate && npm run build
     startCommand: npm start
     healthCheckPath: /api/auth/ok
+    # Let in-flight reviews finish when a new deploy replaces the instance.
+    maxShutdownDelaySeconds: 300
     envVars:
       - key: NODE_VERSION
         value: "20"

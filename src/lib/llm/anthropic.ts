@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import type { LLMProvider, LLMResult, StructuredRequest } from "./types";
 
@@ -17,13 +18,18 @@ function resolveAnthropicApiKey(): string | undefined {
   return raw;
 }
 
+export function toAnthropicOutputFormat<T>(schema: z.ZodType<T>) {
+  // The SDK reuses repeated schemas through $ref and removes constraints that
+  // Anthropic's grammar compiler does not support. The original Zod schema is
+  // still used below to validate the completed response.
+  return zodOutputFormat(schema);
+}
+
 /**
  * Anthropic implementation of the LLMProvider abstraction.
  *
- * Uses the structured-outputs API (`output_config.format` with a JSON schema
- * derived from the request's Zod schema via zod v4's native converter — the
- * SDK's zodOutputFormat helper produces a $defs-heavy schema that overflows
- * the API's grammar compiler), then validates the response against the Zod
+ * Uses the structured-outputs API (`output_config.format`) with the Anthropic
+ * SDK's Zod transformer, then validates the response against the original Zod
  * schema before returning it. Anything that can't be validated surfaces as a
  * typed LLMError — fields are never invented client-side.
  */
@@ -66,8 +72,7 @@ export class AnthropicProvider implements LLMProvider {
       };
     }
 
-    const jsonSchema = z.toJSONSchema(request.schema) as Record<string, unknown>;
-    delete jsonSchema["$schema"];
+    const outputFormat = toAnthropicOutputFormat(request.schema);
 
     let response: Anthropic.Message;
     try {
@@ -77,7 +82,7 @@ export class AnthropicProvider implements LLMProvider {
         system: request.system,
         messages: [{ role: "user", content: request.prompt }],
         output_config: {
-          format: { type: "json_schema", schema: jsonSchema },
+          format: outputFormat,
         },
       });
     } catch (err) {
