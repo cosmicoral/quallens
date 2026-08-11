@@ -14,14 +14,14 @@ export const PLAN_CONFIG = {
     totalLimit: null,
     monthlyLimit: 5,
     monthlyPricePence: 1200,
-    annualPricePence: 12000,
+    annualPricePence: 9900,
   },
   pro: {
     name: "Pro",
     totalLimit: null,
     monthlyLimit: 12,
     monthlyPricePence: 2400,
-    annualPricePence: 24000,
+    annualPricePence: 21000,
   },
 } as const;
 

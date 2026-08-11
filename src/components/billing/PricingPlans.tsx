@@ -18,7 +18,7 @@ const plans = [
     name: "Plus",
     description: "For authors and reviewers running peer review regularly.",
     monthly: 12,
-    annual: 120,
+    annual: 99,
     allowance: "5 reviews each month",
   },
   {
@@ -26,15 +26,29 @@ const plans = [
     name: "Pro",
     description: "A larger allowance for active peer-review workflows.",
     monthly: 24,
-    annual: 240,
+    annual: 210,
     allowance: "12 reviews each month",
   },
 ];
+
+function maxAnnualSavingsPercent(
+  paidPlans: Array<{ monthly: number; annual: number }>,
+): number {
+  return paidPlans.reduce((max, plan) => {
+    const monthlyYearTotal = plan.monthly * 12;
+    if (monthlyYearTotal <= 0) return max;
+    const savings = Math.round((1 - plan.annual / monthlyYearTotal) * 100);
+    return Math.max(max, savings);
+  }, 0);
+}
 
 export function PricingPlans() {
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [loading, setLoading] = useState<PaidPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const annualSavingsPercent = maxAnnualSavingsPercent(
+    plans.filter((plan) => plan.id !== "free"),
+  );
 
   async function checkout(plan: PaidPlan) {
     setLoading(plan);
@@ -77,7 +91,9 @@ export function PricingPlans() {
                 : "text-[var(--slate)] hover:text-[var(--ink)]"
             }`}
           >
-            {value === "annual" ? "Yearly · save 17%" : "Monthly"}
+            {value === "annual"
+              ? `Yearly · save up to ${annualSavingsPercent}%`
+              : "Monthly"}
           </button>
         ))}
       </div>

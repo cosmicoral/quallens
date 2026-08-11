@@ -350,7 +350,7 @@ No extra variables. Email/password works once the required block above is set.
 
 #### Stripe billing (optional; start in test mode)
 
-Create Plus/Pro products with recurring **GBP** prices (£12/£120 and £24/£240).
+Create Plus/Pro products with recurring **GBP** prices (£12/£99 and £24/£210).
 Enable the **Customer Portal**. Then set:
 
 ```dotenv
@@ -422,9 +422,9 @@ Allowances are centralized in `src/lib/billing/config.ts`:
 |---|---:|---:|
 | Free | £0 | 1 total, once per account |
 | Plus monthly | £12/month | 5 per UTC calendar month |
-| Plus annual | £120/year | 5 per UTC calendar month |
+| Plus annual | £99/year | 5 per UTC calendar month |
 | Pro monthly | £24/month | 12 per UTC calendar month |
-| Pro annual | £240/year | 12 per UTC calendar month |
+| Pro annual | £210/year | 12 per UTC calendar month |
 
 Annual billing does not create an annual usage pool. For this MVP, every paid
 allowance uses deterministic UTC calendar months (the first day at 00:00 UTC
@@ -465,7 +465,7 @@ webhook keys must never use a `NEXT_PUBLIC_` prefix.
 ### Stripe test-mode setup
 
 1. In Stripe test mode, create Plus and Pro products. Add recurring GBP Prices:
-   Plus £12 monthly and £120 yearly; Pro £24 monthly and £240 yearly.
+   Plus £12 monthly and £99 yearly; Pro £24 monthly and £210 yearly.
 2. Copy the four `price_...` IDs into the matching environment variables.
 3. Enable/configure the Stripe Customer Portal for subscription management.
 4. Install and authenticate the Stripe CLI, then forward the required events:
