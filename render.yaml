@@ -8,7 +8,7 @@
 # Automated by this Blueprint:
 #   - BETTER_AUTH_SECRET generation
 #   - Production app URLs for auth + billing redirects
-#   - Database migrations on every deploy (preDeployCommand)
+#   - Database migrations during build (free tier has no preDeployCommand)
 #   - ORCID redirect URI derivation from the app origin
 
 services:
@@ -17,8 +17,7 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: npm ci && npm run build
-    preDeployCommand: npm run migrate
+    buildCommand: npm ci && npm run migrate && npm run build
     startCommand: npm start
     healthCheckPath: /api/auth/ok
     envVars:

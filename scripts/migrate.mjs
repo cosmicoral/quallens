@@ -1,9 +1,42 @@
+import { existsSync, readFileSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import pg from "pg";
 
 const { Client } = pg;
 const migrationsDir = join(process.cwd(), "db/migrations");
+
+function loadEnvLocal() {
+  const envPath = join(process.cwd(), ".env.local");
+  if (!existsSync(envPath)) {
+    return;
+  }
+
+  for (const line of readFileSync(envPath, "utf8").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
+
+    const separator = trimmed.indexOf("=");
+    if (separator === -1) {
+      continue;
+    }
+
+    const key = trimmed.slice(0, separator).trim();
+    let value = trimmed.slice(separator + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
+}
 
 function sslConfig(connectionString) {
   if (connectionString.includes("localhost") || connectionString.includes("127.0.0.1")) {
@@ -13,6 +46,10 @@ function sslConfig(connectionString) {
 }
 
 async function main() {
+  if (!process.env.DATABASE_URL?.trim()) {
+    loadEnvLocal();
+  }
+
   const databaseUrl = process.env.DATABASE_URL?.trim();
   if (!databaseUrl) {
     console.error("DATABASE_URL is required to run migrations.");

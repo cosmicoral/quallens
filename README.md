@@ -274,7 +274,7 @@ serverless hosts, and Neon holds auth, billing, and review history.
 
 | Task | How |
 |---|---|
-| Database migrations | `npm run migrate` runs on every Render deploy (`preDeployCommand`) |
+| Database migrations | `npm run migrate` runs during Render **build** (free tier has no preDeployCommand) |
 | Auth/billing base URL | `render.yaml` sets `https://qualisapio.onrender.com`; code also falls back to `RENDER_EXTERNAL_URL` |
 | ORCID redirect URI | Derived from the app origin when `ORCID_REDIRECT_URI` is unset |
 | `BETTER_AUTH_SECRET` | Render Blueprint auto-generates it |
@@ -289,7 +289,8 @@ products + webhook.
 1. Create a Neon project and copy the **pooled** or direct `DATABASE_URL`
    (include `?sslmode=require` if Neon does not append it).
 2. You do **not** need to run SQL by hand before the first deploy — Render runs
-   `npm run migrate` automatically. To apply migrations locally:
+   `npm run migrate` during the build step when `DATABASE_URL` is set. To apply
+   migrations locally:
 
    ```bash
    npm run migrate
@@ -306,7 +307,7 @@ This repo includes [`render.yaml`](render.yaml) at the root (service name:
    - **`DATABASE_URL`** — Neon connection string (**required**)
    - **`ANTHROPIC_API_KEY`** — Anthropic Console (**required for reviews**)
    - Optional OAuth / Stripe variables (leave blank to skip those features)
-4. Deploy. Migrations run automatically before the app starts.
+4. Deploy. Migrations run during the build when `DATABASE_URL` is provided.
 5. If you enable Google, ORCID, or Stripe, register callbacks against
    `https://qualisapio.onrender.com` (see checklist below).
 
