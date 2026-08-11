@@ -1,0 +1,8 @@
+BEGIN;
+
+ALTER TABLE "review_run"
+  ADD COLUMN IF NOT EXISTS "stage_checkpoints" JSONB NOT NULL DEFAULT '{}'::JSONB,
+  ADD COLUMN IF NOT EXISTS "stage_usage" JSONB NOT NULL DEFAULT '{}'::JSONB,
+  ADD COLUMN IF NOT EXISTS "estimated_cost_usd" NUMERIC(12, 6);
+
+COMMIT;

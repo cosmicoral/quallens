@@ -121,6 +121,11 @@ export default async function DashboardPage({
                             Open to follow live progress
                           </p>
                         )}
+                        {review.estimatedCostUsd > 0 && (
+                          <p className="mt-1 text-xs text-[var(--muted)]">
+                            {review.inputTokens.toLocaleString()} input · {review.outputTokens.toLocaleString()} output tokens · ${review.estimatedCostUsd.toFixed(2)} estimated
+                          </p>
+                        )}
                       </div>
                       <span
                         className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${

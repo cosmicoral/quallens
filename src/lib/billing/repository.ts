@@ -12,8 +12,10 @@ import {
   type UserEntitlement,
 } from "./entitlement";
 import type { BillingInterval, Plan } from "./config";
-import type { ManuscriptInput, ReviewResult } from "@/lib/types";
+import type { AgentId, ManuscriptInput, ReviewResult } from "@/lib/types";
+import type { LLMResponseMetadata } from "@/lib/llm";
 import { decryptManuscript, encryptManuscript } from "@/lib/review/input-crypto";
+import type { ReviewStageUsageMap } from "@/lib/review/usage";
 import { hasUnlimitedReviewAccess } from "./unlimited-access";
 
 interface SubscriptionRow {
@@ -55,9 +57,14 @@ export interface RecentReviewRun {
   progressStage: string | null;
   failureCode: string | null;
   failureDetail: string | null;
+  inputTokens: number;
+  outputTokens: number;
+  estimatedCostUsd: number;
+  stageUsage: ReviewStageUsageMap;
 }
 
 export interface StoredReviewRun extends RecentReviewRun {
+  stageCheckpoints: Partial<Record<AgentId, unknown>>;
   result: ReviewResult | null;
 }
 
@@ -66,6 +73,8 @@ export interface ReviewJobRecord {
   userId: string;
   status: RecentReviewRun["status"];
   manuscript: ManuscriptInput | null;
+  stageCheckpoints: Partial<Record<AgentId, unknown>>;
+  stageUsage: ReviewStageUsageMap;
 }
 
 function mapBillingRecord(row: SubscriptionRow): BillingRecord {
@@ -266,6 +275,87 @@ export async function markReviewRunProgress(id: string, stage: string) {
   );
 }
 
+export async function saveReviewStageCheckpoint(
+  id: string,
+  stage: AgentId,
+  output: unknown,
+  metadata?: LLMResponseMetadata,
+) {
+  if (!metadata) {
+    await getDatabase().query(
+      `UPDATE "review_run"
+       SET "stage_checkpoints" = jsonb_set(
+             COALESCE("stage_checkpoints", '{}'::jsonb), ARRAY[$2]::text[], $3::jsonb, true
+           ),
+           "updated_at" = CURRENT_TIMESTAMP
+       WHERE "id" = $1 AND "status" = 'running'`,
+      [id, stage, JSON.stringify(output)],
+    );
+    return;
+  }
+
+  await getDatabase().query(
+    `UPDATE "review_run"
+     SET "stage_checkpoints" = jsonb_set(
+           COALESCE("stage_checkpoints", '{}'::jsonb), ARRAY[$2]::text[], $3::jsonb, true
+         ),
+         "input_tokens" = CASE
+           WHEN COALESCE("stage_usage", '{}'::jsonb) ? $2 THEN COALESCE("input_tokens", 0)
+           ELSE COALESCE("input_tokens", 0) + $5
+         END,
+         "output_tokens" = CASE
+           WHEN COALESCE("stage_usage", '{}'::jsonb) ? $2 THEN COALESCE("output_tokens", 0)
+           ELSE COALESCE("output_tokens", 0) + $6
+         END,
+         "estimated_cost_usd" = CASE
+           WHEN COALESCE("stage_usage", '{}'::jsonb) ? $2 THEN COALESCE("estimated_cost_usd", 0)
+           ELSE COALESCE("estimated_cost_usd", 0) + $7
+         END,
+         "stage_usage" = jsonb_set(
+           COALESCE("stage_usage", '{}'::jsonb), ARRAY[$2]::text[], $4::jsonb, true
+         ),
+         "updated_at" = CURRENT_TIMESTAMP
+     WHERE "id" = $1 AND "status" = 'running'`,
+    [
+      id,
+      stage,
+      JSON.stringify(output),
+      JSON.stringify(metadata),
+      metadata.inputTokens,
+      metadata.outputTokens,
+      metadata.estimatedCostUsd,
+    ],
+  );
+}
+
+/** Record a billable response that failed local validation, without marking the stage complete. */
+export async function recordReviewStageUsage(
+  id: string,
+  stage: AgentId,
+  metadata: LLMResponseMetadata,
+) {
+  await getDatabase().query(
+    `UPDATE "review_run"
+     SET "stage_usage" = jsonb_set(
+           COALESCE("stage_usage", '{}'::jsonb), ARRAY[$2]::text[], $3::jsonb, true
+         ),
+         "input_tokens" = COALESCE("input_tokens", 0) + $4,
+         "output_tokens" = COALESCE("output_tokens", 0) + $5,
+         "estimated_cost_usd" = COALESCE("estimated_cost_usd", 0) + $6,
+         "updated_at" = CURRENT_TIMESTAMP
+     WHERE "id" = $1 AND "status" = 'running'
+       AND NOT (COALESCE("stage_usage", '{}'::jsonb) ? $2)`,
+    [
+      id,
+      stage,
+      JSON.stringify(metadata),
+      metadata.inputTokens,
+      metadata.outputTokens,
+      metadata.estimatedCostUsd,
+    ],
+  );
+}
+
 export async function markReviewRunCompleted(
   id: string,
   result?: ReviewResult,
@@ -308,8 +398,10 @@ export async function getReviewJob(runId: string): Promise<ReviewJobRecord | nul
     user_id: string;
     status: RecentReviewRun["status"];
     input_payload: unknown | null;
+    stage_checkpoints: Partial<Record<AgentId, unknown>> | null;
+    stage_usage: ReviewStageUsageMap | null;
   }>(
-    `SELECT "id", "user_id", "status", "input_payload"
+    `SELECT "id", "user_id", "status", "input_payload", "stage_checkpoints", "stage_usage"
      FROM "review_run" WHERE "id" = $1`,
     [runId],
   );
@@ -320,6 +412,8 @@ export async function getReviewJob(runId: string): Promise<ReviewJobRecord | nul
         userId: row.user_id,
         status: row.status,
         manuscript: row.input_payload ? decryptManuscript(row.input_payload) : null,
+        stageCheckpoints: row.stage_checkpoints ?? {},
+        stageUsage: row.stage_usage ?? {},
       }
     : null;
 }
@@ -364,9 +458,14 @@ export async function listRecentReviewRuns(userId: string, limit = 10): Promise<
     progress_stage: string | null;
     failure_code: string | null;
     failure_detail: string | null;
+    input_tokens: string | null;
+    output_tokens: string | null;
+    estimated_cost_usd: string | null;
+    stage_usage: ReviewStageUsageMap | null;
   }>(
     `SELECT "id", "manuscript_title", "target_journal", "status", "plan_at_run", "started_at", "completed_at",
-            ("result_payload" IS NOT NULL) AS "has_stored_result", "progress_stage", "failure_code", "failure_detail"
+            ("result_payload" IS NOT NULL) AS "has_stored_result", "progress_stage", "failure_code", "failure_detail",
+            "input_tokens", "output_tokens", "estimated_cost_usd", "stage_usage"
      FROM "review_run" WHERE "user_id" = $1
      ORDER BY "started_at" DESC LIMIT $2`,
     [userId, Math.max(1, Math.min(limit, 20))],
@@ -383,6 +482,10 @@ export async function listRecentReviewRuns(userId: string, limit = 10): Promise<
     progressStage: row.progress_stage,
     failureCode: row.failure_code,
     failureDetail: row.failure_detail,
+    inputTokens: Number(row.input_tokens ?? 0),
+    outputTokens: Number(row.output_tokens ?? 0),
+    estimatedCostUsd: Number(row.estimated_cost_usd ?? 0),
+    stageUsage: row.stage_usage ?? {},
   }));
 }
 
@@ -402,9 +505,15 @@ export async function getReviewRunForUser(
     progress_stage: string | null;
     failure_code: string | null;
     failure_detail: string | null;
+    input_tokens: string | null;
+    output_tokens: string | null;
+    estimated_cost_usd: string | null;
+    stage_checkpoints: Partial<Record<AgentId, unknown>> | null;
+    stage_usage: ReviewStageUsageMap | null;
   }>(
     `SELECT "id", "manuscript_title", "target_journal", "status", "plan_at_run", "started_at", "completed_at",
-            "result_payload", "progress_stage", "failure_code", "failure_detail"
+            "result_payload", "progress_stage", "failure_code", "failure_detail",
+            "input_tokens", "output_tokens", "estimated_cost_usd", "stage_checkpoints", "stage_usage"
      FROM "review_run"
      WHERE "id" = $1 AND "user_id" = $2`,
     [runId, userId],
@@ -423,6 +532,11 @@ export async function getReviewRunForUser(
     progressStage: row.progress_stage,
     failureCode: row.failure_code,
     failureDetail: row.failure_detail,
+    inputTokens: Number(row.input_tokens ?? 0),
+    outputTokens: Number(row.output_tokens ?? 0),
+    estimatedCostUsd: Number(row.estimated_cost_usd ?? 0),
+    stageCheckpoints: row.stage_checkpoints ?? {},
+    stageUsage: row.stage_usage ?? {},
     result: row.result_payload,
   };
 }

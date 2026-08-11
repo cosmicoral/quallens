@@ -1,5 +1,5 @@
 import { getLLMProvider } from "@/lib/llm";
-import type { LLMError, LLMProvider } from "@/lib/llm";
+import type { LLMError, LLMProvider, LLMResponseMetadata } from "@/lib/llm";
 import {
   finalReviewSchema,
   type EvidenceAudit,
@@ -107,8 +107,9 @@ export type FinalReviewerResult =
       ok: true;
       finalReview: FinalReview;
       finalAssessment: FinalAssessment;
+      metadata?: LLMResponseMetadata;
     }
-  | { ok: false; error: LLMError };
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 const LEGACY_VERDICT: Record<FinalReview["recommendation"], Verdict> = {
   minor_revision: "minor-revisions",
@@ -171,11 +172,12 @@ export async function synthesizeFinalReview(
   });
 
   if (!result.ok) {
-    return { ok: false, error: result.error };
+    return { ok: false, error: result.error, metadata: result.metadata };
   }
 
   return {
     ok: true,
+    metadata: result.metadata,
     finalReview: result.value,
     finalAssessment: legacyAssessmentFromFinalReview(result.value),
   };

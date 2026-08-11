@@ -1,5 +1,5 @@
 import { getLLMProvider } from "@/lib/llm";
-import type { LLMError, LLMProvider } from "@/lib/llm";
+import type { LLMError, LLMProvider, LLMResponseMetadata } from "@/lib/llm";
 import {
   manuscriptProfileSchema,
   type AgentReview,
@@ -63,8 +63,8 @@ export type ManuscriptReaderReview = AgentReview & {
 };
 
 export type ManuscriptReaderResult =
-  | { ok: true; review: ManuscriptReaderReview }
-  | { ok: false; error: LLMError };
+  | { ok: true; review: ManuscriptReaderReview; metadata?: LLMResponseMetadata }
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 /** Findings about missing methodological information, derived from the profile. */
 function findingsFromProfile(profile: ManuscriptProfile): ReviewFinding[] {
@@ -135,12 +135,13 @@ export async function readManuscript(
   });
 
   if (!result.ok) {
-    return { ok: false, error: result.error };
+    return { ok: false, error: result.error, metadata: result.metadata };
   }
 
   const profile = result.value;
   return {
     ok: true,
+    metadata: result.metadata,
     review: {
       agentId: manuscriptReader.id,
       agentName: manuscriptReader.name,

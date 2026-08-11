@@ -37,6 +37,10 @@ const baseRun = {
   progressStage: "evidence-auditor",
   failureCode: null,
   failureDetail: null,
+  inputTokens: 0,
+  outputTokens: 0,
+  estimatedCostUsd: 0,
+  stageUsage: {},
   result: null,
 };
 
@@ -61,12 +65,32 @@ describe("GET /api/review/[id]", () => {
   });
 
   it("returns progress and schedules recovery for an active job", async () => {
-    mocks.getReviewRunForUser.mockResolvedValue({ ...baseRun, status: "running" });
+    mocks.getReviewRunForUser.mockResolvedValue({
+      ...baseRun,
+      status: "running",
+      stageUsage: {
+        "manuscript-reader": {
+          provider: "anthropic",
+          model: "claude-opus-5",
+          requestId: "req_reader",
+          inputTokens: 15_000,
+          outputTokens: 700,
+          cacheCreationInputTokens: 0,
+          cacheReadInputTokens: 0,
+          estimatedCostUsd: 0.0925,
+        },
+      },
+    });
     const response = await GET(request(), context);
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({
       ok: true,
-      job: { reviewId: "run_1", status: "running", stage: "evidence-auditor" },
+      job: {
+        reviewId: "run_1",
+        status: "running",
+        stage: "evidence-auditor",
+        usage: { inputTokens: 15_000, outputTokens: 700, estimatedCostUsd: 0.0925 },
+      },
     });
     expect(mocks.after).toHaveBeenCalledOnce();
   });

@@ -91,6 +91,27 @@ export interface ReviewResult {
   finalReview?: FinalReview;
   /** Legacy summary retained additively for existing API consumers. */
   finalAssessment: FinalAssessment;
+  /** Provider usage recorded for each completed reviewer stage. */
+  usage?: ReviewUsageSummary;
+}
+
+export interface ReviewStageUsage {
+  stage: AgentId;
+  provider: string;
+  model: string;
+  requestId?: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationInputTokens: number;
+  cacheReadInputTokens: number;
+  estimatedCostUsd: number;
+}
+
+export interface ReviewUsageSummary {
+  inputTokens: number;
+  outputTokens: number;
+  estimatedCostUsd: number;
+  stages: ReviewStageUsage[];
 }
 
 export type ReviewJobStatus = "pending" | "running" | "completed" | "failed";
@@ -101,6 +122,7 @@ export interface ReviewJobView {
   stage?: string;
   startedAt?: string;
   completedAt?: string;
+  usage?: ReviewUsageSummary;
 }
 
 /** Shape shared by review submission and status responses. */
@@ -111,4 +133,11 @@ export interface ReviewResponse {
   error?: string;
   /** Machine-readable error code when an agent fails (e.g. LLM errors). */
   errorCode?: string;
+}
+
+/** One durable reviewer checkpoint delivered over the review SSE stream. */
+export interface ReviewCheckpointEvent {
+  stage: AgentId;
+  output: unknown;
+  usage?: ReviewUsageSummary;
 }

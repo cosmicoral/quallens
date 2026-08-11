@@ -6,6 +6,8 @@ import {
   markReviewRunFailed,
   markReviewRunProgress,
   markReviewRunRunning,
+  recordReviewStageUsage,
+  saveReviewStageCheckpoint,
   withReviewRunLock,
 } from "@/lib/billing/repository";
 
@@ -58,12 +60,27 @@ async function executeReviewJob(runId: string) {
         job.manuscript,
         undefined,
         async (stage) => markReviewRunProgress(runId, stage),
+        {
+          checkpoints: job.stageCheckpoints,
+          usage: job.stageUsage,
+          onCheckpoint: async (stage, output, metadata) => {
+            await saveReviewStageCheckpoint(runId, stage, output, metadata);
+            console.info(
+              `[review-worker] checkpoint saved run=${runId} stage=${stage}${
+                metadata ? ` inputTokens=${metadata.inputTokens} outputTokens=${metadata.outputTokens}` : ""
+              }`,
+            );
+          },
+        },
       );
       if (!pipeline.ok) {
         const { agentId, error } = pipeline.error;
         console.error(
           `[review-worker] agent failure run=${runId} agent=${agentId} code=${error.code}`,
         );
+        if (pipeline.error.metadata) {
+          await recordReviewStageUsage(runId, agentId, pipeline.error.metadata);
+        }
         await failJob(runId, error.code, `${agentId} failed: ${error.message}`);
         return;
       }

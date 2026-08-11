@@ -1,5 +1,5 @@
 import { getLLMProvider } from "@/lib/llm";
-import type { LLMError, LLMProvider } from "@/lib/llm";
+import type { LLMError, LLMProvider, LLMResponseMetadata } from "@/lib/llm";
 import {
   theoryAuditSchema,
   type AgentReview,
@@ -67,8 +67,8 @@ export type TheoryAuditorReview = AgentReview & {
 };
 
 export type TheoryAuditorResult =
-  | { ok: true; review: TheoryAuditorReview }
-  | { ok: false; error: LLMError };
+  | { ok: true; review: TheoryAuditorReview; metadata?: LLMResponseMetadata }
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 const DIMENSION_KEYS = [
   "analytical_integration",
@@ -164,12 +164,13 @@ export async function auditTheory(
   });
 
   if (!result.ok) {
-    return { ok: false, error: result.error };
+    return { ok: false, error: result.error, metadata: result.metadata };
   }
 
   const theoryAudit = result.value;
   return {
     ok: true,
+    metadata: result.metadata,
     review: {
       agentId: theoryAuditor.id,
       agentName: theoryAuditor.name,

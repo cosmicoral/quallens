@@ -2,6 +2,7 @@ import { after, NextResponse } from "next/server";
 import { getAuth } from "@/lib/auth/server";
 import { getReviewRunForUser } from "@/lib/billing/repository";
 import { startReviewJob } from "@/lib/review/worker";
+import { summarizeReviewUsage } from "@/lib/review/usage";
 import type { ReviewResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -41,6 +42,7 @@ export async function GET(
       stage: run.progressStage ?? undefined,
       startedAt: run.startedAt.toISOString(),
       completedAt: run.completedAt?.toISOString(),
+      usage: summarizeReviewUsage(run.stageUsage),
     },
     result: run.status === "completed" ? run.result ?? undefined : undefined,
     error: run.status === "failed"

@@ -22,7 +22,20 @@ export interface LLMError {
   message: string;
 }
 
-export type LLMResult<T> = { ok: true; value: T } | { ok: false; error: LLMError };
+export interface LLMResponseMetadata {
+  provider: string;
+  model: string;
+  requestId?: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationInputTokens: number;
+  cacheReadInputTokens: number;
+  estimatedCostUsd: number;
+}
+
+export type LLMResult<T> =
+  | { ok: true; value: T; metadata?: LLMResponseMetadata }
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 export interface StructuredRequest<T> {
   /** System prompt. */

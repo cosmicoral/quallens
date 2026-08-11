@@ -21,6 +21,11 @@ const VERDICT_STYLES: Record<Verdict, string> = {
 
 export function ReviewResults({ result }: { result: ReviewResult }) {
   const { finalAssessment: final } = result;
+  const estimatedCost = result.usage
+    ? result.usage.estimatedCostUsd < 0.01
+      ? result.usage.estimatedCostUsd.toFixed(4)
+      : result.usage.estimatedCostUsd.toFixed(2)
+    : null;
 
   return (
     <section aria-labelledby="review-results-heading">
@@ -39,6 +44,14 @@ export function ReviewResults({ result }: { result: ReviewResult }) {
         <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
           Review ID {result.reviewId}
         </p>
+        {result.usage && (
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[var(--slate)]">
+            <span>{result.usage.inputTokens.toLocaleString()} input tokens</span>
+            <span>{result.usage.outputTokens.toLocaleString()} output tokens</span>
+            <span>${estimatedCost} estimated API cost</span>
+            <span>{result.usage.stages.length}/6 stages checkpointed</span>
+          </div>
+        )}
       </header>
 
       {result.finalReview ? (

@@ -1,5 +1,5 @@
 import { getLLMProvider } from "@/lib/llm";
-import type { LLMError, LLMProvider } from "@/lib/llm";
+import type { LLMError, LLMProvider, LLMResponseMetadata } from "@/lib/llm";
 import {
   overclaimAuditSchema,
   type AgentReview,
@@ -72,8 +72,8 @@ export type OverclaimAuditorReview = AgentReview & {
 };
 
 export type OverclaimAuditorResult =
-  | { ok: true; review: OverclaimAuditorReview }
-  | { ok: false; error: LLMError };
+  | { ok: true; review: OverclaimAuditorReview; metadata?: LLMResponseMetadata }
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 const RISK_SCORE: Record<OverclaimFinding["risk"], number> = {
   none: 5,
@@ -156,12 +156,13 @@ export async function auditOverclaims(
   });
 
   if (!result.ok) {
-    return { ok: false, error: result.error };
+    return { ok: false, error: result.error, metadata: result.metadata };
   }
 
   const overclaimAudit = result.value;
   return {
     ok: true,
+    metadata: result.metadata,
     review: {
       agentId: overclaimAuditor.id,
       agentName: overclaimAuditor.name,

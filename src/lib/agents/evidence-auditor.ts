@@ -1,5 +1,5 @@
 import { getLLMProvider } from "@/lib/llm";
-import type { LLMError, LLMProvider } from "@/lib/llm";
+import type { LLMError, LLMProvider, LLMResponseMetadata } from "@/lib/llm";
 import {
   evidenceAuditSchema,
   type AgentReview,
@@ -63,8 +63,8 @@ export type EvidenceAuditorReview = AgentReview & {
 };
 
 export type EvidenceAuditorResult =
-  | { ok: true; review: EvidenceAuditorReview }
-  | { ok: false; error: LLMError };
+  | { ok: true; review: EvidenceAuditorReview; metadata?: LLMResponseMetadata }
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 const SUPPORT_SCORE: Partial<Record<ClaimEvidenceAudit["support_assessment"], number>> = {
   strongly_supported: 5,
@@ -162,12 +162,13 @@ export async function auditEvidence(
   });
 
   if (!result.ok) {
-    return { ok: false, error: result.error };
+    return { ok: false, error: result.error, metadata: result.metadata };
   }
 
   const evidenceAudit = result.value;
   return {
     ok: true,
+    metadata: result.metadata,
     review: {
       agentId: evidenceAuditor.id,
       agentName: evidenceAuditor.name,

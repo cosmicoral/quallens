@@ -6,7 +6,16 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewResults } from "@/components/ReviewResults";
 import { ResearchIcon } from "@/components/ResearchIcon";
 import { QualiSapioAgentMascot } from "@/components/review/QualiSapioAgentMascot";
-import type { ManuscriptInput, ReviewResponse, ReviewResult } from "@/lib/types";
+import { SpecialistReviewCard } from "@/components/review/SpecialistReviewCard";
+import type {
+  AgentId,
+  AgentReview,
+  ManuscriptInput,
+  ReviewCheckpointEvent,
+  ReviewResponse,
+  ReviewResult,
+  ReviewUsageSummary,
+} from "@/lib/types";
 import type { UsageView } from "@/lib/billing/entitlement";
 
 async function loadUsage(): Promise<UsageView | null> {
@@ -25,6 +34,32 @@ const STAGE_LABELS: Record<string, string> = {
   "final-reviewer": "Synthesizing the final peer review",
 };
 
+const SPECIALIST_STAGE_ORDER: AgentId[] = [
+  "manuscript-reader",
+  "evidence-auditor",
+  "research-design-reviewer",
+  "theory-auditor",
+  "overclaim-auditor",
+];
+
+function parseEventData<T>(event: Event): T | null {
+  try {
+    return JSON.parse((event as MessageEvent<string>).data) as T;
+  } catch {
+    return null;
+  }
+}
+
+function isAgentReview(output: unknown): output is AgentReview {
+  if (!output || typeof output !== "object") return false;
+  const candidate = output as Partial<AgentReview>;
+  return typeof candidate.agentId === "string"
+    && typeof candidate.agentName === "string"
+    && typeof candidate.summary === "string"
+    && typeof candidate.score === "number"
+    && Array.isArray(candidate.findings);
+}
+
 function wait(milliseconds: number, signal?: AbortSignal) {
   return new Promise<void>((resolve) => {
     const timer = window.setTimeout(resolve, milliseconds);
@@ -35,12 +70,28 @@ function wait(milliseconds: number, signal?: AbortSignal) {
   });
 }
 
+function ReviewUsageCard({ usage }: { usage: ReviewUsageSummary }) {
+  const cost = usage.estimatedCostUsd < 0.01
+    ? usage.estimatedCostUsd.toFixed(4)
+    : usage.estimatedCostUsd.toFixed(2);
+  return (
+    <div className="mt-4 grid gap-3 rounded-xl border border-[var(--line)] bg-white px-4 py-3 text-xs text-[var(--slate)] shadow-sm sm:grid-cols-4">
+      <p><span className="font-semibold text-[var(--ink)]">{usage.stages.length}/6</span> stages saved</p>
+      <p><span className="font-semibold text-[var(--ink)]">{usage.inputTokens.toLocaleString()}</span> input tokens</p>
+      <p><span className="font-semibold text-[var(--ink)]">{usage.outputTokens.toLocaleString()}</span> output tokens</p>
+      <p><span className="font-semibold text-[var(--ink)]">${cost}</span> estimated API cost</p>
+    </div>
+  );
+}
+
 export default function ReviewPage() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [progressStage, setProgressStage] = useState<string | null>(null);
+  const [reviewUsage, setReviewUsage] = useState<ReviewUsageSummary | null>(null);
+  const [partialReviews, setPartialReviews] = useState<Partial<Record<AgentId, AgentReview>>>({});
   const [usage, setUsage] = useState<UsageView | null>(null);
   const [usageLoaded, setUsageLoaded] = useState(false);
 
@@ -76,6 +127,7 @@ export default function ReviewPage() {
 
         consecutiveFailures = 0;
         if (data.job?.stage) setProgressStage(data.job.stage);
+        if (data.job?.usage) setReviewUsage(data.job.usage);
         if (data.job?.status === "completed" && data.result) {
           setResult(data.result);
           setError(null);
@@ -111,6 +163,92 @@ export default function ReviewPage() {
     }
   }, []);
 
+  const streamReview = useCallback(async (reviewId: string, signal?: AbortSignal) => {
+    if (typeof EventSource === "undefined") {
+      await pollReview(reviewId, signal);
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      if (signal?.aborted) {
+        resolve();
+        return;
+      }
+
+      const source = new EventSource(`/api/review/${encodeURIComponent(reviewId)}/stream`);
+      let settled = false;
+      let connectionFailures = 0;
+
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        source.close();
+        signal?.removeEventListener("abort", onAbort);
+        resolve();
+      };
+      const refreshUsage = () => {
+        void loadUsage().then((value) => { if (value) setUsage(value); }).catch(() => {});
+      };
+      const onAbort = () => finish();
+
+      source.onopen = () => {
+        connectionFailures = 0;
+      };
+      source.addEventListener("status", (event) => {
+        const data = parseEventData<ReviewResponse>(event);
+        if (data?.job?.stage) setProgressStage(data.job.stage);
+        if (data?.job?.usage) setReviewUsage(data.job.usage);
+      });
+      source.addEventListener("checkpoint", (event) => {
+        const checkpoint = parseEventData<ReviewCheckpointEvent>(event);
+        if (!checkpoint) return;
+        if (checkpoint.usage) setReviewUsage(checkpoint.usage);
+        if (checkpoint.stage !== "final-reviewer" && isAgentReview(checkpoint.output)) {
+          setPartialReviews((current) => ({
+            ...current,
+            [checkpoint.stage]: checkpoint.output as AgentReview,
+          }));
+        }
+      });
+      source.addEventListener("complete", (event) => {
+        const data = parseEventData<ReviewResponse>(event);
+        if (!data?.result) return;
+        setResult(data.result);
+        setReviewUsage(data.result.usage ?? data.job?.usage ?? null);
+        setError(null);
+        setErrorCode(null);
+        setSubmitting(false);
+        window.history.replaceState({}, "", "/review");
+        refreshUsage();
+        finish();
+      });
+      source.addEventListener("failed", (event) => {
+        const data = parseEventData<ReviewResponse>(event);
+        setError(data?.error ?? "The review could not be completed. Please try again.");
+        setErrorCode(data?.errorCode ?? "provider_error");
+        setSubmitting(false);
+        window.history.replaceState({}, "", "/review");
+        refreshUsage();
+        finish();
+      });
+      source.addEventListener("stream-warning", () => {
+        setProgressStage("reconnecting");
+      });
+      source.onerror = () => {
+        if (settled || signal?.aborted) return;
+        connectionFailures += 1;
+        setProgressStage("reconnecting");
+        // EventSource reconnects automatically. If the stream endpoint itself is
+        // unavailable, retain the existing durable status endpoint as a fallback.
+        if (connectionFailures >= 5) {
+          source.close();
+          void pollReview(reviewId, signal).finally(finish);
+        }
+      };
+      signal?.addEventListener("abort", onAbort, { once: true });
+    });
+  }, [pollReview]);
+
   useEffect(() => {
     const reviewId = new URLSearchParams(window.location.search).get("run");
     if (!reviewId) return;
@@ -118,13 +256,13 @@ export default function ReviewPage() {
     const timer = window.setTimeout(() => {
       setSubmitting(true);
       setProgressStage("queued");
-      void pollReview(reviewId, controller.signal);
+      void streamReview(reviewId, controller.signal);
     }, 0);
     return () => {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [pollReview]);
+  }, [streamReview]);
 
   async function handleSubmit(manuscript: ManuscriptInput) {
     setSubmitting(true);
@@ -132,6 +270,8 @@ export default function ReviewPage() {
     setErrorCode(null);
     setResult(null);
     setProgressStage("queued");
+    setReviewUsage(null);
+    setPartialReviews({});
     try {
       const res = await fetch("/api/review", {
         method: "POST",
@@ -158,7 +298,7 @@ export default function ReviewPage() {
         setSubmitting(false);
       } else {
         window.history.replaceState({}, "", `/review?run=${encodeURIComponent(data.job.reviewId)}`);
-        await pollReview(data.job.reviewId);
+        await streamReview(data.job.reviewId);
       }
     } catch (caught) {
       const detail = caught instanceof Error ? caught.message : "unknown network error";
@@ -330,6 +470,30 @@ export default function ReviewPage() {
                   You can refresh this page; the review will continue and resume automatically.
                 </p>
               </div>
+            )}
+
+            {reviewUsage && !result && <ReviewUsageCard usage={reviewUsage} />}
+
+            {submitting && SPECIALIST_STAGE_ORDER.some((stage) => partialReviews[stage]) && (
+              <section className="mt-5 rounded-2xl border border-[var(--line)] bg-[var(--paper-blue)] p-4 sm:p-5">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--ink)]">Reviewer reports arriving live</p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">
+                      Each completed reviewer is saved and shown immediately.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[var(--blue-deep)] shadow-sm">
+                    {SPECIALIST_STAGE_ORDER.filter((stage) => partialReviews[stage]).length}/5 complete
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {SPECIALIST_STAGE_ORDER.flatMap((stage) => {
+                    const review = partialReviews[stage];
+                    return review ? [<SpecialistReviewCard key={stage} review={review} />] : [];
+                  })}
+                </div>
+              </section>
             )}
 
             {error && (

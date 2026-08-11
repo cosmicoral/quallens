@@ -78,7 +78,7 @@ export function SpecialistReviewCard({ review }: { review: AgentReview }) {
               <span
                 className="rounded-full bg-[var(--paper-blue)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--blue)]"
               >
-                Live analysis
+                Completed
               </span>
             </span>
             <span className="mt-1 block text-xs text-[var(--muted)]">{itemCount}</span>

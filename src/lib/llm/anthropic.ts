@@ -1,7 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
-import type { LLMProvider, LLMResult, StructuredRequest } from "./types";
+import type {
+  LLMProvider,
+  LLMResponseMetadata,
+  LLMResult,
+  StructuredRequest,
+} from "./types";
+import { estimateTokenCostUsd } from "./pricing";
 
 const DEFAULT_MODEL = "claude-opus-5";
 const DEFAULT_MAX_TOKENS = 16000;
@@ -13,6 +19,30 @@ function resolveEffort(): AnthropicEffort {
   return (["low", "medium", "high", "xhigh", "max"] as const).includes(
     effort as AnthropicEffort,
   ) ? effort as AnthropicEffort : "medium";
+}
+
+function responseMetadata(response: Anthropic.Message): LLMResponseMetadata {
+  const inputTokens = response.usage.input_tokens;
+  const outputTokens = response.usage.output_tokens;
+  const cacheCreationInputTokens = response.usage.cache_creation_input_tokens ?? 0;
+  const cacheReadInputTokens = response.usage.cache_read_input_tokens ?? 0;
+  const estimatedCostUsd = estimateTokenCostUsd(response.model, {
+    inputTokens,
+    outputTokens,
+    cacheCreationInputTokens,
+    cacheReadInputTokens,
+  });
+  const requestId = (response as Anthropic.Message & { _request_id?: string | null })._request_id;
+  return {
+    provider: "anthropic",
+    model: response.model,
+    requestId: requestId ?? response.id,
+    inputTokens,
+    outputTokens,
+    cacheCreationInputTokens,
+    cacheReadInputTokens,
+    estimatedCostUsd,
+  };
 }
 
 function resolveAnthropicApiKey(): string | undefined {
@@ -124,6 +154,8 @@ export class AnthropicProvider implements LLMProvider {
       };
     }
 
+    const metadata = responseMetadata(response);
+
     if (response.stop_reason === "refusal") {
       return {
         ok: false,
@@ -131,6 +163,7 @@ export class AnthropicProvider implements LLMProvider {
           code: "refusal",
           message: "The model declined to process this manuscript.",
         },
+        metadata,
       };
     }
     if (response.stop_reason === "max_tokens") {
@@ -141,6 +174,7 @@ export class AnthropicProvider implements LLMProvider {
           message:
             "Model output was truncated (max_tokens reached) and cannot be validated.",
         },
+        metadata,
       };
     }
 
@@ -151,6 +185,7 @@ export class AnthropicProvider implements LLMProvider {
       return {
         ok: false,
         error: { code: "invalid_output", message: "Model returned no text output." },
+        metadata,
       };
     }
 
@@ -164,6 +199,7 @@ export class AnthropicProvider implements LLMProvider {
           code: "invalid_output",
           message: "Model output was not valid JSON.",
         },
+        metadata,
       };
     }
 
@@ -177,9 +213,10 @@ export class AnthropicProvider implements LLMProvider {
             .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
             .join("; ")}`,
         },
+        metadata,
       };
     }
 
-    return { ok: true, value: parsed.data };
+    return { ok: true, value: parsed.data, metadata };
   }
 }

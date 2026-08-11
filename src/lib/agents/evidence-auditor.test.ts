@@ -213,4 +213,49 @@ describe("auditEvidence", () => {
       "final-reviewer",
     ]);
   });
+
+  it("resumes after saved stages without calling those models again", async () => {
+    const initialProvider = new SequenceProvider([
+      broadClaimProfile,
+      broadClaimAudit,
+      underreportedDesignAudit,
+      mentionedTheoryAudit,
+      culturalOverreachAudit,
+      strongSynthesisFixture.finalReview,
+    ]);
+    const saved: Record<string, unknown> = {};
+    await runReviewPipeline(
+      broadClaimManuscript,
+      initialProvider,
+      undefined,
+      { onCheckpoint: (stage, output) => { saved[stage] = output; } },
+    );
+
+    const resumeProvider = new SequenceProvider([
+      mentionedTheoryAudit,
+      culturalOverreachAudit,
+      strongSynthesisFixture.finalReview,
+    ]);
+    const resumedStages: string[] = [];
+    const result = await runReviewPipeline(
+      broadClaimManuscript,
+      resumeProvider,
+      (stage) => { resumedStages.push(stage); },
+      {
+        checkpoints: {
+          "manuscript-reader": saved["manuscript-reader"],
+          "evidence-auditor": saved["evidence-auditor"],
+          "research-design-reviewer": saved["research-design-reviewer"],
+        },
+      },
+    );
+
+    expect(result.ok).toBe(true);
+    expect(resumeProvider.requests).toHaveLength(3);
+    expect(resumedStages).toEqual([
+      "theory-auditor",
+      "overclaim-auditor",
+      "final-reviewer",
+    ]);
+  });
 });

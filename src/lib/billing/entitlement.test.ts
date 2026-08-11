@@ -81,7 +81,7 @@ describe("review entitlements", () => {
     expect(entitlement(pro, 1, 12).canReview).toBe(false);
   });
 
-  it("counts a pending reservation against availability", () => {
+  it("blocks while pending without consuming the remaining allowance", () => {
     const plus = subscription({
       plan: "plus",
       billingInterval: "monthly",
@@ -92,7 +92,7 @@ describe("review entitlements", () => {
     expect(entitlement(plus, 0, 4, 1)).toMatchObject({
       canReview: false,
       reason: "active_review",
-      remaining: 0,
+      remaining: 1,
     });
   });
 
@@ -107,7 +107,31 @@ describe("review entitlements", () => {
     expect(entitlement(plus, 0, 3, 1)).toMatchObject({
       canReview: false,
       reason: "active_review",
+      remaining: 2,
+    });
+  });
+
+  it("deducts one allowance only after the review is completed", () => {
+    const plus = subscription({
+      plan: "plus",
+      billingInterval: "monthly",
+      subscriptionStatus: "active",
+      currentPeriodEnd: new Date("2026-09-01T00:00:00.000Z"),
+      hasHadPaidPlan: true,
+    });
+
+    expect(entitlement(plus, 0, 4, 1)).toMatchObject({
+      used: 4,
+      reserved: 1,
       remaining: 1,
+      canReview: false,
+    });
+    expect(entitlement(plus, 0, 5, 0)).toMatchObject({
+      used: 5,
+      reserved: 0,
+      remaining: 0,
+      canReview: false,
+      reason: "quota_exhausted",
     });
   });
 

@@ -51,6 +51,10 @@ services:
         value: claude-opus-5
       - key: LLM_EFFORT
         value: medium
+      - key: LLM_INPUT_COST_PER_MILLION_USD
+        value: "5"
+      - key: LLM_OUTPUT_COST_PER_MILLION_USD
+        value: "25"
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

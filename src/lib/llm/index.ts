@@ -1,7 +1,14 @@
 import { AnthropicProvider } from "./anthropic";
 import type { LLMProvider } from "./types";
 
-export type { LLMError, LLMErrorCode, LLMProvider, LLMResult, StructuredRequest } from "./types";
+export type {
+  LLMError,
+  LLMErrorCode,
+  LLMProvider,
+  LLMResponseMetadata,
+  LLMResult,
+  StructuredRequest,
+} from "./types";
 export { AnthropicProvider } from "./anthropic";
 
 let defaultProvider: LLMProvider | null = null;

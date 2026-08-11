@@ -1,5 +1,5 @@
 import { getLLMProvider } from "@/lib/llm";
-import type { LLMError, LLMProvider } from "@/lib/llm";
+import type { LLMError, LLMProvider, LLMResponseMetadata } from "@/lib/llm";
 import {
   researchDesignAuditSchema,
   type AgentReview,
@@ -67,8 +67,8 @@ export type ResearchDesignReviewerReview = AgentReview & {
 };
 
 export type ResearchDesignReviewerResult =
-  | { ok: true; review: ResearchDesignReviewerReview }
-  | { ok: false; error: LLMError };
+  | { ok: true; review: ResearchDesignReviewerReview; metadata?: LLMResponseMetadata }
+  | { ok: false; error: LLMError; metadata?: LLMResponseMetadata };
 
 const DIMENSION_KEYS = [
   "research_question_alignment",
@@ -134,12 +134,13 @@ export async function reviewResearchDesign(
   });
 
   if (!result.ok) {
-    return { ok: false, error: result.error };
+    return { ok: false, error: result.error, metadata: result.metadata };
   }
 
   const researchDesignAudit = result.value;
   return {
     ok: true,
+    metadata: result.metadata,
     review: {
       agentId: researchDesignReviewer.id,
       agentName: researchDesignReviewer.name,

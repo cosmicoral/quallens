@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   markReviewRunFailed: vi.fn(),
   markReviewRunProgress: vi.fn(),
   markReviewRunRunning: vi.fn(),
+  recordReviewStageUsage: vi.fn(),
+  saveReviewStageCheckpoint: vi.fn(),
   withReviewRunLock: vi.fn(),
 }));
 
@@ -19,6 +21,8 @@ vi.mock("@/lib/billing/repository", () => ({
   markReviewRunFailed: mocks.markReviewRunFailed,
   markReviewRunProgress: mocks.markReviewRunProgress,
   markReviewRunRunning: mocks.markReviewRunRunning,
+  recordReviewStageUsage: mocks.recordReviewStageUsage,
+  saveReviewStageCheckpoint: mocks.saveReviewStageCheckpoint,
   withReviewRunLock: mocks.withReviewRunLock,
 }));
 
@@ -36,17 +40,35 @@ describe("persisted review worker", () => {
       userId: "user_1",
       status: "pending",
       manuscript: { title: "Long study", body: "文".repeat(12_000) },
+      stageCheckpoints: {},
+      stageUsage: {},
     });
     mocks.markReviewRunRunning.mockResolvedValue(undefined);
     mocks.markReviewRunProgress.mockResolvedValue(undefined);
     mocks.markReviewRunCompleted.mockResolvedValue(undefined);
     mocks.markReviewRunFailed.mockResolvedValue(undefined);
+    mocks.recordReviewStageUsage.mockResolvedValue(undefined);
+    mocks.saveReviewStageCheckpoint.mockResolvedValue(undefined);
   });
 
   it("runs and stores a manuscript longer than 10,000 characters", async () => {
-    mocks.runReviewPipeline.mockImplementation(async (_manuscript, _provider, onProgress) => {
+    mocks.runReviewPipeline.mockImplementation(async (_manuscript, _provider, onProgress, options) => {
       await onProgress("manuscript-reader");
       await onProgress("final-reviewer");
+      await options.onCheckpoint(
+        "manuscript-reader",
+        { agentId: "manuscript-reader" },
+        {
+          provider: "anthropic",
+          model: "claude-opus-5",
+          requestId: "req_1",
+          inputTokens: 12_345,
+          outputTokens: 456,
+          cacheCreationInputTokens: 0,
+          cacheReadInputTokens: 0,
+          estimatedCostUsd: 0.073125,
+        },
+      );
       return {
         ok: true,
         result: { reviewId: "temporary", manuscriptTitle: "Long study", createdAt: "old" },
@@ -58,6 +80,12 @@ describe("persisted review worker", () => {
     expect(mocks.markReviewRunRunning).toHaveBeenCalledWith("run_1");
     expect(mocks.markReviewRunProgress).toHaveBeenNthCalledWith(1, "run_1", "manuscript-reader");
     expect(mocks.markReviewRunProgress).toHaveBeenNthCalledWith(2, "run_1", "final-reviewer");
+    expect(mocks.saveReviewStageCheckpoint).toHaveBeenCalledWith(
+      "run_1",
+      "manuscript-reader",
+      { agentId: "manuscript-reader" },
+      expect.objectContaining({ requestId: "req_1", inputTokens: 12_345 }),
+    );
     expect(mocks.markReviewRunCompleted).toHaveBeenCalledWith(
       "run_1",
       expect.objectContaining({ reviewId: "run_1", manuscriptTitle: "Long study" }),
@@ -70,6 +98,16 @@ describe("persisted review worker", () => {
       error: {
         agentId: "theory-auditor",
         error: { code: "provider_error", message: "Provider unavailable" },
+        metadata: {
+          provider: "anthropic",
+          model: "claude-opus-5",
+          requestId: "req_failed",
+          inputTokens: 500,
+          outputTokens: 10,
+          cacheCreationInputTokens: 0,
+          cacheReadInputTokens: 0,
+          estimatedCostUsd: 0.00275,
+        },
       },
     });
 
@@ -80,6 +118,11 @@ describe("persisted review worker", () => {
       "provider_error",
       expect.any(Date),
       "theory-auditor failed: Provider unavailable",
+    );
+    expect(mocks.recordReviewStageUsage).toHaveBeenCalledWith(
+      "run_1",
+      "theory-auditor",
+      expect.objectContaining({ requestId: "req_failed", outputTokens: 10 }),
     );
     expect(mocks.markReviewRunCompleted).not.toHaveBeenCalled();
   });

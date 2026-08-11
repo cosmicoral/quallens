@@ -94,7 +94,9 @@ export function getUserEntitlement(input: EntitlementInput): UserEntitlement {
     const limit = PLAN_CONFIG[plan].monthlyLimit ?? 0;
     const used = input.completedPaidReviewsInPeriod;
     const reserved = input.activeReservations;
-    const remaining = Math.max(0, limit - used - reserved);
+    // Active work blocks a second concurrent submission, but it is not usage.
+    // The allowance is consumed only after the run reaches `completed`.
+    const remaining = Math.max(0, limit - used);
     const period = getUtcMonthlyQuotaPeriod(now);
     return {
       plan,
@@ -119,7 +121,8 @@ export function getUserEntitlement(input: EntitlementInput): UserEntitlement {
   const limit = freeUnavailable ? 0 : PLAN_CONFIG.free.totalLimit;
   const used = input.completedFreeReviews;
   const reserved = input.activeReservations;
-  const remaining = Math.max(0, limit - used - reserved);
+  // Failed or interrupted reviews must not consume the lifetime free review.
+  const remaining = Math.max(0, limit - used);
   const reason: EntitlementReason = reserved > 0
     ? "active_review"
     : freeUnavailable
