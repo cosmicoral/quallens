@@ -1,5 +1,5 @@
 import "server-only";
-import type Stripe from "stripe";
+import Stripe from "stripe";
 import { isInternalOrcidEmail } from "@/lib/auth/identity";
 import {
   getAppUrl,
@@ -11,6 +11,7 @@ import { hasPaidAccess } from "./entitlement";
 import { BillingError } from "./errors";
 import {
   getBillingRecord,
+  replaceStripeCustomerId,
   setStripeCustomerId,
   type BillingRecord,
 } from "./repository";
@@ -26,6 +27,7 @@ export interface CheckoutDependencies {
   stripe: Pick<Stripe, "customers" | "subscriptions" | "checkout">;
   getBillingRecord: (userId: string) => Promise<BillingRecord>;
   setStripeCustomerId: (userId: string, customerId: string) => Promise<void>;
+  replaceStripeCustomerId: (userId: string, customerId: string) => Promise<void>;
   appUrl: string;
   environment: Record<string, string | undefined>;
 }
@@ -35,6 +37,7 @@ function defaultDependencies(): CheckoutDependencies {
     stripe: getStripe(),
     getBillingRecord,
     setStripeCustomerId,
+    replaceStripeCustomerId,
     appUrl: getAppUrl(),
     environment: process.env,
   };
@@ -49,12 +52,26 @@ const DUPLICATE_BLOCKING_STATUSES = new Set([
   "paused",
 ]);
 
+function isStripeResourceMissing(error: unknown): boolean {
+  return (
+    error instanceof Stripe.errors.StripeError && error.code === "resource_missing"
+  );
+}
+
 async function getOrCreateCustomer(
   user: CheckoutUser,
   record: BillingRecord,
   dependencies: CheckoutDependencies,
 ) {
-  if (record.stripeCustomerId) return record.stripeCustomerId;
+  if (record.stripeCustomerId) {
+    try {
+      await dependencies.stripe.customers.retrieve(record.stripeCustomerId);
+      return record.stripeCustomerId;
+    } catch (error) {
+      if (!isStripeResourceMissing(error)) throw error;
+    }
+  }
+
   const customer = await dependencies.stripe.customers.create(
     {
       name: user.name,
@@ -63,7 +80,11 @@ async function getOrCreateCustomer(
     },
     { idempotencyKey: `quallens-customer-${user.id}` },
   );
-  await dependencies.setStripeCustomerId(user.id, customer.id);
+  if (record.stripeCustomerId) {
+    await dependencies.replaceStripeCustomerId(user.id, customer.id);
+  } else {
+    await dependencies.setStripeCustomerId(user.id, customer.id);
+  }
   return customer.id;
 }
 

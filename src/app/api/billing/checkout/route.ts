@@ -64,7 +64,9 @@ export async function POST(request: Request) {
         error.type === "StripeAuthenticationError"
           ? "Stripe API authentication failed. Check STRIPE_SECRET_KEY matches your price mode (Live vs Test)."
           : error.code === "resource_missing"
-            ? "That subscription price was not found in Stripe. Check the four STRIPE_PRICE_* IDs on the server."
+            ? error.param === "customer"
+              ? "Your Stripe customer was created in Test mode and cannot be reused in Live mode. Try again after the server redeploys the latest fix."
+              : "That subscription price was not found in Stripe. Check the four STRIPE_PRICE_* IDs on the server."
             : "Billing could not be started. Please try again.";
       return NextResponse.json(
         { ok: false, error: message, errorCode: "billing_unavailable" },

@@ -326,3 +326,12 @@ export async function setStripeCustomerId(userId: string, customerId: string) {
     [userId, customerId],
   );
 }
+
+export async function replaceStripeCustomerId(userId: string, customerId: string) {
+  await getDatabase().query(
+    `UPDATE "subscription"
+     SET "stripe_customer_id" = $2, "updated_at" = CURRENT_TIMESTAMP
+     WHERE "user_id" = $1`,
+    [userId, customerId],
+  );
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type Stripe from "stripe";
+import Stripe from "stripe";
 
 vi.mock("server-only", () => ({}));
 
@@ -24,7 +24,10 @@ const billingRecord: BillingRecord = {
 function dependencies(overrides: Partial<CheckoutDependencies> = {}): CheckoutDependencies {
   return {
     stripe: {
-      customers: { create: vi.fn() },
+      customers: {
+        retrieve: vi.fn().mockResolvedValue({ id: "cus_test" }),
+        create: vi.fn().mockResolvedValue({ id: "cus_test" }),
+      },
       subscriptions: { list: vi.fn().mockResolvedValue({ data: [] }) },
       checkout: {
         sessions: {
@@ -34,6 +37,7 @@ function dependencies(overrides: Partial<CheckoutDependencies> = {}): CheckoutDe
     } as unknown as CheckoutDependencies["stripe"],
     getBillingRecord: vi.fn().mockResolvedValue(billingRecord),
     setStripeCustomerId: vi.fn(),
+    replaceStripeCustomerId: vi.fn(),
     appUrl: "https://qualisapio.test",
     environment: {
       STRIPE_SECRET_KEY: "sk_test_example",
@@ -70,7 +74,10 @@ describe("Stripe Checkout", () => {
   it("blocks creation when Stripe already has an active subscription", async () => {
     const deps = dependencies({
       stripe: {
-        customers: { create: vi.fn() },
+        customers: {
+          retrieve: vi.fn().mockResolvedValue({ id: "cus_test" }),
+          create: vi.fn(),
+        },
         subscriptions: { list: vi.fn().mockResolvedValue({ data: [{ status: "active" }] }) },
         checkout: { sessions: { create: vi.fn() } },
       } as unknown as CheckoutDependencies["stripe"],
@@ -82,6 +89,40 @@ describe("Stripe Checkout", () => {
         deps,
       ),
     ).rejects.toMatchObject({ code: "subscription_exists" });
+  });
+
+  it("replaces a stale Test-mode customer when switching to Live Stripe keys", async () => {
+    const create = vi.fn().mockResolvedValue({ id: "cus_live_new" });
+    const replaceStripeCustomerId = vi.fn();
+    const staleCustomerError = new Stripe.errors.StripeInvalidRequestError({
+      message: "No such customer: cus_test",
+      type: "invalid_request_error",
+      code: "resource_missing",
+      param: "customer",
+    });
+    const deps = dependencies({
+      stripe: {
+        customers: {
+          retrieve: vi.fn().mockRejectedValue(staleCustomerError),
+          create,
+        },
+        subscriptions: { list: vi.fn().mockResolvedValue({ data: [] }) },
+        checkout: {
+          sessions: { create: vi.fn().mockResolvedValue({ url: "https://checkout.stripe.test/session" }) },
+        },
+      } as unknown as CheckoutDependencies["stripe"],
+      replaceStripeCustomerId,
+    });
+
+    await expect(
+      createCheckoutSession(
+        { id: "user-1", name: "Jane", email: "jane@example.edu" },
+        { plan: "plus", interval: "monthly" },
+        deps,
+      ),
+    ).resolves.toEqual({ url: "https://checkout.stripe.test/session" });
+
+    expect(replaceStripeCustomerId).toHaveBeenCalledWith("user-1", "cus_live_new");
   });
 });
 
