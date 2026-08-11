@@ -94,6 +94,7 @@ export default function ReviewPage() {
   const [partialReviews, setPartialReviews] = useState<Partial<Record<AgentId, AgentReview>>>({});
   const [usage, setUsage] = useState<UsageView | null>(null);
   const [usageLoaded, setUsageLoaded] = useState(false);
+  const hasOwnerAccess = Boolean(usage && (usage.isUnlimited || usage.planName === "Owner"));
 
   useEffect(() => {
     let active = true;
@@ -442,13 +443,18 @@ export default function ReviewPage() {
                 <div>
                   <p className="text-sm font-semibold text-[var(--ink)]">{usage.planName} peer-review allowance</p>
                   <p className="mt-1 text-xs text-[var(--muted)]">
-                    {usage.isUnlimited
+                    {hasOwnerAccess
                       ? `Unlimited reviews · ${usage.used} successful reviews completed`
                       : `${usage.remaining} remaining · ${usage.used} of ${usage.limit} successful reviews used`}
                     {usage.reserved > 0 ? " · one review in progress" : ""}
                   </p>
                 </div>
-                <Link href="/pricing" className="text-sm font-semibold text-[var(--blue-deep)] hover:underline">View plans</Link>
+                <Link
+                  href={hasOwnerAccess ? "/dashboard" : "/pricing"}
+                  className="text-sm font-semibold text-[var(--blue-deep)] hover:underline"
+                >
+                  {hasOwnerAccess ? "Review history" : "View plans"}
+                </Link>
               </div>
             )}
 
