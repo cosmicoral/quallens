@@ -34,10 +34,11 @@ export type ReviewPipelineResult =
  * Run the full review pipeline.
  *
  * The Manuscript Reader runs first. Evidence, Research Design, and Theory then
- * run in parallel against the original manuscript and validated profile. The
- * Overclaim Auditor then also consumes the completed Evidence Audit. The Final
- * Reviewer runs last, synthesizing all four specialist audits. Any agent can
- * abort the pipeline with a typed error rather than fabricated data.
+ * run sequentially (safer on small Render free-tier instances than parallel
+ * Anthropic calls). The Overclaim Auditor then also consumes the completed
+ * Evidence Audit. The Final Reviewer runs last, synthesizing all four
+ * specialist audits. Any agent can abort the pipeline with a typed error
+ * rather than fabricated data.
  */
 export async function runReviewPipeline(
   manuscript: ManuscriptInput,
@@ -51,21 +52,23 @@ export async function runReviewPipeline(
     };
   }
 
-  const [evidenceResult, researchDesignResult, theoryResult] = await Promise.all([
-    auditEvidence(manuscript, readerResult.review.profile, provider ?? undefined),
-    reviewResearchDesign(
-      manuscript,
-      readerResult.review.profile,
-      provider ?? undefined,
-    ),
-    auditTheory(manuscript, readerResult.review.profile, provider ?? undefined),
-  ]);
+  const evidenceResult = await auditEvidence(
+    manuscript,
+    readerResult.review.profile,
+    provider ?? undefined,
+  );
   if (!evidenceResult.ok) {
     return {
       ok: false,
       error: { agentId: evidenceAuditor.id, error: evidenceResult.error },
     };
   }
+
+  const researchDesignResult = await reviewResearchDesign(
+    manuscript,
+    readerResult.review.profile,
+    provider ?? undefined,
+  );
   if (!researchDesignResult.ok) {
     return {
       ok: false,
@@ -75,6 +78,12 @@ export async function runReviewPipeline(
       },
     };
   }
+
+  const theoryResult = await auditTheory(
+    manuscript,
+    readerResult.review.profile,
+    provider ?? undefined,
+  );
   if (!theoryResult.ok) {
     return {
       ok: false,

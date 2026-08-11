@@ -170,7 +170,7 @@ export async function reserveReviewRun(
        SET "status" = 'failed', "failure_code" = 'stale_reservation',
            "completed_at" = $2, "updated_at" = $2
        WHERE "user_id" = $1 AND "status" IN ('pending', 'running')
-         AND "started_at" < $2 - INTERVAL '2 hours'`,
+         AND "started_at" < $2 - INTERVAL '15 minutes'`,
       [userId, now],
     );
 

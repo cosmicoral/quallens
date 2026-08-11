@@ -67,9 +67,10 @@ export default function ReviewPage() {
       } else {
         setResult(data.result);
       }
-    } catch {
+    } catch (caught) {
+      const detail = caught instanceof Error ? caught.message : "unknown network error";
       setError(
-        "Could not reach the review service. The request may have timed out — six AI reviewers can take several minutes. Try a shorter manuscript and keep this tab open.",
+        `Could not reach the review service (${detail}). Hard-refresh the page (Cmd+Shift+R), keep the tab open, and check Render Logs for [api/review]. Six reviewers can take several minutes.`,
       );
     } finally {
       setSubmitting(false);

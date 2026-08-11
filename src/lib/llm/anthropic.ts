@@ -3,7 +3,19 @@ import { z } from "zod";
 import type { LLMProvider, LLMResult, StructuredRequest } from "./types";
 
 const DEFAULT_MODEL = "claude-opus-5";
-const DEFAULT_MAX_TOKENS = 16000;
+const DEFAULT_MAX_TOKENS = 8000;
+
+function resolveAnthropicApiKey(): string | undefined {
+  const raw = process.env.ANTHROPIC_API_KEY?.trim();
+  if (!raw) return undefined;
+  if (
+    (raw.startsWith('"') && raw.endsWith('"'))
+    || (raw.startsWith("'") && raw.endsWith("'"))
+  ) {
+    return raw.slice(1, -1).trim() || undefined;
+  }
+  return raw;
+}
 
 /**
  * Anthropic implementation of the LLMProvider abstraction.
@@ -28,7 +40,11 @@ export class AnthropicProvider implements LLMProvider {
     // Constructed lazily so importing this module (e.g. during `next build`)
     // never requires credentials.
     if (!this.client) {
-      this.client = new Anthropic();
+      const apiKey = resolveAnthropicApiKey();
+      if (!apiKey) {
+        throw new Error("ANTHROPIC_API_KEY is missing.");
+      }
+      this.client = new Anthropic({ apiKey });
     }
     return this.client;
   }
