@@ -153,7 +153,7 @@ describe("review entitlements", () => {
     }).canReview).toBe(false);
   });
 
-  it("retains canceled access only through the already-paid period", () => {
+  it("retains canceled paid access through the paid period, then exposes an unused free review", () => {
     const canceled = subscription({
       plan: "plus",
       billingInterval: "annual",
@@ -162,18 +162,18 @@ describe("review entitlements", () => {
       cancelAtPeriodEnd: true,
       hasHadPaidPlan: true,
     });
-    expect(entitlement(canceled, 1, 0)).toMatchObject({ isPaid: true, canReview: true });
+    expect(entitlement(canceled, 0, 0)).toMatchObject({ isPaid: true, canReview: true });
     expect(getUserEntitlement({
       subscription: canceled,
-      completedFreeReviews: 1,
+      completedFreeReviews: 0,
       completedPaidReviewsInPeriod: 0,
       activeReservations: 0,
       now: new Date("2026-08-21T00:00:00.000Z"),
-    })).toMatchObject({ isPaid: false, canReview: false, reason: "former_paid_user" });
+    })).toMatchObject({ isPaid: false, canReview: true, remaining: 1, reason: "available" });
   });
 
   it.each(["unpaid", "incomplete", "incomplete_expired", "trialing", "paused"])(
-    "does not grant paid access for %s",
+    "falls back to the unused lifetime free review when paid access is %s",
     (status) => {
       const state = subscription({
         plan: "plus",
@@ -182,18 +182,29 @@ describe("review entitlements", () => {
         currentPeriodEnd: new Date("2026-09-01T00:00:00.000Z"),
         hasHadPaidPlan: true,
       });
-      expect(entitlement(state, 0, 0)).toMatchObject({ canReview: false, isPaid: false });
+      expect(entitlement(state, 0, 0)).toMatchObject({
+        canReview: true,
+        isPaid: false,
+        remaining: 1,
+        reason: "available",
+      });
     },
   );
 
-  it("does not grant a new free trial after paid access ends", () => {
+  it("preserves one lifetime free review after paid access ends", () => {
     const formerPaid = subscription({
       subscriptionStatus: "canceled",
       hasHadPaidPlan: true,
     });
     expect(entitlement(formerPaid, 0, 0)).toMatchObject({
+      canReview: true,
+      remaining: 1,
+      reason: "available",
+    });
+    expect(entitlement(formerPaid, 1, 0)).toMatchObject({
       canReview: false,
-      reason: "former_paid_user",
+      remaining: 0,
+      reason: "free_trial_used",
     });
   });
 });

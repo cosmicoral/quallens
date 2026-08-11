@@ -3,7 +3,7 @@ import type { UsageView } from "@/lib/billing/entitlement";
 
 function periodCopy(usage: UsageView) {
   if (usage.isUnlimited) return "Unlimited owner access";
-  if (!usage.isPaid) return usage.reason === "former_paid_user" ? "Paid access ended" : "Lifetime trial";
+  if (!usage.isPaid) return "Lifetime free review";
   if (!usage.quotaPeriodEnd) return "Current allowance";
   return `Resets ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(usage.quotaPeriodEnd))}`;
 }
@@ -20,7 +20,7 @@ export function UsageSummary({ usage, compact = false }: { usage: UsageView; com
   const percent = usage.isUnlimited
     ? 0
     : usage.limit > 0
-      ? Math.min(100, ((usage.used + usage.reserved) / usage.limit) * 100)
+      ? Math.min(100, (usage.used / usage.limit) * 100)
       : 100;
   return (
     <section className={`account-card rounded-[1.15rem] ${compact ? "p-5 sm:p-6" : "p-6"}`}>

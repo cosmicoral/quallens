@@ -117,19 +117,18 @@ export function getUserEntitlement(input: EntitlementInput): UserEntitlement {
     };
   }
 
-  const freeUnavailable = input.subscription.hasHadPaidPlan;
-  const limit = freeUnavailable ? 0 : PLAN_CONFIG.free.totalLimit;
+  // Every account owns one lifetime free successful review, even if it has
+  // previously held a paid subscription. Paid runs are counted separately.
+  const limit = PLAN_CONFIG.free.totalLimit;
   const used = input.completedFreeReviews;
   const reserved = input.activeReservations;
   // Failed or interrupted reviews must not consume the lifetime free review.
   const remaining = Math.max(0, limit - used);
   const reason: EntitlementReason = reserved > 0
     ? "active_review"
-    : freeUnavailable
-      ? "former_paid_user"
-      : remaining > 0
-        ? "available"
-        : "free_trial_used";
+    : remaining > 0
+      ? "available"
+      : "free_trial_used";
 
   return {
     plan: "free",
