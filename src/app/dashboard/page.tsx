@@ -88,13 +88,16 @@ export default async function DashboardPage({
                   review.completedAt ?? review.startedAt,
                 );
                 const canOpen = review.status === "completed" && review.hasStoredResult;
+                const isActive = review.status === "pending" || review.status === "running";
                 return (
                   <li key={review.id} className="py-4 first:pt-1">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
-                        {canOpen ? (
+                        {canOpen || isActive ? (
                           <Link
-                            href={`/dashboard/reviews/${review.id}`}
+                            href={canOpen
+                              ? `/dashboard/reviews/${review.id}`
+                              : `/review?run=${review.id}`}
                             className="truncate text-sm font-semibold text-[var(--ink)] transition hover:text-[var(--blue-deep)] hover:underline"
                           >
                             {review.manuscriptTitle}
@@ -111,6 +114,11 @@ export default async function DashboardPage({
                         {review.status === "completed" && !review.hasStoredResult && (
                           <p className="mt-1 text-xs text-[var(--muted)]">
                             Result not stored for this run.
+                          </p>
+                        )}
+                        {isActive && (
+                          <p className="mt-1 text-xs font-medium text-[var(--blue-deep)]">
+                            Open to follow live progress
                           </p>
                         )}
                       </div>

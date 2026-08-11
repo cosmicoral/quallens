@@ -12,7 +12,8 @@ import {
   type UserEntitlement,
 } from "./entitlement";
 import type { BillingInterval, Plan } from "./config";
-import type { ReviewResult } from "@/lib/types";
+import type { ManuscriptInput, ReviewResult } from "@/lib/types";
+import { decryptManuscript, encryptManuscript } from "@/lib/review/input-crypto";
 
 interface SubscriptionRow {
   user_id: string;
@@ -50,10 +51,20 @@ export interface RecentReviewRun {
   startedAt: Date;
   completedAt: Date | null;
   hasStoredResult: boolean;
+  progressStage: string | null;
+  failureCode: string | null;
+  failureDetail: string | null;
 }
 
 export interface StoredReviewRun extends RecentReviewRun {
   result: ReviewResult | null;
+}
+
+export interface ReviewJobRecord {
+  id: string;
+  userId: string;
+  status: RecentReviewRun["status"];
+  manuscript: ManuscriptInput | null;
 }
 
 function mapBillingRecord(row: SubscriptionRow): BillingRecord {
@@ -157,8 +168,7 @@ export async function getUsageView(userId: string, now = new Date()): Promise<Us
 
 export async function reserveReviewRun(
   userId: string,
-  manuscriptTitle: string,
-  targetJournal?: string | null,
+  manuscript: ManuscriptInput,
   now = new Date(),
 ): Promise<ReviewReservation> {
   const client = await getDatabase().connect();
@@ -168,9 +178,11 @@ export async function reserveReviewRun(
     await client.query(
       `UPDATE "review_run"
        SET "status" = 'failed', "failure_code" = 'stale_reservation',
+           "failure_detail" = 'The saved review expired before it could be completed.',
+           "input_payload" = NULL, "progress_stage" = 'failed',
            "completed_at" = $2, "updated_at" = $2
        WHERE "user_id" = $1 AND "status" IN ('pending', 'running')
-         AND "started_at" < $2 - INTERVAL '15 minutes'`,
+         AND "updated_at" < $2 - INTERVAL '2 hours'`,
       [userId, now],
     );
 
@@ -191,18 +203,19 @@ export async function reserveReviewRun(
     await client.query(
       `INSERT INTO "review_run"
          ("id", "user_id", "manuscript_title", "target_journal", "plan_at_run", "status",
-          "started_at", "quota_period_start", "provider", "model")
-       VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8, $9)`,
+          "started_at", "quota_period_start", "provider", "model", "input_payload", "progress_stage")
+       VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8, $9, $10, 'queued')`,
       [
         id,
         userId,
-        manuscriptTitle,
-        targetJournal?.trim() || null,
+        manuscript.title,
+        manuscript.targetJournal?.trim() || null,
         entitlement.plan,
         now,
         entitlement.quotaPeriodStart,
         process.env.LLM_PROVIDER ?? "anthropic",
         process.env.LLM_MODEL ?? null,
+        JSON.stringify(encryptManuscript(manuscript)),
       ],
     );
     await client.query("COMMIT");
@@ -215,11 +228,21 @@ export async function reserveReviewRun(
   }
 }
 
-export async function markReviewRunRunning(id: string) {
+export async function markReviewRunRunning(id: string, stage = "manuscript-reader") {
   await getDatabase().query(
-    `UPDATE "review_run" SET "status" = 'running', "updated_at" = CURRENT_TIMESTAMP
-     WHERE "id" = $1 AND "status" = 'pending'`,
-    [id],
+    `UPDATE "review_run"
+     SET "status" = 'running', "progress_stage" = $2, "updated_at" = CURRENT_TIMESTAMP
+     WHERE "id" = $1 AND "status" IN ('pending', 'running')`,
+    [id, stage],
+  );
+}
+
+export async function markReviewRunProgress(id: string, stage: string) {
+  await getDatabase().query(
+    `UPDATE "review_run"
+     SET "progress_stage" = $2, "updated_at" = CURRENT_TIMESTAMP
+     WHERE "id" = $1 AND "status" = 'running'`,
+    [id, stage],
   );
 }
 
@@ -233,6 +256,10 @@ export async function markReviewRunCompleted(
      SET "status" = 'completed',
          "completed_at" = $2,
          "result_payload" = $3,
+         "input_payload" = NULL,
+         "progress_stage" = 'completed',
+         "failure_code" = NULL,
+         "failure_detail" = NULL,
          "updated_at" = $2
      WHERE "id" = $1 AND "status" IN ('pending', 'running')`,
     [id, completedAt, result ? JSON.stringify(result) : null],
@@ -243,14 +270,65 @@ export async function markReviewRunFailed(
   id: string,
   failureCode: string,
   completedAt = new Date(),
+  failureDetail?: string,
 ) {
   await getDatabase().query(
     `UPDATE "review_run"
      SET "status" = 'failed', "failure_code" = $2,
-         "completed_at" = $3, "updated_at" = $3
+         "failure_detail" = $4, "input_payload" = NULL,
+         "progress_stage" = 'failed', "completed_at" = $3, "updated_at" = $3
      WHERE "id" = $1 AND "status" IN ('pending', 'running')`,
-    [id, failureCode, completedAt],
+    [id, failureCode, completedAt, failureDetail?.slice(0, 2000) ?? null],
   );
+}
+
+export async function getReviewJob(runId: string): Promise<ReviewJobRecord | null> {
+  const result = await getDatabase().query<{
+    id: string;
+    user_id: string;
+    status: RecentReviewRun["status"];
+    input_payload: unknown | null;
+  }>(
+    `SELECT "id", "user_id", "status", "input_payload"
+     FROM "review_run" WHERE "id" = $1`,
+    [runId],
+  );
+  const row = result.rows[0];
+  return row
+    ? {
+        id: row.id,
+        userId: row.user_id,
+        status: row.status,
+        manuscript: row.input_payload ? decryptManuscript(row.input_payload) : null,
+      }
+    : null;
+}
+
+/** Hold a database-backed lock so only one Render process can execute a job. */
+export async function withReviewRunLock(
+  runId: string,
+  work: () => Promise<void>,
+): Promise<boolean> {
+  const client = await getDatabase().connect();
+  let locked = false;
+  try {
+    const lock = await client.query<{ acquired: boolean }>(
+      `SELECT pg_try_advisory_lock(hashtextextended($1, 0)) AS "acquired"`,
+      [runId],
+    );
+    locked = Boolean(lock.rows[0]?.acquired);
+    if (!locked) return false;
+    await work();
+    return true;
+  } finally {
+    if (locked) {
+      await client.query(
+        `SELECT pg_advisory_unlock(hashtextextended($1, 0))`,
+        [runId],
+      ).catch(() => {});
+    }
+    client.release();
+  }
 }
 
 export async function listRecentReviewRuns(userId: string, limit = 10): Promise<RecentReviewRun[]> {
@@ -263,9 +341,12 @@ export async function listRecentReviewRuns(userId: string, limit = 10): Promise<
     started_at: Date;
     completed_at: Date | null;
     has_stored_result: boolean;
+    progress_stage: string | null;
+    failure_code: string | null;
+    failure_detail: string | null;
   }>(
     `SELECT "id", "manuscript_title", "target_journal", "status", "plan_at_run", "started_at", "completed_at",
-            ("result_payload" IS NOT NULL) AS "has_stored_result"
+            ("result_payload" IS NOT NULL) AS "has_stored_result", "progress_stage", "failure_code", "failure_detail"
      FROM "review_run" WHERE "user_id" = $1
      ORDER BY "started_at" DESC LIMIT $2`,
     [userId, Math.max(1, Math.min(limit, 20))],
@@ -279,6 +360,9 @@ export async function listRecentReviewRuns(userId: string, limit = 10): Promise<
     startedAt: row.started_at,
     completedAt: row.completed_at,
     hasStoredResult: row.has_stored_result,
+    progressStage: row.progress_stage,
+    failureCode: row.failure_code,
+    failureDetail: row.failure_detail,
   }));
 }
 
@@ -295,9 +379,12 @@ export async function getReviewRunForUser(
     started_at: Date;
     completed_at: Date | null;
     result_payload: ReviewResult | null;
+    progress_stage: string | null;
+    failure_code: string | null;
+    failure_detail: string | null;
   }>(
     `SELECT "id", "manuscript_title", "target_journal", "status", "plan_at_run", "started_at", "completed_at",
-            "result_payload"
+            "result_payload", "progress_stage", "failure_code", "failure_detail"
      FROM "review_run"
      WHERE "id" = $1 AND "user_id" = $2`,
     [runId, userId],
@@ -313,6 +400,9 @@ export async function getReviewRunForUser(
     startedAt: row.started_at,
     completedAt: row.completed_at,
     hasStoredResult: row.result_payload != null,
+    progressStage: row.progress_stage,
+    failureCode: row.failure_code,
+    failureDetail: row.failure_detail,
     result: row.result_payload,
   };
 }

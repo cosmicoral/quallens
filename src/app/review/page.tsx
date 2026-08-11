@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewResults } from "@/components/ReviewResults";
 import { ResearchIcon } from "@/components/ResearchIcon";
@@ -15,11 +15,32 @@ async function loadUsage(): Promise<UsageView | null> {
   return response.ok && data.usage ? data.usage : null;
 }
 
+const STAGE_LABELS: Record<string, string> = {
+  queued: "Queued safely",
+  "manuscript-reader": "Reading and profiling the manuscript",
+  "evidence-auditor": "Auditing evidence and claims",
+  "research-design-reviewer": "Reviewing the research design",
+  "theory-auditor": "Auditing theory and concepts",
+  "overclaim-auditor": "Checking the scope of claims",
+  "final-reviewer": "Synthesizing the final peer review",
+};
+
+function wait(milliseconds: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve) => {
+    const timer = window.setTimeout(resolve, milliseconds);
+    signal?.addEventListener("abort", () => {
+      window.clearTimeout(timer);
+      resolve();
+    }, { once: true });
+  });
+}
+
 export default function ReviewPage() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [progressStage, setProgressStage] = useState<string | null>(null);
   const [usage, setUsage] = useState<UsageView | null>(null);
   const [usageLoaded, setUsageLoaded] = useState(false);
 
@@ -37,11 +58,80 @@ export default function ReviewPage() {
     return () => { active = false; };
   }, []);
 
+  const pollReview = useCallback(async (reviewId: string, signal?: AbortSignal) => {
+    let consecutiveFailures = 0;
+    while (!signal?.aborted) {
+      try {
+        const response = await fetch(`/api/review/${encodeURIComponent(reviewId)}`, {
+          cache: "no-store",
+          signal,
+        });
+        const raw = await response.text();
+        let data: ReviewResponse;
+        try {
+          data = JSON.parse(raw) as ReviewResponse;
+        } catch {
+          throw new Error(`Unreadable status response (HTTP ${response.status})`);
+        }
+
+        consecutiveFailures = 0;
+        if (data.job?.stage) setProgressStage(data.job.stage);
+        if (data.job?.status === "completed" && data.result) {
+          setResult(data.result);
+          setError(null);
+          setErrorCode(null);
+          setSubmitting(false);
+          window.history.replaceState({}, "", "/review");
+          void loadUsage().then((value) => { if (value) setUsage(value); }).catch(() => {});
+          return;
+        }
+        if (data.job?.status === "failed" || (!data.ok && response.status < 500)) {
+          setError(data.error ?? "The review could not be completed. Please try again.");
+          setErrorCode(data.errorCode ?? "provider_error");
+          setSubmitting(false);
+          window.history.replaceState({}, "", "/review");
+          void loadUsage().then((value) => { if (value) setUsage(value); }).catch(() => {});
+          return;
+        }
+      } catch (caught) {
+        if (signal?.aborted) return;
+        consecutiveFailures += 1;
+        setProgressStage("reconnecting");
+        if (consecutiveFailures >= 10) {
+          const detail = caught instanceof Error ? caught.message : "network error";
+          setError(
+            `The review is still saved, but its status could not be reached (${detail}). Refresh this page to resume checking it.`,
+          );
+          setErrorCode("status_unavailable");
+          setSubmitting(false);
+          return;
+        }
+      }
+      await wait(consecutiveFailures > 0 ? 3_000 : 2_000, signal);
+    }
+  }, []);
+
+  useEffect(() => {
+    const reviewId = new URLSearchParams(window.location.search).get("run");
+    if (!reviewId) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      setSubmitting(true);
+      setProgressStage("queued");
+      void pollReview(reviewId, controller.signal);
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [pollReview]);
+
   async function handleSubmit(manuscript: ManuscriptInput) {
     setSubmitting(true);
     setError(null);
     setErrorCode(null);
     setResult(null);
+    setProgressStage("queued");
     try {
       const res = await fetch("/api/review", {
         method: "POST",
@@ -55,26 +145,27 @@ export default function ReviewPage() {
       } catch {
         setError(
           res.status >= 500
-            ? `The review service timed out or crashed (HTTP ${res.status}). Try a shorter manuscript, or check Render logs for Anthropic errors.`
+            ? `The review service could not start the saved job (HTTP ${res.status}). Please try again.`
             : `The review service returned an unreadable response (HTTP ${res.status}). Please try again.`,
         );
         setErrorCode("provider_error");
+        setSubmitting(false);
         return;
       }
-      if (!data.ok || !data.result) {
+      if (!data.ok || !data.job) {
         setError(data.error ?? "The review failed. Please try again.");
         setErrorCode(data.errorCode ?? null);
+        setSubmitting(false);
       } else {
-        setResult(data.result);
+        window.history.replaceState({}, "", `/review?run=${encodeURIComponent(data.job.reviewId)}`);
+        await pollReview(data.job.reviewId);
       }
     } catch (caught) {
       const detail = caught instanceof Error ? caught.message : "unknown network error";
       setError(
-        `Could not reach the review service (${detail}). Hard-refresh the page (Cmd+Shift+R), keep the tab open, and check Render Logs for [api/review]. Six reviewers can take several minutes.`,
+        `Could not submit the review (${detail}). Please try again.`,
       );
-    } finally {
       setSubmitting(false);
-      void loadUsage().then((value) => { if (value) setUsage(value); }).catch(() => {});
     }
   }
 
@@ -226,7 +317,17 @@ export default function ReviewPage() {
             />
 
             {submitting && (
-              <QualiSapioAgentMascot illustrativeSequence className="mt-5" />
+              <div className="mt-5">
+                <QualiSapioAgentMascot illustrativeSequence />
+                <p role="status" className="mt-3 text-center text-sm font-semibold text-[var(--blue-deep)]">
+                  {progressStage === "reconnecting"
+                    ? "Reconnecting to the saved review…"
+                    : STAGE_LABELS[progressStage ?? "queued"] ?? "Review in progress"}
+                </p>
+                <p className="mt-1 text-center text-xs text-[var(--muted)]">
+                  You can refresh this page; the review will continue and resume automatically.
+                </p>
+              </div>
             )}
 
             {error && (

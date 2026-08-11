@@ -31,6 +31,8 @@ services:
       # Render sets NODE_ENV=production automatically at runtime for web services.
       - key: BETTER_AUTH_SECRET
         generateValue: true
+      - key: REVIEW_INPUT_ENCRYPTION_KEY
+        generateValue: true
       - key: BETTER_AUTH_URL
         value: https://qualisapio.onrender.com
       - key: NEXT_PUBLIC_APP_URL
@@ -43,6 +45,8 @@ services:
         value: anthropic
       - key: LLM_MODEL
         value: claude-opus-5
+      - key: LLM_EFFORT
+        value: medium
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

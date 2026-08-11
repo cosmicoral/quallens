@@ -1,35 +1,70 @@
-import { NextResponse } from "next/server";
-import { runReviewPipeline } from "@/lib/agents/pipeline";
-import type { LLMErrorCode } from "@/lib/llm";
-import type { ManuscriptInput, ReviewResponse } from "@/lib/types";
+import { randomUUID } from "node:crypto";
+import { after, NextResponse } from "next/server";
+import type { ManuscriptInput, Methodology, ReviewResponse } from "@/lib/types";
 import { getAuth } from "@/lib/auth/server";
 import { getOrCreateResearcherProfile } from "@/lib/auth/profile";
 import { BillingError } from "@/lib/billing/errors";
-import {
-  markReviewRunCompleted,
-  markReviewRunFailed,
-  markReviewRunRunning,
-  reserveReviewRun,
-} from "@/lib/billing/repository";
+import { markReviewRunFailed, reserveReviewRun } from "@/lib/billing/repository";
+import { startReviewJob } from "@/lib/review/worker";
 
 export const runtime = "nodejs";
+export const maxDuration = 1800;
 
-/** Map agent failure codes to HTTP statuses. */
-const ERROR_STATUS: Record<LLMErrorCode, number> = {
-  missing_api_key: 500,
-  provider_error: 502,
-  invalid_output: 502,
-  refusal: 422,
-};
+const MAX_MANUSCRIPT_CHARS = 300_000;
+const METHODOLOGIES = new Set<Methodology>([
+  "ethnography",
+  "interviews",
+  "focus-groups",
+  "case-study",
+  "grounded-theory",
+  "discourse-analysis",
+  "mixed-methods",
+  "other",
+]);
 
-/**
- * POST /api/review
- *
- * Accepts a ManuscriptInput and returns a ReviewResult. The Manuscript
- * Reader, all four specialist auditors, and Final Reviewer run against a real
- * LLM. Agent failures surface as typed errors (errorCode) — never invented data.
- */
-export async function POST(request: Request) {
+type ReviewStage =
+  | "authentication"
+  | "profile"
+  | "request_validation"
+  | "reservation"
+  | "dispatch";
+
+interface ReviewRequestContext {
+  requestId: string;
+  reservationId?: string;
+  stage: ReviewStage;
+}
+
+function manuscriptSize(manuscript: ManuscriptInput) {
+  return [
+    manuscript.title,
+    manuscript.abstract,
+    manuscript.body,
+    manuscript.methodology,
+    manuscript.discipline,
+    manuscript.targetJournal,
+    manuscript.authorNotes,
+  ].reduce((total, value) => total + (value?.length ?? 0), 0);
+}
+
+async function safelyMarkDispatchFailed(runId: string, requestId: string) {
+  try {
+    await markReviewRunFailed(
+      runId,
+      "dispatch_error",
+      new Date(),
+      `The background review could not be scheduled. Reference: ${requestId}.`,
+    );
+  } catch (error) {
+    console.error(
+      `[api/review] could not persist dispatch failure request=${requestId} run=${runId}`,
+      error,
+    );
+  }
+}
+
+async function handleReviewRequest(request: Request, context: ReviewRequestContext) {
+  context.stage = "authentication";
   const session = await getAuth().api.getSession({ headers: request.headers });
   if (!session) {
     return NextResponse.json<ReviewResponse>(
@@ -37,8 +72,11 @@ export async function POST(request: Request) {
       { status: 401 },
     );
   }
+
+  context.stage = "profile";
   await getOrCreateResearcherProfile(session.user);
 
+  context.stage = "request_validation";
   let body: Partial<ManuscriptInput>;
   try {
     body = await request.json();
@@ -58,77 +96,91 @@ export async function POST(request: Request) {
 
   const manuscript: ManuscriptInput = {
     title: body.title.trim(),
-    abstract: body.abstract,
-    body: body.body,
-    methodology: body.methodology,
-    discipline: body.discipline,
+    abstract: body.abstract?.trim() || undefined,
+    body: body.body.trim(),
+    methodology: body.methodology && METHODOLOGIES.has(body.methodology)
+      ? body.methodology
+      : undefined,
+    discipline: body.discipline?.trim() || undefined,
     targetJournal: body.targetJournal?.trim() || undefined,
-    authorNotes: body.authorNotes,
+    authorNotes: body.authorNotes?.trim() || undefined,
   };
+  if (manuscriptSize(manuscript) > MAX_MANUSCRIPT_CHARS) {
+    return NextResponse.json<ReviewResponse>(
+      {
+        ok: false,
+        error: "The manuscript is too large. Please keep the submitted text under 300,000 characters.",
+        errorCode: "manuscript_too_large",
+      },
+      { status: 413 },
+    );
+  }
 
+  context.stage = "reservation";
   let reservation;
   try {
-    reservation = await reserveReviewRun(
-      session.user.id,
-      manuscript.title,
-      manuscript.targetJournal ?? null,
-    );
+    reservation = await reserveReviewRun(session.user.id, manuscript);
   } catch (error) {
     if (error instanceof BillingError) {
-      const status = error.code === "active_review" ? 409 : 402;
       return NextResponse.json<ReviewResponse>(
         { ok: false, error: error.message, errorCode: error.code },
-        { status },
+        { status: error.code === "active_review" ? 409 : 402 },
       );
     }
     throw error;
   }
+  context.reservationId = reservation.id;
 
-  let pipelineResult;
+  context.stage = "dispatch";
   try {
-    await markReviewRunRunning(reservation.id);
-    console.info(
-      `[api/review] starting run ${reservation.id} title=${JSON.stringify(manuscript.title.slice(0, 80))} bodyChars=${manuscript.body.length}`,
-    );
-    pipelineResult = await runReviewPipeline(manuscript);
+    after(() => startReviewJob(reservation.id));
   } catch (error) {
-    console.error(`[api/review] unexpected pipeline failure for ${reservation.id}`, error);
-    try {
-      await markReviewRunFailed(reservation.id, "unexpected_pipeline_error");
-    } catch {
-      // A stale-reservation sweep releases this run if the database is temporarily unavailable.
-    }
+    await safelyMarkDispatchFailed(reservation.id, context.requestId);
+    throw error;
+  }
+
+  console.info(
+    `[api/review] queued request=${context.requestId} run=${reservation.id} bodyChars=${manuscript.body.length}`,
+  );
+  return NextResponse.json<ReviewResponse>(
+    {
+      ok: true,
+      job: { reviewId: reservation.id, status: "pending", stage: "queued" },
+    },
+    { status: 202, headers: { "Cache-Control": "no-store" } },
+  );
+}
+
+export async function POST(request: Request) {
+  const context: ReviewRequestContext = {
+    requestId: randomUUID(),
+    stage: "authentication",
+  };
+
+  try {
+    const response = await handleReviewRequest(request, context);
+    response.headers.set("X-Review-Request-Id", context.requestId);
+    return response;
+  } catch (error) {
+    console.error(
+      `[api/review] unhandled failure request=${context.requestId} stage=${context.stage}${
+        context.reservationId ? ` run=${context.reservationId}` : ""
+      }`,
+      error,
+    );
     return NextResponse.json<ReviewResponse>(
       {
         ok: false,
-        error: "The review pipeline failed unexpectedly. Please try again.",
+        error: `The review service failed during ${context.stage}. Reference: ${context.requestId}.`,
         errorCode: "provider_error",
       },
-      { status: 502 },
-    );
-  }
-  if (!pipelineResult.ok) {
-    const { agentId, error } = pipelineResult.error;
-    await markReviewRunFailed(reservation.id, error.code);
-    return NextResponse.json<ReviewResponse>(
       {
-        ok: false,
-        error: `${agentId} failed: ${error.message}`,
-        errorCode: error.code,
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+          "X-Review-Request-Id": context.requestId,
+        },
       },
-      { status: ERROR_STATUS[error.code] ?? 502 },
     );
   }
-
-  const result = {
-    ...pipelineResult.result,
-    reviewId: reservation.id,
-    createdAt: new Date().toISOString(),
-  };
-  try {
-    await markReviewRunCompleted(reservation.id, result);
-  } catch (error) {
-    console.error("Failed to persist review result for run", reservation.id, error);
-  }
-  return NextResponse.json<ReviewResponse>({ ok: true, result });
 }

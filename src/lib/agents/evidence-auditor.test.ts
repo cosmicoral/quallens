@@ -175,4 +175,42 @@ describe("auditEvidence", () => {
     );
     expect(result.result.finalReview).toEqual(strongSynthesisFixture.finalReview);
   });
+
+  it("passes a 10,000+ character manuscript intact through every reviewer", async () => {
+    const provider = new SequenceProvider([
+      broadClaimProfile,
+      broadClaimAudit,
+      underreportedDesignAudit,
+      mentionedTheoryAudit,
+      culturalOverreachAudit,
+      strongSynthesisFixture.finalReview,
+    ]);
+    const tailMarker = "END-OF-LONG-MANUSCRIPT-9284";
+    const manuscript = {
+      ...broadClaimManuscript,
+      body: `${broadClaimManuscript.body}\n${"qualitative evidence ".repeat(650)}\n${tailMarker}`,
+    };
+    const stages: string[] = [];
+
+    const result = await runReviewPipeline(
+      manuscript,
+      provider,
+      (stage) => { stages.push(stage); },
+    );
+
+    expect(manuscript.body.length).toBeGreaterThan(10_000);
+    expect(result.ok).toBe(true);
+    expect(provider.requests).toHaveLength(6);
+    for (const request of provider.requests) {
+      expect(request.prompt).toContain(tailMarker);
+    }
+    expect(stages).toEqual([
+      "manuscript-reader",
+      "evidence-auditor",
+      "research-design-reviewer",
+      "theory-auditor",
+      "overclaim-auditor",
+      "final-reviewer",
+    ]);
+  });
 });

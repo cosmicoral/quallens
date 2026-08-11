@@ -93,9 +93,20 @@ export interface ReviewResult {
   finalAssessment: FinalAssessment;
 }
 
-/** Shape of the POST /api/review response. */
+export type ReviewJobStatus = "pending" | "running" | "completed" | "failed";
+
+export interface ReviewJobView {
+  reviewId: string;
+  status: ReviewJobStatus;
+  stage?: string;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+/** Shape shared by review submission and status responses. */
 export interface ReviewResponse {
   ok: boolean;
+  job?: ReviewJobView;
   result?: ReviewResult;
   error?: string;
   /** Machine-readable error code when an agent fails (e.g. LLM errors). */

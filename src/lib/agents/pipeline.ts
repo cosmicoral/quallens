@@ -30,6 +30,8 @@ export type ReviewPipelineResult =
   | { ok: true; result: ReviewResult }
   | { ok: false; error: PipelineError };
 
+export type ReviewProgressCallback = (stage: AgentId) => void | Promise<void>;
+
 /**
  * Run the full review pipeline.
  *
@@ -43,7 +45,9 @@ export type ReviewPipelineResult =
 export async function runReviewPipeline(
   manuscript: ManuscriptInput,
   provider?: LLMProvider,
+  onProgress?: ReviewProgressCallback,
 ): Promise<ReviewPipelineResult> {
+  await onProgress?.(manuscriptReader.id);
   const readerResult = await readManuscript(manuscript, provider ?? undefined);
   if (!readerResult.ok) {
     return {
@@ -52,6 +56,7 @@ export async function runReviewPipeline(
     };
   }
 
+  await onProgress?.(evidenceAuditor.id);
   const evidenceResult = await auditEvidence(
     manuscript,
     readerResult.review.profile,
@@ -64,6 +69,7 @@ export async function runReviewPipeline(
     };
   }
 
+  await onProgress?.(researchDesignReviewer.id);
   const researchDesignResult = await reviewResearchDesign(
     manuscript,
     readerResult.review.profile,
@@ -79,6 +85,7 @@ export async function runReviewPipeline(
     };
   }
 
+  await onProgress?.(theoryAuditor.id);
   const theoryResult = await auditTheory(
     manuscript,
     readerResult.review.profile,
@@ -91,6 +98,7 @@ export async function runReviewPipeline(
     };
   }
 
+  await onProgress?.(overclaimAuditor.id);
   const overclaimResult = await auditOverclaims(
     manuscript,
     readerResult.review.profile,
@@ -111,6 +119,7 @@ export async function runReviewPipeline(
     theoryResult.review,
     overclaimResult.review,
   ];
+  await onProgress?.(finalReviewer.id);
   const finalResult = await synthesizeFinalReview(
     manuscript,
     readerResult.review.profile,

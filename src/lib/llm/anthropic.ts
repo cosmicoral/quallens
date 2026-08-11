@@ -4,7 +4,16 @@ import { z } from "zod";
 import type { LLMProvider, LLMResult, StructuredRequest } from "./types";
 
 const DEFAULT_MODEL = "claude-opus-5";
-const DEFAULT_MAX_TOKENS = 8000;
+const DEFAULT_MAX_TOKENS = 16000;
+
+type AnthropicEffort = "low" | "medium" | "high" | "xhigh" | "max";
+
+function resolveEffort(): AnthropicEffort {
+  const effort = process.env.LLM_EFFORT?.trim().toLowerCase();
+  return (["low", "medium", "high", "xhigh", "max"] as const).includes(
+    effort as AnthropicEffort,
+  ) ? effort as AnthropicEffort : "medium";
+}
 
 function resolveAnthropicApiKey(): string | undefined {
   const raw = process.env.ANTHROPIC_API_KEY?.trim();
@@ -82,6 +91,7 @@ export class AnthropicProvider implements LLMProvider {
         system: request.system,
         messages: [{ role: "user", content: request.prompt }],
         output_config: {
+          effort: resolveEffort(),
           format: outputFormat,
         },
       });
