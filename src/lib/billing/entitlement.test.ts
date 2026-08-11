@@ -22,17 +22,33 @@ function entitlement(
   completedFreeReviews: number,
   completedPaidReviewsInPeriod: number,
   activeReservations = 0,
+  unlimited = false,
 ) {
   return getUserEntitlement({
     subscription: state,
     completedFreeReviews,
     completedPaidReviewsInPeriod,
     activeReservations,
+    unlimited,
     now,
   });
 }
 
 describe("review entitlements", () => {
+  it("grants unlimited reviews only while no review is already active", () => {
+    expect(entitlement(subscription(), 300, 200, 0, true)).toMatchObject({
+      isUnlimited: true,
+      canReview: true,
+      reason: "available",
+      used: 500,
+    });
+    expect(entitlement(subscription(), 300, 200, 1, true)).toMatchObject({
+      isUnlimited: true,
+      canReview: false,
+      reason: "active_review",
+    });
+  });
+
   it("allows one lifetime free review and blocks the second", () => {
     expect(entitlement(subscription(), 0, 0).canReview).toBe(true);
     expect(entitlement(subscription(), 1, 0)).toMatchObject({

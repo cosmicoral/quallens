@@ -16,6 +16,7 @@ export interface EntitlementInput {
   completedFreeReviews: number;
   completedPaidReviewsInPeriod: number;
   activeReservations: number;
+  unlimited?: boolean;
   now?: Date;
 }
 
@@ -31,6 +32,7 @@ export interface UserEntitlement {
   billingInterval: BillingInterval | null;
   subscriptionStatus: string;
   isPaid: boolean;
+  isUnlimited: boolean;
   limit: number;
   used: number;
   reserved: number;
@@ -66,6 +68,27 @@ export function getUserEntitlement(input: EntitlementInput): UserEntitlement {
   const now = input.now ?? new Date();
   const paid = hasPaidAccess(input.subscription, now);
 
+  if (input.unlimited) {
+    const reserved = input.activeReservations;
+    return {
+      plan: input.subscription.plan,
+      billingInterval: input.subscription.billingInterval,
+      subscriptionStatus: input.subscription.subscriptionStatus,
+      isPaid: paid,
+      isUnlimited: true,
+      limit: 0,
+      used: input.completedFreeReviews + input.completedPaidReviewsInPeriod,
+      reserved,
+      remaining: 0,
+      canReview: reserved === 0,
+      reason: reserved > 0 ? "active_review" : "available",
+      quotaPeriodStart: null,
+      quotaPeriodEnd: null,
+      cancelAtPeriodEnd: input.subscription.cancelAtPeriodEnd,
+      canManageBilling: Boolean(input.subscription.stripeCustomerId),
+    };
+  }
+
   if (paid) {
     const plan = input.subscription.plan;
     const limit = PLAN_CONFIG[plan].monthlyLimit ?? 0;
@@ -78,6 +101,7 @@ export function getUserEntitlement(input: EntitlementInput): UserEntitlement {
       billingInterval: input.subscription.billingInterval,
       subscriptionStatus: input.subscription.subscriptionStatus,
       isPaid: true,
+      isUnlimited: false,
       limit,
       used,
       reserved,
@@ -109,6 +133,7 @@ export function getUserEntitlement(input: EntitlementInput): UserEntitlement {
     billingInterval: null,
     subscriptionStatus: input.subscription.subscriptionStatus,
     isPaid: false,
+    isUnlimited: false,
     limit,
     used,
     reserved,
@@ -128,6 +153,7 @@ export interface UsageView {
   billingInterval: BillingInterval | null;
   subscriptionStatus: string;
   isPaid: boolean;
+  isUnlimited: boolean;
   limit: number;
   used: number;
   reserved: number;
@@ -143,7 +169,7 @@ export interface UsageView {
 export function toUsageView(entitlement: UserEntitlement): UsageView {
   return {
     ...entitlement,
-    planName: PLAN_CONFIG[entitlement.plan].name,
+    planName: entitlement.isUnlimited ? "Owner" : PLAN_CONFIG[entitlement.plan].name,
     quotaPeriodStart: entitlement.quotaPeriodStart?.toISOString() ?? null,
     quotaPeriodEnd: entitlement.quotaPeriodEnd?.toISOString() ?? null,
   };

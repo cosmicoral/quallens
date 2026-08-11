@@ -33,6 +33,10 @@ services:
         generateValue: true
       - key: REVIEW_INPUT_ENCRYPTION_KEY
         generateValue: true
+      - key: UNLIMITED_REVIEW_USER_IDS
+        sync: false
+      - key: UNLIMITED_REVIEW_EMAILS
+        sync: false
       - key: BETTER_AUTH_URL
         value: https://qualisapio.onrender.com
       - key: NEXT_PUBLIC_APP_URL

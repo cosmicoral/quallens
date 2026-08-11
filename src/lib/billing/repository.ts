@@ -14,6 +14,7 @@ import {
 import type { BillingInterval, Plan } from "./config";
 import type { ManuscriptInput, ReviewResult } from "@/lib/types";
 import { decryptManuscript, encryptManuscript } from "@/lib/review/input-crypto";
+import { hasUnlimitedReviewAccess } from "./unlimited-access";
 
 interface SubscriptionRow {
   user_id: string;
@@ -154,7 +155,24 @@ async function getEntitlementWithClient(
 ) {
   const subscription = await getBillingRecordWithClient(client, userId, lock);
   const usage = await countUsage(client, userId, now);
-  return getUserEntitlement({ subscription, ...usage, now });
+  const identityResult = await client.query<{
+    email: string | null;
+    email_verified: boolean;
+  }>(
+    `SELECT "email", "emailVerified" AS "email_verified" FROM "user" WHERE "id" = $1`,
+    [userId],
+  );
+  const identity = identityResult.rows[0];
+  return getUserEntitlement({
+    subscription,
+    ...usage,
+    unlimited: hasUnlimitedReviewAccess({
+      userId,
+      email: identity?.email,
+      emailVerified: identity?.email_verified,
+    }),
+    now,
+  });
 }
 
 export async function getUsageView(userId: string, now = new Date()): Promise<UsageView> {

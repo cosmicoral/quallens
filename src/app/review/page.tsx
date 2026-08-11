@@ -302,7 +302,9 @@ export default function ReviewPage() {
                 <div>
                   <p className="text-sm font-semibold text-[var(--ink)]">{usage.planName} peer-review allowance</p>
                   <p className="mt-1 text-xs text-[var(--muted)]">
-                    {usage.remaining} remaining · {usage.used} of {usage.limit} successful reviews used
+                    {usage.isUnlimited
+                      ? `Unlimited reviews · ${usage.used} successful reviews completed`
+                      : `${usage.remaining} remaining · ${usage.used} of ${usage.limit} successful reviews used`}
                     {usage.reserved > 0 ? " · one review in progress" : ""}
                   </p>
                 </div>
