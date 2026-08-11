@@ -58,6 +58,31 @@ function isStripeResourceMissing(error: unknown): boolean {
   );
 }
 
+async function createStripeCustomer(
+  user: CheckoutUser,
+  dependencies: CheckoutDependencies,
+  options: { replaceExisting: boolean },
+) {
+  const customer = await dependencies.stripe.customers.create(
+    {
+      name: user.name,
+      ...(isInternalOrcidEmail(user.email) ? {} : { email: user.email }),
+      metadata: { qualLensUserId: user.id },
+    },
+    {
+      idempotencyKey: options.replaceExisting
+        ? `quallens-customer-replace-${user.id}`
+        : `quallens-customer-${user.id}`,
+    },
+  );
+  if (options.replaceExisting) {
+    await dependencies.replaceStripeCustomerId(user.id, customer.id);
+  } else {
+    await dependencies.setStripeCustomerId(user.id, customer.id);
+  }
+  return customer.id;
+}
+
 async function getOrCreateCustomer(
   user: CheckoutUser,
   record: BillingRecord,
@@ -69,23 +94,22 @@ async function getOrCreateCustomer(
       return record.stripeCustomerId;
     } catch (error) {
       if (!isStripeResourceMissing(error)) throw error;
+      return createStripeCustomer(user, dependencies, { replaceExisting: true });
     }
   }
 
-  const customer = await dependencies.stripe.customers.create(
-    {
-      name: user.name,
-      ...(isInternalOrcidEmail(user.email) ? {} : { email: user.email }),
-      metadata: { qualLensUserId: user.id },
-    },
-    { idempotencyKey: `quallens-customer-${user.id}` },
-  );
-  if (record.stripeCustomerId) {
-    await dependencies.replaceStripeCustomerId(user.id, customer.id);
-  } else {
-    await dependencies.setStripeCustomerId(user.id, customer.id);
-  }
-  return customer.id;
+  return createStripeCustomer(user, dependencies, { replaceExisting: false });
+}
+
+async function listCustomerSubscriptions(
+  customerId: string,
+  dependencies: CheckoutDependencies,
+) {
+  return dependencies.stripe.subscriptions.list({
+    customer: customerId,
+    status: "all",
+    limit: 10,
+  });
 }
 
 export async function createCheckoutSession(
@@ -109,12 +133,15 @@ export async function createCheckoutSession(
     );
   }
 
-  const customerId = await getOrCreateCustomer(user, record, dependencies);
-  const subscriptions = await dependencies.stripe.subscriptions.list({
-    customer: customerId,
-    status: "all",
-    limit: 10,
-  });
+  let customerId = await getOrCreateCustomer(user, record, dependencies);
+  let subscriptions;
+  try {
+    subscriptions = await listCustomerSubscriptions(customerId, dependencies);
+  } catch (error) {
+    if (!isStripeResourceMissing(error)) throw error;
+    customerId = await createStripeCustomer(user, dependencies, { replaceExisting: true });
+    subscriptions = await listCustomerSubscriptions(customerId, dependencies);
+  }
   if (subscriptions.data.some((item) => DUPLICATE_BLOCKING_STATUSES.has(item.status))) {
     throw new BillingError(
       "subscription_exists",
