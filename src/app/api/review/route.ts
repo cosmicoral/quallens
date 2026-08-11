@@ -87,8 +87,12 @@ export async function POST(request: Request) {
   let pipelineResult;
   try {
     await markReviewRunRunning(reservation.id);
+    console.info(
+      `[api/review] starting run ${reservation.id} title=${JSON.stringify(manuscript.title.slice(0, 80))} bodyChars=${manuscript.body.length}`,
+    );
     pipelineResult = await runReviewPipeline(manuscript);
-  } catch {
+  } catch (error) {
+    console.error(`[api/review] unexpected pipeline failure for ${reservation.id}`, error);
     try {
       await markReviewRunFailed(reservation.id, "unexpected_pipeline_error");
     } catch {

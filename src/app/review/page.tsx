@@ -48,7 +48,19 @@ export default function ReviewPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(manuscript),
       });
-      const data: ReviewResponse = await res.json();
+      const raw = await res.text();
+      let data: ReviewResponse;
+      try {
+        data = JSON.parse(raw) as ReviewResponse;
+      } catch {
+        setError(
+          res.status >= 500
+            ? `The review service timed out or crashed (HTTP ${res.status}). Try a shorter manuscript, or check Render logs for Anthropic errors.`
+            : `The review service returned an unreadable response (HTTP ${res.status}). Please try again.`,
+        );
+        setErrorCode("provider_error");
+        return;
+      }
       if (!data.ok || !data.result) {
         setError(data.error ?? "The review failed. Please try again.");
         setErrorCode(data.errorCode ?? null);
@@ -56,7 +68,9 @@ export default function ReviewPage() {
         setResult(data.result);
       }
     } catch {
-      setError("Could not reach the review service. Please try again.");
+      setError(
+        "Could not reach the review service. The request may have timed out — six AI reviewers can take several minutes. Try a shorter manuscript and keep this tab open.",
+      );
     } finally {
       setSubmitting(false);
       void loadUsage().then((value) => { if (value) setUsage(value); }).catch(() => {});
