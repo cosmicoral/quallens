@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { STUDIO, StudioProductBadge } from "@/components/StudioAttribution";
 import { AiDifferentiator } from "@/components/landing/AiDifferentiator";
 import { BenefitsSection } from "@/components/landing/BenefitsSection";
 import { ComingSoonRevisionSection } from "@/components/landing/ComingSoonRevisionSection";
@@ -17,6 +18,8 @@ export default function Home() {
       <main>
         <section className="section-shell grid gap-12 py-12 sm:py-16 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-14 lg:py-20">
           <div className="max-w-xl">
+            <StudioProductBadge />
+
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[var(--blue-soft)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--blue-deep)] shadow-sm">
               <span className="size-1.5 rounded-full bg-[var(--blue)]" />
               AI multi-agent peer review
@@ -95,7 +98,16 @@ export default function Home() {
                   Six AI reviewers. One structured peer-review report.
                 </p>
                 <p className="mt-1 text-sm text-slate-200">
-                  Built for authors and peer reviewers in qualitative social science.
+                  A{" "}
+                  <a
+                    href={STUDIO.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-white underline decoration-white/35 underline-offset-2 transition hover:decoration-white"
+                  >
+                    {STUDIO.name}
+                  </a>{" "}
+                  product for authors and peer reviewers in qualitative social science.
                 </p>
               </div>
             </div>
