@@ -200,7 +200,9 @@ export async function reserveReviewRun(
            "input_payload" = NULL, "progress_stage" = 'failed',
            "completed_at" = $2, "updated_at" = $2
        WHERE "user_id" = $1 AND "status" IN ('pending', 'running')
-         AND "updated_at" < $2 - INTERVAL '2 hours'`,
+         -- The cast is required: PostgreSQL otherwise resolves the unknown
+         -- parameter in the timestamp subtraction as an interval, not a timestamp.
+         AND "updated_at" < $2::timestamptz - INTERVAL '2 hours'`,
       [userId, now],
     );
 
