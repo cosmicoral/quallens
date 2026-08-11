@@ -52,6 +52,19 @@ const PRICE_ENV_KEYS = {
 
 type BillingEnvironment = Record<string, string | undefined>;
 
+/** Strip surrounding quotes Render users sometimes paste into env values. */
+export function normalizeEnvValue(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"'))
+    || (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim() || undefined;
+  }
+  return trimmed;
+}
+
 export const REQUIRED_BILLING_ENV_KEYS = [
   "STRIPE_SECRET_KEY",
   "STRIPE_PRICE_PLUS_MONTHLY",
@@ -63,7 +76,7 @@ export const REQUIRED_BILLING_ENV_KEYS = [
 export function getMissingBillingEnvKeys(
   environment: BillingEnvironment = process.env,
 ): string[] {
-  return REQUIRED_BILLING_ENV_KEYS.filter((key) => !environment[key]?.trim());
+  return REQUIRED_BILLING_ENV_KEYS.filter((key) => !normalizeEnvValue(environment[key]));
 }
 
 export function getApprovedPriceId(
@@ -71,7 +84,7 @@ export function getApprovedPriceId(
   environment: BillingEnvironment = process.env,
 ): string {
   const key = PRICE_ENV_KEYS[selection.plan][selection.interval];
-  const priceId = environment[key]?.trim();
+  const priceId = normalizeEnvValue(environment[key]);
   if (!priceId) {
     throw new BillingError(
       "billing_not_configured",
@@ -88,7 +101,7 @@ export function getPlanForPriceId(
   for (const plan of ["plus", "pro"] as const) {
     for (const interval of ["monthly", "annual"] as const) {
       const key = PRICE_ENV_KEYS[plan][interval];
-      if (environment[key]?.trim() === priceId) return { plan, interval };
+      if (normalizeEnvValue(environment[key]) === priceId) return { plan, interval };
     }
   }
   return null;

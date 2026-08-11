@@ -4,6 +4,7 @@ import {
   getApprovedPriceId,
   getMissingBillingEnvKeys,
   getPlanForPriceId,
+  normalizeEnvValue,
 } from "./config";
 import { BillingError } from "./errors";
 
@@ -54,5 +55,21 @@ describe("approved Stripe price mapping", () => {
 
   it("throws billing_not_configured when a price env var is missing", () => {
     expect(() => getApprovedPriceId({ plan: "plus", interval: "monthly" }, {})).toThrow(BillingError);
+  });
+
+  it("strips surrounding quotes from env values", () => {
+    expect(normalizeEnvValue('"price_quoted"')).toBe("price_quoted");
+    expect(
+      getApprovedPriceId(
+        { plan: "plus", interval: "monthly" },
+        { STRIPE_PRICE_PLUS_MONTHLY: '"price_plus_monthly"' },
+      ),
+    ).toBe("price_plus_monthly");
+    expect(getMissingBillingEnvKeys({ STRIPE_SECRET_KEY: '"sk_test_example"' })).toEqual([
+      "STRIPE_PRICE_PLUS_MONTHLY",
+      "STRIPE_PRICE_PLUS_ANNUAL",
+      "STRIPE_PRICE_PRO_MONTHLY",
+      "STRIPE_PRICE_PRO_ANNUAL",
+    ]);
   });
 });
