@@ -17,14 +17,16 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: npm ci && npm run migrate && npm run build
+    # --include=dev: Tailwind/PostCSS live in devDependencies but are required at build time.
+    # NODE_ENV must not be "production" during install (see envVars note below).
+    buildCommand: npm ci --include=dev && npm run migrate && npm run build
     startCommand: npm start
     healthCheckPath: /api/auth/ok
     envVars:
       - key: NODE_VERSION
         value: "20"
-      - key: NODE_ENV
-        value: production
+      # Do not set NODE_ENV=production here — it makes npm ci skip devDependencies during build.
+      # Render sets NODE_ENV=production automatically at runtime for web services.
       - key: BETTER_AUTH_SECRET
         generateValue: true
       - key: BETTER_AUTH_URL
