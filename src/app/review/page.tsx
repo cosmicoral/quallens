@@ -423,7 +423,12 @@ export default function ReviewPage() {
                   <ResearchIcon name="synthesize" className="size-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold">Final synthesis</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold">Final synthesis</p>
+                    <span className="rounded-full bg-sky-400/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-sky-200">
+                      Active
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs leading-5 text-slate-400">
                     Delivers a peer-review report with prioritized revisions.
                   </p>
