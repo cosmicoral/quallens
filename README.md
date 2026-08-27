@@ -5,6 +5,8 @@ You submit a manuscript; a panel of specialist reviewer agents each examines it
 from a different angle, and a final reviewer synthesizes their assessments into
 a revision-readiness judgment with prioritized recommendations.
 
+Demo Video: https://www.youtube.com/watch?v=bydAizlv5cw 
+
 The system combines specialized review perspectives for manuscript understanding,
 evidence support, research design, theory use, overclaim detection, and final synthesis.
 
